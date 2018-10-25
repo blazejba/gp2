@@ -1,11 +1,13 @@
-from random import randint
+from random import randint, random
 import subprocess
 
 
 class Island(object):
     def __init__(self, config, genome_size):
-        self.EVALUATION_FUNCTION = "eval/src/" + config['eval'] + ".py"
+        self.EVALUATION_FUNCTION = 'eval/src/' + config['eval'] + '.py'
         self.POPULATION_SIZE = int(config['size'])
+        self.NUM_OF_BREEDERS = int(config['breeders'])
+        self.CROSSOVER_POINTS = int(config['crossover_points'])
         self.GENOME_SIZE = int(genome_size['genome_size'])
         self.individuals = self.initiate_individuals()
         self.processes = []
@@ -37,3 +39,31 @@ class Island(object):
                     best_individual = index
             self.individuals.append(tmp_individuals[best_individual])
             tmp_individuals.remove(tmp_individuals[best_individual])
+
+    def evolve(self):
+        # Fitness proportionate selection
+        breeders = []
+        for _ in range(self.NUM_OF_BREEDERS):
+            nf = self.normalize_fitness()
+            anf = self.accumulated_normalized_fitness(nf)
+            R = random()
+            for order, fitness in enumerate(anf):
+                if fitness >= R:
+                    breeders.append(self.individuals[order][1])
+                    del self.individuals[order]
+
+    def crossover(self, genome1, genome2):
+        new_genome = []
+
+        return new_genome
+
+    def accumulated_normalized_fitness(self, normalized_fitness):
+        anf = [normalized_fitness[0]]
+        return [anf.append(normalized_fitness[index-1] + normalized_fitness[index]) for index in range(1, len(anf)-1)]
+
+    def normalize_fitness(self):
+        fitness_sum = 0
+        for individual in self.individuals:
+            fitness_sum += individual[0]
+        nf = []
+        return [nf.append(individual[0]/fitnessSum) for individual in self.individuals]
