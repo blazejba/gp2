@@ -1,0 +1,3 @@
+<experiment genome_size="16">
+    <island  size="10" eval="one_max"/>
+</experiment>

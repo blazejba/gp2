@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<data>
+    <function name="one_max">
+        <input format="string" length="fixed" repair="false" />
+    </function>
+
+    <function name="something">
+        <input format="tree" length="floating" repair="false" />
+    </function>
+</data>
