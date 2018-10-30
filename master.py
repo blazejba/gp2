@@ -18,6 +18,7 @@ def main():
     exp_xml_tree = ET.parse(PATH_EXPERIMENT_CONFIG)
     exp_xml_root = exp_xml_tree.getroot()
     max_fitness = int(exp_xml_root.attrib['max_fitness'])
+    print('max fitness', max_fitness)
     islands = []
 
     # INIT islands FROM experiment file
@@ -38,11 +39,8 @@ def main():
             # IF unfinished processes exist CHECK them
             if len(island.processes) > 0:
                 for process in island.processes:
-                    status = process.poll()
-                    if status == 1:
-                        stdout = process.communicate()[0]
-                        stdout = stdout.decode('ascii')
-                        [index, fitness] = [x.strip() for x in stdout.split(',')]
+                    if process.poll():
+                        [index, fitness] = decode_stdout(process.communicate()[0])
                         island.individuals[int(index)][0] = int(fitness)
                         island.processes.remove(process)
             # IF NOT unfinished processes exist EVOLVE and CREATE open processes
@@ -54,9 +52,16 @@ def main():
 
 def termination_check(max_fitness, islands):
     for island in islands:
+        print("individuals", island.individuals[0][0])
         if island.individuals[0][0] == max_fitness:
             print_all(islands)
             sys.exit()
+
+
+def decode_stdout(stdout):
+    stdout = stdout.decode('ascii')
+    index, fitness = [x for x in stdout.split(',')]
+    return index, fitness
 
 
 def print_all(islands):
