@@ -11,7 +11,9 @@ class Island(object):
         self.GENOME_SIZE = int(genome_size['genome_size'])
         self.MUTATION_RATE = int(config['mutation_rate'])
         self.individuals = self.initiate_individuals()
+        self.crossover_points = self.find_crossover_points()
         self.processes = []
+        self.generation = 0
 
     def initiate_individuals(self):
         individuals = []
@@ -43,30 +45,25 @@ class Island(object):
 
     def evolve(self):
         breeders = self.select_breeders()
-        self.individuals = []
-        for _ in range(self.POPULATION_SIZE):
+        del self.individuals[self.BREEDERS_NUM:self.POPULATION_SIZE - 1]
+        print(self.individuals, len(self.individuals))
+        for _ in range(2, self.POPULATION_SIZE):
             individual = [0, self.mutate(self.crossover(breeders))]
             self.individuals.append(individual)
+        self.generation += 1
 
     def mutate(self, genome):
-        # Randomly decide which genes will be mutated based on mutation rate
-        genes_to_mutate = []
-        while self.whats_mutation_rate(genes_to_mutate) < self.MUTATION_RATE:
-            gene = randint(0, self.GENOME_SIZE - 1)
-            if gene not in genes_to_mutate:
-                genes_to_mutate.append(gene)
-
-        # Mutate selected genes
-        print("how many genes are mutated", len(genes_to_mutate))
-        for index in range(len(genes_to_mutate)):
-            genome[genes_to_mutate[index]] = 1 if genome[genes_to_mutate[index]] == 0 else 0
-
+        for index, gene in enumerate(genome):
+            R = random()
+            if R*100 < self.MUTATION_RATE:
+                genome[index] = 1 if gene == 0 else 0
         return genome
 
     def whats_mutation_rate(self, list):
-        return (len(list)/self.GENOME_SIZE)*100
+        return (len(list)/self.GENOME_SIZE)*100  # [percent]
 
     def select_breeders(self):
+        # Truncation selection
         # Fitness proportionate selection
         breeders = []
         for _ in range(self.BREEDERS_NUM):
@@ -75,24 +72,27 @@ class Island(object):
             R = random()
             for order, fitness in enumerate(anf):
                 if fitness >= R:
-                    breeders.append(self.individuals[order][1])
+                    breeders.append(self.individuals[order])
                     del self.individuals[order]
                     break
         return breeders
 
-    def crossover(self, genomes):
+    def crossover(self, breeders):
+        # Proportionate selection
+        genomes = [breeder[1] for breeder in breeders]
         new_genome = []
-        P = int(self.GENOME_SIZE/(self.CROSSOVER_POINTS_NUM + 1))
+        for section in range(self.CROSSOVER_POINTS_NUM + 1):
+            choice = randint(0, 1)
+            new_genome += genomes[choice][self.crossover_points[section]:self.crossover_points[section+1]]
+        return new_genome
+
+    def find_crossover_points(self):
         crossover_points = []
+        P = int(self.GENOME_SIZE/(self.CROSSOVER_POINTS_NUM + 1))
         for number in range(self.CROSSOVER_POINTS_NUM + 1):
             crossover_points.append(number * P)
         crossover_points.append(self.GENOME_SIZE)
-        while new_genome == genomes[0] or new_genome == genomes[1] or len(new_genome) == 0:
-            new_genome = []
-            for section in range(self.CROSSOVER_POINTS_NUM + 1):
-                choice = randint(0, 1)
-                new_genome += genomes[choice][crossover_points[section]:crossover_points[section+1]]
-        return new_genome
+        return crossover_points
 
     def accumulated_normalized_fitness(self, normd_fitness):
         anf = [normd_fitness[0]]

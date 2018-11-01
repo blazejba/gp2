@@ -7,9 +7,11 @@ __status__ = "Prototype"
 
 
 import sys
+import time
 from src.Island import Island
 import xml.etree.ElementTree as ET
 
+start_t = time.time()
 PATH_EVALUATION_CONFIG = 'eval/config.xml'
 PATH_EXPERIMENT_CONFIG = 'exp/' + sys.argv[1] + '.xml'
 
@@ -18,7 +20,6 @@ def main():
     exp_xml_tree = ET.parse(PATH_EXPERIMENT_CONFIG)
     exp_xml_root = exp_xml_tree.getroot()
     max_fitness = int(exp_xml_root.attrib['max_fitness'])
-    print('max fitness', max_fitness)
     islands = []
 
     # INIT islands FROM experiment file
@@ -35,27 +36,30 @@ def main():
 
     while 1:
         for island in islands:
-            island.sort_individuals()
             # IF unfinished processes exist CHECK them
             if len(island.processes) > 0:
                 for process in island.processes:
                     if process.poll():
-                        [index, fitness] = decode_stdout(process.communicate()[0])
+                        index, fitness = decode_stdout(process.communicate()[0])
                         island.individuals[int(index)][0] = int(fitness)
                         island.processes.remove(process)
             # IF NOT unfinished processes exist EVOLVE and CREATE open processes
             else:
+                island.sort_individuals()
+                termination_check(max_fitness, islands)
                 island.evolve()
                 island.open_processes()
-        termination_check(max_fitness, islands)
 
 
 def termination_check(max_fitness, islands):
     for island in islands:
-        print("individuals", island.individuals[0][0])
         if island.individuals[0][0] == max_fitness:
-            print_all(islands)
-            sys.exit()
+            end_t = time.time()
+            print("\n")
+            print(end_t - start_t, "[seconds]")
+            print(island.individuals)
+            print(island.generation)
+            sys.exit("Solution found.")
 
 
 def decode_stdout(stdout):
