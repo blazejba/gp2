@@ -12,9 +12,11 @@ The master file of the GP algorithm.
 **eval/**  
 Fitness evaluation functions. Each function requires an input/out definition in *eval/config.xml*.     
 **src/**  
-Class definitions and other custom-made programs imported in *master.py*. 
+Class definitions and other custom-made programs imported in *master.py*.  
 **exp/**  
 XML files with the available experiments.
+
+## Experiment configuration file  
 
 **exp/<experiment_name>.xml** 
 *  **experiment**   
