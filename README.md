@@ -14,9 +14,9 @@ Fitness evaluation functions. Each function requires an input/out definition in 
 **src/**  
 Class definitions and other custom-made programs imported in *master.py*.  
 **exp/**  
-XML files with the available experiments.
+XML files with the available experiments.  
 **exp/logs**  
-Folder contains logs from the performed experiments organized by the date.
+Folder contains logs from the performed experiments organized by the date.  
 
 ## Experiment configuration file  
 
