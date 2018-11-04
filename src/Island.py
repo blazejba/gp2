@@ -6,9 +6,12 @@ class Island(object):
     def __init__(self, config, genome_size):
         self.EVALUATION_FUNCTION = 'eval/src/' + config['eval'] + '.py'
         self.POPULATION_SIZE = int(config['size'])
-        self.BREEDERS_NUM = int(config['breeders'])
         self.CROSSOVER_POINTS_NUM = int(config['crossover_points'])
         self.GENOME_SIZE = int(genome_size['genome_size'])
+        self.NUM_OF_PARENTS = int(config['parents'])
+        self.GA_TYPE = config['ga_type']
+        if self.GA_TYPE == "ELITE":
+            self.NUM_OF_ELITES = int(config['elites'])
         self.MUTATION_RATE = int(config['mutation_rate'])
         self.individuals = self.initiate_individuals()
         self.crossover_points = self.find_crossover_points()
@@ -16,14 +19,7 @@ class Island(object):
         self.generation = 0
 
     def initiate_individuals(self):
-        individuals = []
-        for _ in range(self.POPULATION_SIZE):
-            # [fitness, genome[], evaluated]
-            individual = [0, [], False]
-            for _ in range(self.GENOME_SIZE):
-                individual[1].append(randint(0, 1))
-            individuals.append(individual)
-        return individuals
+        return [[0, [randint(0, 1) for _ in range(self.GENOME_SIZE)], False] for _ in range(self.POPULATION_SIZE)]
 
     def open_processes(self):
         for index, individual in enumerate(self.individuals):
@@ -46,16 +42,44 @@ class Island(object):
             self.individuals.append(tmp_individuals[best_individual])
             tmp_individuals.remove(tmp_individuals[best_individual])
 
+    def select_propotionally(self, list):
+        R = random()
+        anl = self.accumulate_normalized_list(self.normalize_list(list))
+        for index, entry in enumerate(anl):
+            if entry >= R:
+                return index
+
+    def accumulate_normalized_list(self, normalized_list):
+        anl = [normalized_list[0]]
+        if len(normalized_list) >= 2:
+            for index in range(1, len(normalized_list)):
+                anl.append(anl[index - 1] + normalized_list[index])
+        return anl
+
+    def normalize_list(self, list):
+        sum = 0
+        for entry in list:
+            sum += entry
+        return [entry / sum for entry in list] if sum != 0 else [1] * len(list)
+
     def evolve(self):
-        breeders = self.select_breeders()
-
-        # Elitism
-        del self.individuals[self.BREEDERS_NUM:self.POPULATION_SIZE]
-
-        for _ in range(2, self.POPULATION_SIZE):
-            individual = [0, self.mutate(self.crossover(breeders)), False]
-            self.individuals.append(individual)
+        new_generation = self.replace()
+        for _ in range(len(new_generation), self.POPULATION_SIZE):
+            parents = self.select()
+            new_generation.append(self.reproduce(parents))
+        self.individuals = new_generation
         self.generation += 1
+
+    def replace(self):
+        if self.GA_TYPE == 'ELITE':
+            return [self.individuals[index] for index in range(self.NUM_OF_ELITES)]
+
+    def select(self):
+        fitness_list = [individual[0] for individual in self.individuals]
+        return [self.individuals[self.select_propotionally(fitness_list)][1] for _ in range(self.NUM_OF_PARENTS)]
+
+    def reproduce(self, parents):
+        return [0, self.mutate(self.crossover(parents)), False]
 
     def mutate(self, genome):
         for index, gene in enumerate(genome):
@@ -67,28 +91,10 @@ class Island(object):
     def whats_mutation_rate(self, list):
         return (len(list)/self.GENOME_SIZE)*100  # [percent]
 
-    def select_breeders(self):
-        # Truncation selection
-        # Fitness proportionate selection
-        breeders = []
-        individuals_copy = self.individuals.copy()
-        for _ in range(self.BREEDERS_NUM):
-            nf = self.normalize_fitness(individuals_copy)
-            anf = self.accumulated_normalized_fitness(nf)
-            R = random()
-            for order, fitness in enumerate(anf):
-                if fitness >= R:
-                    breeders.append(individuals_copy[order])
-                    del individuals_copy[order]
-                    break
-        return breeders
-
-    def crossover(self, breeders):
-        # Proportionate selection
-        genomes = [breeder[1] for breeder in breeders]
+    def crossover(self, genomes):
         new_genome = []
         for section in range(self.CROSSOVER_POINTS_NUM + 1):
-            choice = randint(0, 1)
+            choice = randint(0, self.NUM_OF_PARENTS - 1)
             new_genome += genomes[choice][self.crossover_points[section]:self.crossover_points[section+1]]
         return new_genome
 
@@ -100,17 +106,4 @@ class Island(object):
         crossover_points.append(self.GENOME_SIZE)
         return crossover_points
 
-    def accumulated_normalized_fitness(self, normd_fitness):
-        anf = [normd_fitness[0]]
-        if len(normd_fitness) >= 2:
-            for index in range(1, len(normd_fitness)):
-                anf.append(anf[index - 1] + normd_fitness[index])
-        return anf
-
-    def normalize_fitness(self, individuals):
-        fitness_sum = 0
-        for individual in individuals:
-            fitness_sum += individual[0]
-        return [individual[0]/fitness_sum for individual in individuals] if fitness_sum != 0 \
-            else [1] * self.POPULATION_SIZE
 #

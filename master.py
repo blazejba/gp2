@@ -50,14 +50,14 @@ def main():
             # IF NOT unfinished processes exist EVOLVE and CREATE open processes
             else:
                 island.sort_individuals()
-                logfile.write(str(island.individuals[0]) + ',' + str(island.individuals[1]) + ','+ str(island.generation) + '\n')
+                logfile.write(str(island.individuals[0]) + ',' + str(island.individuals[1]) + ',' +
+                              str(island.generation) + '\n')
                 if termination_check(max_fitness, island):
                     end_t = time.time()
                     print("\n")
                     print(island.generation, 'generation')
                     print(end_t - start_t, 'computation time [seconds]')
                     print(island.individuals)
-                    print(island.generation)
                     sys.exit("Solution found.")
                 island.evolve()
                 island.open_processes()
