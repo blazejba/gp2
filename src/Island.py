@@ -18,7 +18,8 @@ class Island(object):
     def initiate_individuals(self):
         individuals = []
         for _ in range(self.POPULATION_SIZE):
-            individual = [0, []]
+            # [fitness, genome[], evaluated]
+            individual = [0, [], False]
             for _ in range(self.GENOME_SIZE):
                 individual[1].append(randint(0, 1))
             individuals.append(individual)
@@ -26,6 +27,8 @@ class Island(object):
 
     def open_processes(self):
         for index, individual in enumerate(self.individuals):
+            if individual[2]:
+                continue
             genome = ''.join(str(gene) for gene in individual[1])
             self.processes.append(subprocess.Popen(["python3", self.EVALUATION_FUNCTION, genome, str(index)],
                                                    stdout=subprocess.PIPE))
@@ -45,10 +48,12 @@ class Island(object):
 
     def evolve(self):
         breeders = self.select_breeders()
-        del self.individuals[self.BREEDERS_NUM:self.POPULATION_SIZE - 1]
-        print(self.individuals, len(self.individuals))
+
+        # Elitism
+        del self.individuals[self.BREEDERS_NUM:self.POPULATION_SIZE]
+
         for _ in range(2, self.POPULATION_SIZE):
-            individual = [0, self.mutate(self.crossover(breeders))]
+            individual = [0, self.mutate(self.crossover(breeders)), False]
             self.individuals.append(individual)
         self.generation += 1
 
@@ -66,14 +71,15 @@ class Island(object):
         # Truncation selection
         # Fitness proportionate selection
         breeders = []
+        individuals_copy = self.individuals.copy()
         for _ in range(self.BREEDERS_NUM):
-            nf = self.normalize_fitness()
+            nf = self.normalize_fitness(individuals_copy)
             anf = self.accumulated_normalized_fitness(nf)
             R = random()
             for order, fitness in enumerate(anf):
                 if fitness >= R:
-                    breeders.append(self.individuals[order])
-                    del self.individuals[order]
+                    breeders.append(individuals_copy[order])
+                    del individuals_copy[order]
                     break
         return breeders
 
@@ -96,15 +102,15 @@ class Island(object):
 
     def accumulated_normalized_fitness(self, normd_fitness):
         anf = [normd_fitness[0]]
-        if len(normd_fitness) > 2:
+        if len(normd_fitness) >= 2:
             for index in range(1, len(normd_fitness)):
                 anf.append(anf[index - 1] + normd_fitness[index])
         return anf
 
-    def normalize_fitness(self):
+    def normalize_fitness(self, individuals):
         fitness_sum = 0
-        for individual in self.individuals:
+        for individual in individuals:
             fitness_sum += individual[0]
-        return [individual[0]/fitness_sum for individual in self.individuals] if fitness_sum != 0 \
+        return [individual[0]/fitness_sum for individual in individuals] if fitness_sum != 0 \
             else [1] * self.POPULATION_SIZE
 #

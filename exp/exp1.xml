@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <experiment genome_size="16" max_fitness="16">
 
-    <island  size="10" eval="one_max" breeders="2" crossover_points="5" mutation_rate="5" />
+    <island  size="5" eval="one_max" breeders="2" crossover_points="5" mutation_rate="5" />
 
 </experiment>
