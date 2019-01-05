@@ -59,5 +59,22 @@ Elitism, a certain number of the fittest individuals is injected to the next gen
     * [**elites**]  
     Number of elities left in each generation. If not defined the default value is 2.
 * SS  
-Stead-state, 
+todo
+    * [**todo**]
 
+## Implementation
+
+For each island defined for an experiment, a list of processes is being kept. Each generation starts with a new population
+which consists of individuals created or passed from the last generation, a proportion of which is based on the rules chosen
+for the island. For instance in Elitism GP (see ga_type/elitism), a number of elites, the fittest of the generation, 
+are injected to the next generation and the rest of the population follows a stead-state based rules of reproduction
+(see ga_type/steady_state). The newly created individuals share genomes with their predecessors with possible mutations
+(see techniques/crossover and techniques/mutation).
+
+## Techniques
+
+**crossover**  
+todo
+
+**mutation**  
+todo 

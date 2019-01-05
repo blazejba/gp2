@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 import sys
 
 genome = sys.argv[1]
@@ -11,5 +12,3 @@ for gene in genome:
 
 sys.stdout.write(individual + ',' + str(fitness))
 sys.exit(1)
-
-

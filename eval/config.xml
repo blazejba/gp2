@@ -1,10 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <data>
     <function name="one_max">
-        <input format="string" length="fixed" repair="false" />
+        <input
+                type="ga"
+                letters="0,1"
+                length="fixed"
+                repair="false"
+        />
     </function>
 
-    <function name="something">
-        <input format="tree" length="floating" repair="false" />
+    <function name="times_plus_2_max">
+        <input
+                type="gp"
+                letters="2,*,+"
+                length="fixed"
+                repair="true"
+        />
     </function>
 </data>

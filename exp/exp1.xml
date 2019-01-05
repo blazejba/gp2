@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<experiment genome_size="16" max_fitness="16" max_time="100">
+<experiment genome_size="16" max_fitness="16" max_time="10">
 
     <island  size="5"
              eval="one_max"

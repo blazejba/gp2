@@ -7,35 +7,22 @@ __status__ = "Prototype"
 
 
 import sys
-import time
 from src.Island import Island
+from src.Experiment import Experiment
 import xml.etree.ElementTree as ET
 
-PATH_EVALUATION_CONFIG = 'eval/config.xml'
-PATH_EXPERIMENT_CONFIG = 'exp/' + sys.argv[1] + '.xml'
+
+EVALUATION_CONFIG_PATH = 'eval/config.xml'
+EXPERIMENT_CONFIG_PATH = 'exp/' + sys.argv[1] + '.xml'
+EXPERIMENT_LOG_PATH = 'exp/logs/' + sys.argv[1]
 
 
 def main():
-    PATH_EXPERIMENT_LOG = 'exp/logs/' + sys.argv[1] + '_' + get_date() + '.log'
-    logfile = open(PATH_EXPERIMENT_LOG, 'w')
-    logfile.write("configs\n")
-    start_t = time.time()
-    exp_xml_tree = ET.parse(PATH_EXPERIMENT_CONFIG)
-    exp_xml_root = exp_xml_tree.getroot()
-    max_fitness = int(exp_xml_root.attrib['max_fitness'])
-    islands = []
+    # Initialize the experiment
+    experiment = Experiment(ET.parse(EXPERIMENT_CONFIG_PATH).getroot(), sys.argv[1])
 
-    # INIT islands FROM experiment file
-    for island in exp_xml_root:
-        islands.append(Island(island.attrib, exp_xml_root.attrib))
-
-    # OPEN processes FOR all islands
-    for island in islands:
-        island.open_processes()
-
-    # CLEAN
-    del exp_xml_root
-    del exp_xml_tree
+    # Create and populate the islands, then start artificial evolution
+    islands = init_islands(experiment, ET.parse(EVALUATION_CONFIG_PATH).getroot())
 
     while 1:
         for island in islands:
@@ -50,22 +37,30 @@ def main():
             # IF NOT unfinished processes exist EVOLVE and CREATE open processes
             else:
                 island.sort_individuals()
-                logfile.write(str(island.individuals[0]) + ',' + str(island.individuals[1]) + ',' +
-                              str(island.generation) + '\n')
-                if termination_check(max_fitness, island):
-                    end_t = time.time()
-                    print("\n")
-                    print(island.generation, 'generation')
-                    print(end_t - start_t, 'computation time [seconds]')
-                    print(island.individuals)
-                    sys.exit("Solution found.")
-                island.evolve()
-                island.open_processes()
+                experiment.update_log(island)
+
+                # Terminate the experiment if time or fitness condition has been reached
+                # Otherwise keep on evolving
+                if experiment.termination_check(island):
+                    print_all(islands)
+                    sys.exit()
+                else:
+                    island.evolve()
+                    island.open_processes()
 
 
-def termination_check(max_fitness, island):
-    if island.individuals[0][0] == max_fitness:
-        return True
+def init_islands(experiment, evaluation_functions):
+    islands = []
+
+    # INIT islands FROM experiment file
+    for island in experiment.island_configs:
+        islands.append(Island(island, experiment.genome_size, evaluation_functions))
+
+    # OPEN processes
+    for island in islands:
+        island.open_processes()
+
+    return islands
 
 
 def decode_stdout(stdout):
@@ -76,13 +71,8 @@ def decode_stdout(stdout):
 
 def print_all(islands):
     for island in islands:
-        print(island + '\n')
-
-
-def get_date():
-    date = time.localtime()
-    return str(date.tm_year) + str(date.tm_mon) + str(date.tm_mday) + \
-           '_' + str(date.tm_hour) + str(date.tm_min) + str(date.tm_sec)
+        for individual in island.individuals:
+            print(individual)
 
 
 if __name__ == '__main__':

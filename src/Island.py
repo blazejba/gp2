@@ -3,16 +3,24 @@ import subprocess
 
 
 class Island(object):
-    def __init__(self, config, genome_size):
+    def __init__(self, config, genome_size, evaluation_functions):
+        # Evolution settings
         self.EVALUATION_FUNCTION = 'eval/src/' + config['eval'] + '.py'
         self.POPULATION_SIZE = int(config['size'])
         self.CROSSOVER_POINTS_NUM = int(config['crossover_points'])
-        self.GENOME_SIZE = int(genome_size['genome_size'])
+        self.GENOME_SIZE = genome_size
         self.NUM_OF_PARENTS = int(config['parents'])
         self.GA_TYPE = config['ga_type']
         if self.GA_TYPE == "ELITE":
             self.NUM_OF_ELITES = int(config['elites'])
         self.MUTATION_RATE = int(config['mutation_rate'])
+
+        # Evaluation function
+        for f in evaluation_functions:
+            if f.attrib['name'] == config['eval']:
+                print("type" + f[0].attrib['type'])
+
+        # Other
         self.individuals = self.initiate_individuals()
         self.crossover_points = self.find_crossover_points()
         self.processes = []
@@ -42,7 +50,7 @@ class Island(object):
             self.individuals.append(tmp_individuals[best_individual])
             tmp_individuals.remove(tmp_individuals[best_individual])
 
-    def select_propotionally(self, list):
+    def select_proportionally(self, list):
         R = random()
         anl = self.accumulate_normalized_list(self.normalize_list(list))
         for index, entry in enumerate(anl):
@@ -76,7 +84,7 @@ class Island(object):
 
     def select(self):
         fitness_list = [individual[0] for individual in self.individuals]
-        return [self.individuals[self.select_propotionally(fitness_list)][1] for _ in range(self.NUM_OF_PARENTS)]
+        return [self.individuals[self.select_proportionally(fitness_list)][1] for _ in range(self.NUM_OF_PARENTS)]
 
     def reproduce(self, parents):
         return [0, self.mutate(self.crossover(parents)), False]
