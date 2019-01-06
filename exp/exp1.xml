@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <experiment genome_size="16" max_fitness="16" max_time="10">
 
-    <island  size="5"
-             eval="one_max"
+    <island  population_size="5"
+             evaluation_function="one_max"
              crossover_points="5"
              mutation_rate="5"
-             ga_type="ELITE"
+             replacement_strategy="elite"
              elites="2"
              parents="2"
     />

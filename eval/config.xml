@@ -1,20 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<data>
+<evaluation_functions>
+
     <function name="one_max">
-        <input
-                type="ga"
-                letters="0,1"
-                length="fixed"
-                repair="false"
+        <parameters
+                ea_type="ga"
+                dna_letters="0,1"
+                dna_length="fixed"
+                dna_repair="false"
         />
     </function>
 
     <function name="times_plus_2_max">
-        <input
-                type="gp"
-                letters="2,*,+"
-                length="fixed"
-                repair="true"
+        <parameters
+                ea_type="gp"
+                dna_letters="2,*,+"
+                dna_length="fixed"
+                dna_repair="true"
         />
     </function>
-</data>
+
+</evaluation_functions>

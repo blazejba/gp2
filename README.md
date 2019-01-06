@@ -1,11 +1,17 @@
-# General purpose GA/GP
-### python library | parallel computation | island-based
+# GPEC lib
+### General Purpose Evolutionary Computation library
+##### python library | parallel computation | ga/gp supported | island-based | highly customizable
   
 ## Run
   
 **master.py**  
 The master file of the GP algorithm.
 > $ python3 master.py <experiment_name>
+
+## Glossary
+**[EA]** - Evolutionary Algorithm  
+**[GA]** - Genetic Algorithm  
+**[GP]** - Genetic Programming  
   
 ## Filesystem
 
@@ -37,10 +43,10 @@ Given in seconds. Defines a termination condition, has a higher priority than th
 
 #### **Settings for the islands**  
 
-[**size**]  
+[**population_size**]  
 The size of a population  
 
-[**eval**]  
+[**evaluation_function**]  
 Name of fitness evaluation function  
 
 [**parents**]   
@@ -52,7 +58,7 @@ number of points for crossover
 [**mutation_rate**]  
 A chance for a gene to mutate, given in %  
 
-[**ga_type**]  
+[**replacement_strategy**]  
 Defines replacement strategy. Variants: 
 * ELITE   
 Elitism, a certain number of the fittest individuals is injected to the next generation by default.
@@ -61,6 +67,15 @@ Elitism, a certain number of the fittest individuals is injected to the next gen
 * SS  
 todo
     * [**todo**]
+
+## Evaluation functions
+#### Available evaluators
+The list of evaluation functions coming with this library:
+1. **One max** [GA]- The score is proportional to the number of ones in a binary string of a fixed length. 
+2. **Times plus two max** [GP] - The score is a result of multiplying (times) and adding (plus) twos (two) of a fixed length.
+
+#### Adding a new definition of evaluator
+In **eval/** a **config.xml** file is located containing definitions of all the evaluation functions. 
 
 ## Implementation
 
