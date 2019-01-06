@@ -2,18 +2,18 @@
 ### General Purpose Evolutionary Computation library
 ##### python library | parallel computation | ga/gp supported | island-based | highly customizable
   
-## Run
+## 1 Run
   
 **master.py**  
 The master file of the GP algorithm.
 > $ python3 master.py <experiment_name>
 
-## Glossary
+## 2 Glossary
 **[EA]** - Evolutionary Algorithm  
 **[GA]** - Genetic Algorithm  
 **[GP]** - Genetic Programming  
   
-## Filesystem
+## 3 Filesystem
 
 **eval/**  
 Fitness evaluation functions. Each function requires an input/out definition in *eval/config.xml*.     
@@ -24,14 +24,13 @@ XML files with the available experiments.
 **exp/logs/**  
 Folder contains logs from the performed experiments organized by the date.  
 
-## Experiment configuration file  
+## 4 Experiment configuration file  
 
 The experiment file is located in:
 
 > exp/<experiment_name>.xml
 
-#### **Settings for the experiment**
-   
+#### 4.1 Experiment customization
 [**genome_size**]  
 Number of genes in a genome  
 
@@ -41,7 +40,7 @@ Defines a terminator condition. If the maximum fitness for the given evaluation 
 [**max_time**]  
 Given in seconds. Defines a termination condition, has a higher priority than the maximum fitness. 
 
-#### **Settings for the islands**  
+#### 4.2 Island customization  
 
 [**population_size**]  
 The size of a population  
@@ -68,16 +67,16 @@ Elitism, a certain number of the fittest individuals is injected to the next gen
 todo
     * [**todo**]
 
-## Evaluation functions
-#### Available evaluators
+## 5 Evaluation functions
+#### 5.1 Available evaluators
 The list of evaluation functions coming with this library:
 1. **One max** [GA]- The score is proportional to the number of ones in a binary string of a fixed length. 
-2. **Times plus two max** [GP] - The score is a result of multiplying (times) and adding (plus) twos (two) of a fixed length.
+2. **Times plus one max** [GP] - The score is a result of multiplying (times) and adding (plus) ones. 
 
-#### Adding a new definition of evaluator
+#### 5.2 Adding a new definition of evaluator
 In **eval/** a **config.xml** file is located containing definitions of all the evaluation functions. 
 
-## Implementation
+## 6 Implementation
 
 For each island defined for an experiment, a list of processes is being kept. Each generation starts with a new population
 which consists of individuals created or passed from the last generation, a proportion of which is based on the rules chosen
@@ -86,7 +85,7 @@ are injected to the next generation and the rest of the population follows a ste
 (see ga_type/steady_state). The newly created individuals share genomes with their predecessors with possible mutations
 (see techniques/crossover and techniques/mutation).
 
-## Techniques
+## 7 Techniques
 
 **crossover**  
 todo

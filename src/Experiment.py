@@ -19,12 +19,12 @@ class Experiment():
 			self.island_configs.append(island.attrib)
 
 	def termination_check(self, island):
-			if island.individuals[0][0] == self.max_fitness:
+			if island.individuals[0][0] >= self.max_fitness and self.max_fitness != 0:
 				print('Evolution terminated: maximum fitness has been achieved.')
 				print('Generated', island.generation, 'generations in', time.time() - self.start_t, 'seconds.')
 				print('Individuals of the last generation:\n')
 				return True
-			elif self.max_time < time.time() - self.start_t:
+			elif self.max_time < time.time() - self.start_t and self.max_time != 0:
 				print('Evolution terminated: timeout.')
 				print('Generated', island.generation, 'generations in', time.time() - self.start_t, 'seconds.')
 				print('Individuals of the last generation:\n')

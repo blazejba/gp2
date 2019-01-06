@@ -10,10 +10,10 @@
         />
     </function>
 
-    <function name="times_plus_2_max">
+    <function name="times_plus_one_max">
         <parameters
                 ea_type="gp"
-                dna_letters="2,*,+"
+                dna_letters="1,*,+"
                 dna_length="fixed"
                 dna_repair="true"
         />
