@@ -14,6 +14,7 @@ The master file of the GP algorithm.
 **[GP]** - Genetic Programming  
   
 ## 3 Filesystem
+todo overall of the filesystem
 
 **eval/**  
 Fitness evaluation functions. Each function requires an input/out definition in *eval/config.xml*.     

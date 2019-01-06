@@ -11,26 +11,26 @@ class Island(object):
         self.num_of_parents             = int(config['parents'])
         self.mutation_rate              = int(config['mutation_rate'])
         self.replacement_strategy       = config['replacement_strategy']
+        self.genome_size                = genome_size
         if self.replacement_strategy == "elite":
             self.num_of_elites          = int(config['elites'])
-        self.genome_size = genome_size
 
         # Evaluation function
         for f in evaluation_functions:
             if f.attrib['name'] == config['evaluation_function']:
-                self.ga_type = f[0].attrib['ea_type']
-                self.dna_length = f[0].attrib['dna_length']
-                self.dna_repair = f[0].attrib['dna_repair'] == 'true'
-                self.dna_letters = [letter for letter in f[0].attrib['dna_letters'].split(',')]
+                self.ga_type        = f[0].attrib['ea_type']
+                self.dna_length     = f[0].attrib['dna_length']
+                self.dna_repair     = f[0].attrib['dna_repair'] == 'true'
+                self.dna_letters    = [letter for letter in f[0].attrib['dna_letters'].split(',')]
 
         # EA variables
-        self.generation = 0
-        self.individuals = self.initiate_individuals()
-        self.processes = []
-        self.crossover_points = self.find_crossover_points()
+        self.generation         = 0
+        self.individuals        = self.initiate_individuals()
+        self.crossover_points   = self.find_crossover_points()
 
         # Parallel computation variables
         self.processes = []
+        self.open_processes()
 
     def initiate_individuals(self):
         return [[0, [self.dna_letters[randint(0, len(self.dna_letters) - 1)] for _ in range(self.genome_size)], False]
