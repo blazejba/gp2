@@ -13,7 +13,7 @@ class Island(object):
         self.replacement_strategy       = config['replacement_strategy']
         self.genome_size                = genome_size
         if self.replacement_strategy == "elite":
-            self.num_of_elites          = int(config['elites'])
+            self.num_of_elites          = int(config['num_of_elites'])
 
         # Evaluation function
         for f in evaluation_functions:

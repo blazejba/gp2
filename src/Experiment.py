@@ -41,7 +41,6 @@ class Experiment():
 
 			return False
 
-
 	def initialize_log(self):
 		path = 'exp/logs/' + self.experiment_name
 		logfile = open(path + '_' + get_date_in_string() + '.log', 'w')

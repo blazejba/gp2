@@ -6,8 +6,9 @@
              crossover_points="5"
              mutation_rate="5"
              replacement_strategy="elite"
-             elites="2"
+             num_of_elites="2"
              parents="2"
+             dna_repair="false"
     />
 
 </experiment>

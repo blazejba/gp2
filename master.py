@@ -10,16 +10,14 @@ import sys
 import xml.etree.ElementTree as ET
 from src.Experiment import Experiment
 
-EVALUATION_CONFIG_PATH = 'eval/config.xml'
-EXPERIMENT_CONFIG_PATH = 'exp/' + sys.argv[1] + '.xml'
-EXPERIMENT_LOG_PATH = 'exp/logs/' + sys.argv[1]
-
 
 def main():
-    # Initialize the experiment
     experiment_name = sys.argv[1]
-    experiment = Experiment(ET.parse(EXPERIMENT_CONFIG_PATH).getroot(),
-                            ET.parse(EVALUATION_CONFIG_PATH).getroot(),
+    evaluation_xml_path = 'eval/config.xml'
+    experiment_xml_path = 'exp/' + experiment_name + '.xml'
+
+    experiment = Experiment(ET.parse(experiment_xml_path).getroot(),
+                            ET.parse(evaluation_xml_path).getroot(),
                             experiment_name)
 
     while 1:

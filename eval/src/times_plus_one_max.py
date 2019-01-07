@@ -4,7 +4,7 @@
 Score board
 genome_size     fitness
 11              9
-15              16git
+15              16
 '''
 
 import sys
