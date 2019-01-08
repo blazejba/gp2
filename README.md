@@ -11,8 +11,6 @@ and `Blazej`'s thesis supervisor.
 
 ## 1 Run
   
-**master.py**  
-The master file of the GP algorithm.
 > $ python3 master.py <experiment_name>
 
 ## 2 Glossary
@@ -132,18 +130,53 @@ The **eval/config.xml** file contains definitions of all the evaluation function
 </evaluation_functions>
 ```
 
-
 ## 6 Implementation
 Many methods have been implemented to control diversity and extend the coverage of the search space in evolutionary computation.
 
-#### 6.1 The island model
+### 6.1 The island model
 Is an example of a distributed population model. 
 
-#### 6.2 Similarity-based selection
-Together with fitness combine into a score driving the selection and thus the evolution. Applied only 
+##### 6.1.1 Migration
+Different migration strategies
 
+### 6.2 Reproduction policies 
+##### 6.3.1 Mutation
+
+##### 6.3.2 Crossover
+One-point crossover and multi-point crossover
+
+### 6.3 Selection policies
+Todo
+
+##### 6.3.1 Roulette Wheel
+Evolutionary robotics p. 29
+
+##### 6.3.2 Rank based
+Individuals are ranked from the best to the worst. The probability of making offspring is proportional to their rank, 
+not to their fitness value. [Evolutionary robotics p. 30]
+
+##### 6.3.3 Truncation selection
+Ranking the individuals, selecting the top M of them and let them make O copies of their chromosomes, such that M x O = N.
+
+##### 6.3.4 Tournament based
+Good for parallel computation. Probably won't be implemented tho.
+
+##### 6.3.5 Similarity-based
+Todo 
 
 ## 7 Techniques of EC
+- Almost all components of genetic algorithms are stochastic
+- implicit parallelism, schemata 
+    - schemata is major genetic operator because it generates innovation
+    - mutation is a local search operator 
+
+**Self-organization**  
+adaptation process usually involves a large number of evaluations of the interactions between the system and the environment.
+Using self-organization does not require any human supervision. The main advantage of relying on self-organization is
+the fact that designer does not need to find the optimal solution. His efforts are redirected towards an implementation
+of the environment, in this case, the evaluator. 
+Emergence of complex abilities from a process of autonomous interaction between the agent and the environment. 
+
 **types of evolutionary algorithms**  
 Defined by chosen replacement strategy, like steady state, elitism etc
 
@@ -152,3 +185,6 @@ what it is, types
 
 **mutation**  
 what it is, mutation rate
+
+## 8 References
+Evolutionary robotics, Dario Floreano

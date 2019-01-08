@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<experiment genome_size="15" max_fitness="16" max_time="0">
+<experiment chromosome_length="20" max_fitness="0" max_time="15">
 
     <island  population_size="10"
              evaluation_function="times_plus_one_max"
              crossover_points="6"
              mutation_rate="10"
-             replacement_strategy="elite"
+             replacement_policy="elite"
+             selection_policy="roulette_wheel"
              num_of_elites="3"
              parents="3"
              dna_repair="false"
