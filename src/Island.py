@@ -1,6 +1,6 @@
-from os import rename
 from random import randint, random
-from src.utilities import remove_tmp, normalize_vector, accumulate_vector
+from src.utilities import normalize_vector, accumulate_vector
+from src.MigrationPolicy import MigrationPolicy
 import subprocess
 
 
@@ -14,7 +14,7 @@ class Island(object):
         self.mutation_rate              = int(config['mutation_rate'])
         self.replacement_policy         = config['replacement_policy']
         self.selection_policy           = config['selection_policy']
-        self.migration_policy           = config['migration_policy']
+        self.migration_policy           = MigrationPolicy(tmp_dir, name, config['migration_policy'])
         self.chromosome_length          = chromosome_length
         if self.replacement_policy == "elite":
             self.num_of_elites          = int(config['num_of_elites'])
@@ -33,25 +33,8 @@ class Island(object):
         self.crossover_points   = self.find_crossover_points()
 
         # Parallel computation variables
-        self.name = name
-        self.tmp_dir = tmp_dir
-        self.migration_file = ''
         self.processes = []
         self.open_processes()
-
-    def migrate_out(self):
-        remove_tmp(self.migration_file)
-        buffer_path = self.tmp_dir + '/' + str(self.name)
-        self.migration_file = self.tmp_dir + '/' + str(self.name) + '_' + str(self.individuals[0][0])
-        file = open(buffer_path, 'w+t')
-        [file.write(gene) for gene in self.individuals[0][1]]
-        file.close()
-        rename(buffer_path, self.migration_file)
-
-    def migrate_in(self):
-        file = open(self.migration_file, 'r')
-        print(file.readline())
-        file.close()
 
     def initiate_individuals(self):
         return [[0, [self.dna_letters[randint(0, len(self.dna_letters) - 1)] for _ in range(self.chromosome_length)], False]
@@ -95,6 +78,12 @@ class Island(object):
 
     def replace(self):
         if self.replacement_policy == 'elite':
+            if self.migration_policy.in_allowed:
+                self.migration_policy.generations_since_migration += 1
+                if self.migration_policy.generations_since_migration == self.migration_policy.period:
+                    self.migration_policy.generations_since_migration = 0
+                    return [self.individuals[index] for index in range(self.num_of_elites - 1)] + \
+                           [self.migration_policy.migrate_in()]
             return [self.individuals[index] for index in range(self.num_of_elites)]
 
     def select(self):

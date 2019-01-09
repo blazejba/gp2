@@ -6,8 +6,7 @@
 `Blazej Banaszewski`, MSc student of Robotics at University of Southern Denmark 
 
 `John Hallam`, Professor at Mærsk Mc-Kinney Møller Institute, 
-Head of Embodied Systems for Robotics and Learning at University of Southern Denmark,
-and `Blazej`'s thesis supervisor.
+Head of Embodied Systems for Robotics and Learning at University of Southern Denmark, also `Blazej`'s thesis supervisor.
 
 ## 1 Run
   
@@ -59,7 +58,7 @@ The experiment file is located in:
 > exp/<experiment_name>.xml
 
 All parameters with asterisk (*) next to their name are necessary to be specified. The parameters without asterisk
-will be set to defaults if no value has been given. 
+will be set to defaults if no value has been assigned.
 
 #### 4.1 Experiment customization
 [*] **`chromosome_length`**  = Int  
@@ -75,19 +74,23 @@ At least one of the termination conditions has to be true. The time condition ha
 [*] **`population_size*`** = integer  
 The size of a population  
 
-**`evaluator*`** Name of fitness evaluation function  
+**`evaluator*`**  
+Name of fitness evaluation function  
 
-**`parents`**  The algorithm allows multi-parent recombination. The default value is 2 parents.  
+**`parents`**  
+The algorithm allows multi-parent recombination. The default value is 2 parents.  
 
-**`crossover_points`** Number of points for crossover  
+**`crossover_points`**  
+Number of points for crossover  
 
-**`mutation_rate`**  A chance for a gene to mutate, given in %  
+**`mutation_rate`**  
+A chance for a gene to mutate, given in %  
 
-**`replacement_policy`** = [elite/ss],[num_of_elites {if elite}]
+**`replacement_policy`** = [elite/ss],[num_of_elites {if elite}]  
 Defines replacement strategy. Variants: 
-* `elite`
+* `elite`  
 Elitism, a certain number of the fittest individuals is injected to the next generation by default.
-    * `num_of_elites` = Int
+    * `num_of_elites` = Int  
       Number of elites left in each generation. If not defined the default value is 2.
 * `stead-state`
     * todo
@@ -109,7 +112,7 @@ Todo
 * `migration_out` = [true/false] 
 * `migration_in` = [true/false]
 
-**`dna_repair`**
+**`dna_repair`**  
 If chosen, individuals with broken dna (e.g. invalid format for the given problem) will not be discarded. 
 In order to preserve potentially valuable information of the code, such individuals will populate an repair island
 and stay there until their dna has been fixed. Repaired individuals will then migrate to other islands.
@@ -156,7 +159,6 @@ The **eval/config.xml** file contains definitions of all the evaluation function
 ```
 
 ## 6 Implementation
-Many methods have been implemented to control diversity and extend the coverage of the search space in evolutionary computation.  
 ![alt text](documentation/gpec_general_flowchart.png)
 
 ### 6.1 The island model
@@ -165,14 +167,16 @@ Is an example of a distributed population model.
 - Micro grain
 - Fine grain
 
-### 6.2 Replacement policies
+### 6.2 Replacement
+Replacement policies
+
 ##### 6.2.1 Elitism
 todo
 
 ##### 6.2.2 Stead-state
 todo
 
-##### 6.2.3 Migration policies
+##### 6.2.3 Migration
 - Pettey (1987) designed a distributed model based on the polytypic concept of a species being represented
 by several types that are capable of mating and producing viable offspring. Every generation, migration sent
 the best individuals in each population to each neighbour, replacing the worst individuals. 
@@ -184,14 +188,17 @@ in the local population according to a predefined ordering, effectively simulati
 
 - Probabilistic migration
 
-### 6.3 Reproduction policies 
+### 6.3 Reproduction
+Different reproduction methods implemented. TODO
+ 
 ##### 6.3.1 Mutation
+Mutation rate. TODO
 
 ##### 6.3.2 Crossover
-One-point crossover and multi-point crossover
+One-point crossover and multi-point crossover. TODO
 
-### 6.4 Selection policies
-Todo
+### 6.4 Selection
+Different selection policies implemented.
 
 ##### 6.4.1 Roulette Wheel
 Evolutionary robotics p. 29
@@ -209,12 +216,14 @@ Good for parallel computation. Probably won't be implemented tho.
 ##### 6.4.5 Similarity-based
 Todo 
 
-## 7 Techniques of EC
-- Almost all components of genetic algorithms are stochastic
-- implicit parallelism, schemata 
-    - schemata is major genetic operator because it generates innovation
-    - mutation is a local search operator 
+## 7 Results
+#### 7.1 One Max
+todo
 
+#### 7.2 Times Plus One Max
+Todo: deriving a math formula for finding maximum fitness for a tree of any size.
+
+## 8 Techniques of Evolutionary Computation
 **Self-organization**  
 adaptation process usually involves a large number of evaluations of the interactions between the system and the environment.
 Using self-organization does not require any human supervision. The main advantage of relying on self-organization is
@@ -222,14 +231,19 @@ the fact that designer does not need to find the optimal solution. His efforts a
 of the environment, in this case, the evaluator. 
 Emergence of complex abilities from a process of autonomous interaction between the agent and the environment. 
 
-**types of evolutionary algorithms**  
-Defined by chosen replacement strategy, like steady state, elitism etc
+**Schemata**
+- Evolutionary Robotics book
+- Almost all components of genetic algorithms are stochastic
+- implicit parallelism, schemata 
+    - schemata is major genetic operator because it generates innovation
+    - mutation is a local search operator 
 
-**crossover**  
-what it is, types
+**Speedup**
+- Linear speedup
+- Super-linear speedup
 
-**mutation**  
-what it is, mutation rate
+**Common issues related to Evolutionary Computation**
+- Pre-mature convergence
 
-## 8 References
-Evolutionary robotics, Dario Floreano
+## 9 References
+Evolutionary Robotics, Dario Floreano

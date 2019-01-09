@@ -72,12 +72,11 @@ class Experiment():
 							island.processes.remove(process)
 				else:
 					island.sort_individuals()
-					island.migrate_out()
-					island.migrate_in()
+					island.migration_policy.migrate_out(island.individuals[0])
 					self.update_log(island)
 					if self.termination_check(island):
 						for island in self.islands:
-							remove_tmp(island.migration_file)
+							remove_tmp(island.migration_policy.migration_file)
 						os.removedirs(self.tmp_dir)
 						sys.exit()
 					else:
