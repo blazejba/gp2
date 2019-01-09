@@ -58,21 +58,24 @@ The experiment file is located in:
 
 > exp/<experiment_name>.xml
 
+All parameters with asterisk (*) next to their name are necessary to be specified. The parameters without asterisk
+will be set to defaults if no value has been given. 
+
 #### 4.1 Experiment customization
-**`genome_size`** 
-Number of genes in a genome  
+[*] **`chromosome_length`**  = Int  
+Number of letters encoding a chromosome.
 
-**`max_fitness`**
-Defines a terminator condition. If the maximum fitness for the given evaluation function is not known, leave empty.
-
-**`max_time`**
-Given in seconds. Defines a termination condition, has a higher priority than the maximum fitness. 
+[*] **`termination_condition`** = [fitness],[time],[Int {if fitness=true}],[Int {if time=true}]   
+At least one of the termination conditions has to be true. The time condition has a priority over the fitness condition.  
+* `fitness` = [true/false]  
+* `time` = [true/false]
 
 #### 4.2 Island customization  
 
-**`population_size`**  The size of a population  
+[*] **`population_size*`** = integer  
+The size of a population  
 
-**`evaluation_function`**  Name of fitness evaluation function  
+**`evaluator*`** Name of fitness evaluation function  
 
 **`parents`**  The algorithm allows multi-parent recombination. The default value is 2 parents.  
 
@@ -80,11 +83,31 @@ Given in seconds. Defines a termination condition, has a higher priority than th
 
 **`mutation_rate`**  A chance for a gene to mutate, given in %  
 
-**`replacement_strategy`**   Defines replacement strategy. Variants: 
-* `elite ` Elitism, a certain number of the fittest individuals is injected to the next generation by default.
-    * `num_of_elites` Number of elites left in each generation. If not defined the default value is 2.
+**`replacement_policy`** = [elite/ss],[num_of_elites {if elite}]
+Defines replacement strategy. Variants: 
+* `elite`
+Elitism, a certain number of the fittest individuals is injected to the next generation by default.
+    * `num_of_elites` = Int
+      Number of elites left in each generation. If not defined the default value is 2.
 * `stead-state`
     * todo
+    
+**`selection_policy`** = [roulette_wheel/rank/truncation/tournament]
+* `roulette_wheel` 
+* `rank`
+* `truncation`
+* `tournament`
+
+    
+**`migration_policy`** = [out],[in],[periodical/every_generation], [period{if=periodical}]
+* `periodical`  
+Todo
+    * `period`  
+    Todo
+* `every_generation`  
+Todo
+* `migration_out` = [true/false] 
+* `migration_in` = [true/false]
 
 **`dna_repair`**
 If chosen, individuals with broken dna (e.g. invalid format for the given problem) will not be discarded. 
@@ -98,10 +121,12 @@ To determine whether the repair for a given problem is available look at the **`
 #### 5.1 Available evaluators
 **Genetic Algorithms:**
 1. **One max** - The score is proportional to the number of ones in a binary string of a fixed length. 
-2. sth
+2. what else?
 
 **Genetic programming:**
 1. **Times plus one max** - The score is a result of multiplying (times) and adding (plus) ones. 
+2. **Beam structure in COMSOL** - The strength of a beam of given length and volume is evaluated in COMSOL Multiphysics
+simulation tool.  **TODO**
 
 #### 5.2 Adding a new definition of evaluator
 The **eval/config.xml** file contains definitions of all the evaluation functions. 
@@ -131,37 +156,57 @@ The **eval/config.xml** file contains definitions of all the evaluation function
 ```
 
 ## 6 Implementation
-Many methods have been implemented to control diversity and extend the coverage of the search space in evolutionary computation.
+Many methods have been implemented to control diversity and extend the coverage of the search space in evolutionary computation.  
+![alt text](documentation/gpec_general_flowchart.png)
 
 ### 6.1 The island model
 Is an example of a distributed population model. 
+- Coarse grain 
+- Micro grain
+- Fine grain
 
-##### 6.1.1 Migration
-Different migration strategies
+### 6.2 Replacement policies
+##### 6.2.1 Elitism
+todo
 
-### 6.2 Reproduction policies 
+##### 6.2.2 Stead-state
+todo
+
+##### 6.2.3 Migration policies
+- Pettey (1987) designed a distributed model based on the polytypic concept of a species being represented
+by several types that are capable of mating and producing viable offspring. Every generation, migration sent
+the best individuals in each population to each neighbour, replacing the worst individuals. 
+- Tanese (1987,1989) presented a parallel genetic algorithm implemented on a hypercube structure. 
+Migration occurred periodically, where migrants where selected according to fitness and replaced individuals 
+selected based on fitness in the receiving population.
+- Belding (1995) extended the work of Tanese (1989) where migrants were selected by choosing the first $n$ individuals 
+in the local population according to a predefined ordering, effectively simulating a more random migrant selection strategy. 
+
+- Probabilistic migration
+
+### 6.3 Reproduction policies 
 ##### 6.3.1 Mutation
 
 ##### 6.3.2 Crossover
 One-point crossover and multi-point crossover
 
-### 6.3 Selection policies
+### 6.4 Selection policies
 Todo
 
-##### 6.3.1 Roulette Wheel
+##### 6.4.1 Roulette Wheel
 Evolutionary robotics p. 29
 
-##### 6.3.2 Rank based
+##### 6.4.2 Rank based
 Individuals are ranked from the best to the worst. The probability of making offspring is proportional to their rank, 
 not to their fitness value. [Evolutionary robotics p. 30]
 
-##### 6.3.3 Truncation selection
+##### 6.4.3 Truncation selection
 Ranking the individuals, selecting the top M of them and let them make O copies of their chromosomes, such that M x O = N.
 
-##### 6.3.4 Tournament based
+##### 6.4.4 Tournament based
 Good for parallel computation. Probably won't be implemented tho.
 
-##### 6.3.5 Similarity-based
+##### 6.4.5 Similarity-based
 Todo 
 
 ## 7 Techniques of EC

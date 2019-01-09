@@ -1,26 +1,27 @@
+from os import rename
 from random import randint, random
 from src.utilities import remove_tmp, normalize_vector, accumulate_vector
 import subprocess
-import os
 
 
 class Island(object):
     def __init__(self, name, config, chromosome_length, evaluation_functions, tmp_dir):
         # Evolution settings
-        self.evaluation_function_path   = 'eval/src/' + config['evaluation_function'] + '.py'
+        self.evaluation_function_path   = 'eval/src/' + config['evaluator'] + '.py'
         self.population_size            = int(config['population_size'])
         self.num_of_crossover_points    = int(config['crossover_points'])
         self.num_of_parents             = int(config['parents'])
         self.mutation_rate              = int(config['mutation_rate'])
         self.replacement_policy         = config['replacement_policy']
         self.selection_policy           = config['selection_policy']
+        self.migration_policy           = config['migration_policy']
         self.chromosome_length          = chromosome_length
         if self.replacement_policy == "elite":
             self.num_of_elites          = int(config['num_of_elites'])
 
         # Evaluation function
         for f in evaluation_functions:
-            if f.attrib['name'] == config['evaluation_function']:
+            if f.attrib['name'] == config['evaluator']:
                 self.ga_type        = f[0].attrib['ea_type']
                 self.dna_length     = f[0].attrib['dna_length']
                 self.dna_repair     = f[0].attrib['dna_repair'] == 'true'
@@ -40,12 +41,12 @@ class Island(object):
 
     def migrate_out(self):
         remove_tmp(self.migration_file)
-        #creation_path = self.tmp_dir + '/dmz/' + str(self.name)  + '_' + str(self.individuals[0][0])
+        buffer_path = self.tmp_dir + '/' + str(self.name)
         self.migration_file = self.tmp_dir + '/' + str(self.name) + '_' + str(self.individuals[0][0])
-        file = open(self.migration_file, 'w+t')
+        file = open(buffer_path, 'w+t')
         [file.write(gene) for gene in self.individuals[0][1]]
         file.close()
-        #to do: after creating the file in /tmp/dmz/ copy it to /tmp/ to prevent reading/writing conflicts
+        rename(buffer_path, self.migration_file)
 
     def migrate_in(self):
         file = open(self.migration_file, 'r')

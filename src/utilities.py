@@ -1,4 +1,4 @@
-import time
+from time import localtime
 import os
 
 
@@ -14,11 +14,11 @@ def normalize_vector(vector):
     total = 0
     for entry in vector:
         total += entry
-    return [entry / sum for entry in vector] if total != 0 else [1] * len(vector)
+    return [entry / total for entry in vector] if total != 0 else 1 / len(vector)
 
 
 def get_date_in_string():
-    date = time.localtime()
+    date = localtime()
     return str(date.tm_year) + '_' + str(date.tm_mon) + '_' + \
            str(date.tm_mday) + '_' + str(date.tm_hour) + '_' + \
            str(date.tm_min) + '_' + str(date.tm_sec)
