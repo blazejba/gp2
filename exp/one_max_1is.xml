@@ -8,7 +8,7 @@
             mutation_rate      =   "5"
             replacement_policy =   "elite"
             selection_policy   =   "roulette_wheel"
-            migration_policy   =   "true,true,periodical,5"
+            migration_policy   =   "false,false,periodical,5"
             num_of_elites      =   "2"
             parents            =   "2"
             dna_repair         =   "false"

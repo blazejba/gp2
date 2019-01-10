@@ -20,36 +20,28 @@ Head of Embodied Systems for Robotics and Learning at University of Southern Den
   
 ## 3 Filesystem
 ```
--- README.md
--- master.py
---
--- eval/
----- one_max/
-------- code.py
-------- config.xml
----- times_plus_one_max/
-------- code.py
-------- config.py
---
--- src/
----- Experiment.py
----- Island.py
----- utilities.py
---
--- exp/
----- logs/
----- exp1.xml
----- exp2.xml
+README.md
+master.py
+eval/
+--- one_max/
+-------- code.py
+-------- config.xml
+--- times_plus_one_max/
+-------- code.py
+-------- config.py
+src/
+--- Experiment.py
+--- Island.py
+--- utilities.py
+exp/
+--- one_max_1is.xml
+--- one_max_2is.xml
+--- times_plus_one_max_2is.xml
+--- logs/
+-------- one_max_1is_<date>_<time>.log
+-------- one_max_2is_<date>_<time>.log
+-------- times_plus_one_max_1is_<date>_<time>.log
 ```
-
-**eval/**  
-Fitness evaluation functions. Each function requires an input/out definition in *eval/config.xml*.     
-**src/**  
-Class definitions and other custom-made programs imported in *master.py*.  
-**exp/**  
-XML files with the available experiments.  
-**exp/logs/**  
-Folder contains logs from the performed experiments organized by the date.  
 
 ## 4 Experiment configuration file  
 
@@ -58,7 +50,18 @@ The experiment file is located in:
 > exp/<experiment_name>.xml
 
 All parameters with asterisk (*) next to their name are necessary to be specified. The parameters without asterisk
-will be set to defaults if no value has been assigned.
+will be set to defaults if no value has been assigned. An exemplary experiment configuration structure has been shown below.
+
+```xml
+<experiment chromosome_length="16" max_fitness="16" max_time="0">
+    <island population_size="5" evaluator="one_max" genotype_repair="false">
+            <reproduction crossover_points="5" mutation_rate="5" num_of_parents="2"/>
+            <replacement policy="elite" num_of_elites="2"/>
+            <selection policy="roulette_wheel"/>
+            <migration policy="periodical" in="true" out="true" period="5"/>
+    </island>
+</experiment>
+```
 
 #### 4.1 Experiment customization
 [*] **`chromosome_length`**  = Int  
@@ -104,11 +107,8 @@ Elitism, a certain number of the fittest individuals is injected to the next gen
     
 **`migration_policy`** = [out],[in],[periodical/every_generation], [period{if=periodical}]
 * `periodical`  
-Todo
-    * `period`  
-    Todo
-* `every_generation`  
-Todo
+    * `period` = Integer   
+    Defines the number of generations between accepting a immigrant to an island. 
 * `probabilistic`  
     * `probability` = Float  
     Where 1 is 100%. A probability to take an immigrant in each generation. 
@@ -138,31 +138,16 @@ simulation tool.  **TODO**
 The **eval/config.xml** file contains definitions of all the evaluation functions. 
 
 ```xml
-<evaluation_functions>
-
-    <function name="one_max">
-        <parameters
-                ea_type="ga"
-                dna_letters="0,1"
-                dna_length="fixed"
-                dna_repair="false"
-        />
-    </function>
-
-    <function name="times_plus_one_max">
-        <parameters
-                ea_type="gp"
-                dna_letters="1,*,+"
-                dna_length="fixed"
-                dna_repair="true"
-        />
-    </function>
-
-</evaluation_functions>
+<evaluator name="one_max">
+    <param ea_type="ga"/>
+    <param letters="0,1"/>
+    <param chromosome_length="fixed"/>
+    <param genotype_repair="false"/>
+</evaluator>
 ```
 
 ## 6 Implementation
-![alt text](documentation/gpec_general_flowchart.png)
+![alt text](docs/gpec_general_flowchart.png)
 
 ### 6.1 The island model
 Is an example of a distributed population model. 
@@ -200,6 +185,9 @@ Mutation rate. TODO
 ##### 6.3.2 Crossover
 One-point crossover and multi-point crossover. TODO
 
+##### 6.3.3 Recombination
+Multi-parental and single parents recombination.
+
 ### 6.4 Selection
 Different selection policies implemented.
 
@@ -219,6 +207,12 @@ Good for parallel computation. Probably won't be implemented tho.
 ##### 6.4.5 Similarity-based
 Todo 
 
+### 6.5 Evaluation
+- In case of GP, a decoding might be needed. Reverse Polish Notation.
+- Fitness evaluation. 
+- Phenotype validity check
+    - if chromosome is not properly encoded an individual can be send to a repair island. 
+        - Information preservation.
 ## 7 Results
 #### 7.1 One Max
 todo
