@@ -3,7 +3,7 @@ import sys
 import time
 import tempfile
 from src.Island import Island
-from src.utilities import decode_stdout, get_date_in_string, remove_tmp
+from src.utilities import decode_stdout, get_date_in_string, remove_tmp, kill_all_processes
 
 
 class Experiment():
@@ -52,12 +52,12 @@ class Experiment():
 		return logfile
 
 	def update_log(self, island):
-		self.log.write(str(island.generation) + ',' +
-					   str(island.individuals[0]) + ',' +
-		               str(island.individuals[1]) + '\n')
+		self.log.write(str(island.generation) + ',' + str(island.island_name) + ',' +
+					   str(island.individuals[0]) + ',' + str(island.individuals[1]) + '\n')
 
 	def print_all_individuals(self):
 		for island in self.islands:
+			print('island [ ' + str(island.island_name) + ' ]')
 			for individual in island.individuals:
 				print(individual)
 
@@ -76,6 +76,7 @@ class Experiment():
 					self.update_log(island)
 					if self.termination_check(island):
 						for island in self.islands:
+							kill_all_processes(island.processes)
 							remove_tmp(island.migration_policy.migration_file)
 						os.removedirs(self.tmp_dir)
 						sys.exit()

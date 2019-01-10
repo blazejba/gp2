@@ -109,6 +109,9 @@ Todo
     Todo
 * `every_generation`  
 Todo
+* `probabilistic`  
+    * `probability` = Float  
+    Where 1 is 100%. A probability to take an immigrant in each generation. 
 * `migration_out` = [true/false] 
 * `migration_in` = [true/false]
 

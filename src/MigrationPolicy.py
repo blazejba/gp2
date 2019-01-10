@@ -20,22 +20,28 @@ class MigrationPolicy(object):
 
 	def migrate_out(self, individual):
 		if self.out_allowed:
-			remove_tmp(self.migration_file)
-			self.migration_file = self.tmp_dir + '/' + str(self.island_name) + '_' + str(individual[0])
 			file = open(self.buffer_dir, 'w+t')
 			[file.write(gene + ',') for gene in individual[1]]
 			file.close()
+			remove_tmp(self.migration_file)
+			self.migration_file = self.tmp_dir + '/' + str(self.island_name) + '_' + str(individual[0])
 			rename(self.buffer_dir, self.migration_file)
 
 	def migrate_in(self):
 		successful = False
 		for (dirpath, dirnames, filenames) in walk(self.tmp_dir):
 			[island, fitness] = [int(x) for x in filenames[0].split('_')]
-			if  island == self.island_name:
+			if island != self.island_name:
 				file = open(self.tmp_dir + '/' + filenames[0])
 				chromosome = file.readlines()[0].split(',')
-				del chromosome[len(chromosome)]
+				del chromosome[len(chromosome) - 1]
 				file.close()
 				successful = True
+				print('success')
 				return successful, [fitness, chromosome, True]
+		print('fail')
 		return successful, []
+
+	def increase_migration_clock(self):
+		if self.generations_since_migration < self.period:
+			self.generations_since_migration += 1

@@ -16,6 +16,7 @@ class Island(object):
         self.selection_policy           = config['selection_policy']
         self.migration_policy           = MigrationPolicy(tmp_dir, name, config['migration_policy'])
         self.chromosome_length          = chromosome_length
+        self.island_name                = name
         if self.replacement_policy == "elite":
             self.num_of_elites          = int(config['num_of_elites'])
 
@@ -79,11 +80,12 @@ class Island(object):
     def replace(self):
         if self.replacement_policy == 'elite':
             if self.migration_policy.in_allowed:
-                self.migration_policy.generations_since_migration += 1
                 if self.migration_policy.generations_since_migration == self.migration_policy.period:
-                    self.migration_policy.generations_since_migration = 0
-                    return [self.individuals[index] for index in range(self.num_of_elites - 1)] + \
-                           [self.migration_policy.migrate_in()]
+                    status, immigrant = self.migration_policy.migrate_in()
+                    if status:
+                        self.migration_policy.generations_since_migration = 0
+                        return [self.individuals[index] for index in range(self.num_of_elites - 1)] + [immigrant]
+            self.migration_policy.increase_migration_clock()
             return [self.individuals[index] for index in range(self.num_of_elites)]
 
     def select(self):

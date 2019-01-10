@@ -33,3 +33,8 @@ def decode_stdout(stdout):
 def remove_tmp(path):
     if os.path.exists(path):
         os.remove(path)
+
+
+def kill_all_processes(processes):
+    for process in processes:
+        process.kill()
