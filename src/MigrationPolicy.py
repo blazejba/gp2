@@ -1,4 +1,5 @@
 from os import rename, walk
+from random import random
 from src.utilities import remove_tmp
 
 
@@ -11,12 +12,15 @@ class MigrationPolicy(object):
 		self.migration_file     = ''
 
 		# Policy settings
-		configs = [x for x in config.split(',')]
-		self.in_allowed                     = configs[0] == 'true'
-		self.out_allowed                    = configs[1] == 'true'
-		self.policy                         = configs[2]
-		self.period                         = int(configs[3])
-		self.generations_since_migration    = 0
+		self.in_allowed     = config['in'] == 'true'
+		self.out_allowed    = config['out'] == 'true'
+		self.policy         = config['policy']
+
+		if self.policy == 'periodical':
+			self.period                      = int(config['period'])
+			self.generations_since_migration = 0
+		if self.policy == 'probabilistic':
+			self.mutation_probability        = float(config['probabilistic'])
 
 	def migrate_out(self, individual):
 		if self.out_allowed:
@@ -27,20 +31,35 @@ class MigrationPolicy(object):
 			self.migration_file = self.tmp_dir + '/' + str(self.island_name) + '_' + str(individual[0])
 			rename(self.buffer_dir, self.migration_file)
 
-	def migrate_in(self):
+	def periodical_migration(self):
 		successful = False
-		for (dirpath, dirnames, filenames) in walk(self.tmp_dir):
-			[island, fitness] = [int(x) for x in filenames[0].split('_')]
-			if island != self.island_name:
-				file = open(self.tmp_dir + '/' + filenames[0])
-				chromosome = file.readlines()[0].split(',')
-				del chromosome[len(chromosome) - 1]
-				file.close()
-				successful = True
-				print('success')
-				return successful, [fitness, chromosome, True]
-		print('fail')
+		if self.generations_since_migration == self.period:
+			for (dirpath, dirnames, filenames) in walk(self.tmp_dir):
+				[island, fitness] = [int(x) for x in filenames[0].split('_')]
+				if island != self.island_name:
+					file = open(self.tmp_dir + '/' + filenames[0])
+					chromosome = file.readlines()[0].split(',')
+					del chromosome[len(chromosome) - 1]
+					file.close()
+					successful = True
+					print('successful periodical migration')
+					self.generations_since_migration = 0
+					return successful, [fitness, chromosome, True]
+		self.increase_migration_clock()
+		print('failed periodical migration')
 		return successful, []
+
+	def probabilistic_migration(self):
+		print('probabilistic migration not implemented')
+		return False, []
+
+	def migrate_in(self):
+		if self.in_allowed:
+			if self.policy == 'periodical':
+				return self.periodical_migration()
+			elif self.policy == 'probabilistic':
+				return self.probabilistic_migration()
+		return False, []
 
 	def increase_migration_clock(self):
 		if self.generations_since_migration < self.period:

@@ -3,9 +3,9 @@ from src.utilities import normalize_vector, accumulate_vector
 
 
 class SelectionPolicy(object):
-	def __init__(self, policy, parents):
-		self.policy = policy
-		self.num_of_parents = parents
+	def __init__(self, selection_config, reproduction_config):
+		self.policy = selection_config['policy']
+		self.num_of_parents = int(reproduction_config['num_of_parents'])
 
 	def get_fitness_list(self, individuals):
 		return [individual[0] for individual in individuals]

@@ -25,7 +25,7 @@ class Experiment():
 		self.log = self.initialize_log()
 
 	def initialize_islands(self, experiment, evaluators):
-		return [Island(name, island.attrib, self.chromosome_length, evaluators, self.tmp_dir) for name, island in enumerate(experiment)]
+		return [Island(name, island, self.chromosome_length, evaluators, self.tmp_dir) for name, island in enumerate(experiment)]
 
 	def termination_check(self, island):
 			if island.individuals[0][0] >= self.max_fitness and self.max_fitness != 0:
@@ -72,12 +72,12 @@ class Experiment():
 							island.processes.remove(process)
 				else:
 					island.sort_individuals()
-					island.migration_policy.migrate_out(island.individuals[0])
+					island.replacement_policy.migration_policy.migrate_out(island.individuals[0])
 					self.update_log(island)
 					if self.termination_check(island):
 						for island in self.islands:
 							kill_all_processes(island.processes)
-							remove_tmp(island.migration_policy.migration_file)
+							remove_tmp(island.replacement_policy.migration_policy.migration_file)
 						os.removedirs(self.tmp_dir)
 						sys.exit()
 					else:
