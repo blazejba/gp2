@@ -3,7 +3,7 @@ import sys
 import time
 import tempfile
 from src.Island import Island
-from src.utilities import decode_stdout, get_date_in_string, remove_tmp, kill_all_processes
+from src.utilities import decode_stdout, get_date_in_string, remove_tmp, kill_all_processes, open_processes
 
 
 class Experiment():
@@ -20,6 +20,8 @@ class Experiment():
 		# Islands settings
 		self.island_configs = []
 		self.islands        = self.initialize_islands(experiment_xml_config, evaluators_xml_config)
+		for island in self.islands:
+			open_processes(island)
 
 		# Logs
 		self.log = self.initialize_log()
@@ -62,24 +64,36 @@ class Experiment():
 				print(individual)
 
 	def run(self):
-			for id, island in enumerate(self.islands):
-				if len(island.processes) > 0: # Collect stdout from unfinished processes if they exists
-					for process in island.processes:
-						if process.poll():
-							index, fitness = decode_stdout(process.communicate()[0])
-							island.individuals[int(index)][0] = int(fitness)
-							island.individuals[int(index)][2] = True
-							island.processes.remove(process)
+			for island in self.islands:
+				if len(island.processes) > 0:
+					self.collect_fitness()
 				else:
-					island.sort_individuals()
-					island.replacement_policy.migration_policy.migrate_out(island.individuals[0])
-					self.update_log(island)
+					self.organize_island(island)
 					if self.termination_check(island):
-						for island in self.islands:
-							kill_all_processes(island.processes)
-							remove_tmp(island.replacement_policy.migration_policy.migration_file)
-						os.removedirs(self.tmp_dir)
-						sys.exit()
+						self.quit_experiment()
 					else:
-						island.evolve()
-						island.open_processes()
+						self.next_generation()
+
+	def organize_island(self, island):
+		island.sort_individuals()
+		self.update_log(island)
+
+	def next_generation(self, island):
+		island.replacement_policy.migration_policy.migrate_out(island.individuals[0])
+		island.evolve()
+		open_processes(island)
+
+	def collect_fitness(self, island):
+		for process in island.processes:
+			if process.poll():
+				index, fitness = decode_stdout(process.communicate()[0])
+				island.individuals[int(index)][0] = int(fitness)
+				island.individuals[int(index)][2] = True
+				island.processes.remove(process)
+
+	def quit_experiment(self):
+		for island in self.islands:
+			kill_all_processes(island.processes)
+			remove_tmp(island.replacement_policy.migration_policy.migration_file)
+		os.removedirs(self.tmp_dir)
+		sys.exit()

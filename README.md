@@ -149,6 +149,9 @@ The **eval/config.xml** file contains definitions of all the evaluation function
 ## 6 Implementation
 ![alt text](docs/gpec_general_flowchart.png)
 
+### 6.0 Parallel processing
+![alt text](docs/parallel_processing.png)
+
 ### 6.1 The island model
 Is an example of a distributed population model. 
 - Coarse grain 

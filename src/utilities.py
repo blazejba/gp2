@@ -1,5 +1,6 @@
 from time import localtime
 import os
+import subprocess
 
 
 def accumulate_vector(vector):
@@ -33,6 +34,15 @@ def decode_stdout(stdout):
 def remove_tmp(path):
     if os.path.exists(path):
         os.remove(path)
+
+
+def open_processes(island):
+    for index, individual in enumerate(island.individuals):
+        if individual[2]:  # dont evaluate elites/previously evaluated
+            continue
+        genome = ''.join(str(gene) for gene in individual[1])
+        island.processes.append(subprocess.Popen(["python3", island.evaluation_function_path, genome, str(index)],
+                                                 stdout=subprocess.PIPE))
 
 
 def kill_all_processes(processes):

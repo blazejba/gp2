@@ -33,28 +33,21 @@ class Island(object):
         if not migration_config and not reproduction_config and not replacement_config and not selection_config:
             print('[config error] migration, reproduction, replacement or selection config missing or incomplete.')
 
-        self.reproduction_policy    = ReproductionPolicy(self.population_size, reproduction_config, chromosome_length, self.genotype_letters)
         self.selection_policy       = SelectionPolicy(selection_config, reproduction_config)
-        self.replacement_policy     = ReplacementPolicy(replacement_config, migration_config, tmp_dir, name)
+        self.replacement_policy     = ReplacementPolicy(replacement_config, migration_config, tmp_dir,
+                                                        name, self.population_size)
+        self.reproduction_policy    = ReproductionPolicy(self.population_size, reproduction_config,
+                                                         chromosome_length, self.genotype_letters)
 
         # More variables
         self.generation     = 0
         self.individuals    = self.initiate_individuals()
         self.island_name    = name
         self.processes      = []
-        self.open_processes()
 
     def initiate_individuals(self):
         return [[0, [self.genotype_letters[randint(0, len(self.genotype_letters) - 1)] for _ in range(self.chromosome_length)], False]
                 for _ in range(self.population_size)]
-
-    def open_processes(self):
-        for index, individual in enumerate(self.individuals):
-            if individual[2]: # dont evaluate elites/previously evaluated
-                continue
-            genome = ''.join(str(gene) for gene in individual[1])
-            self.processes.append(subprocess.Popen(["python3", self.evaluation_function_path, genome, str(index)],
-                                                   stdout=subprocess.PIPE))
 
     def sort_individuals(self):
         tmp_individuals = self.individuals
@@ -70,10 +63,12 @@ class Island(object):
             tmp_individuals.remove(tmp_individuals[best_individual])
 
     def evolve(self):
-        new_generation = self.replacement_policy.replace(self.individuals)
-        for _ in range(len(new_generation), self.population_size):
-            parents = self.selection_policy.select_parents(self.individuals)
-            new_generation.append(self.reproduction_policy.reproduce(parents))
-        self.individuals = new_generation
+        # Replacement
+        from_old_generation, num_of_children = self.replacement_policy.replace(self.individuals)
+        # Selection
+        parents = self.selection_policy.select_parents(self.individuals)
+        # Reproduction
+        new_generation = [self.reproduction_policy.reproduce(parents) for _ in range(num_of_children)]
+        # New generation
+        self.individuals = new_generation + from_old_generation
         self.generation += 1
-#
