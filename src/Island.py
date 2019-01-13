@@ -2,7 +2,6 @@ from random import randint
 from src.SelectionPolicy import SelectionPolicy
 from src.ReproductionPolicy import ReproductionPolicy
 from src.ReplacementPolicy import ReplacementPolicy
-import subprocess
 
 
 class Island(object):

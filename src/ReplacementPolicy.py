@@ -13,9 +13,9 @@ class ReplacementPolicy(object):
 
 	def replace(self, individuals):
 		if self.policy == 'elitism':
-			status, immigrant = self.migration_policy.migrate_in()
+			status, immigrants = self.migration_policy.migrate_in()
 			if status:
-				from_old_generation = [individuals[index] for index in range(self.num_of_elites - 1)] + [immigrant]
+				from_old_generation = [individuals[index] for index in range(self.num_of_elites - 1)] + immigrants
 			else:
 				from_old_generation = [individuals[index] for index in range(self.num_of_elites)]
 			num_of_children = self.population_size - len(from_old_generation)

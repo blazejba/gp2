@@ -3,7 +3,7 @@ import sys
 import time
 import tempfile
 from src.Island import Island
-from src.utilities import decode_stdout, get_date_in_string, remove_tmp, kill_all_processes, open_processes
+from src.utilities import decode_stdout, get_date_in_string, clean_dir, kill_all_processes, open_processes
 
 
 class Experiment():
@@ -30,21 +30,28 @@ class Experiment():
 		return [Island(name, island, self.chromosome_length, evaluators, self.tmp_dir) for name, island in enumerate(experiment)]
 
 	def termination_check(self, island):
-			if island.individuals[0][0] >= self.max_fitness and self.max_fitness != 0:
-				print('Evolution terminated: maximum fitness has been achieved.')
-				print('Generated', island.generation, 'generations in', time.time() - self.start_t, 'seconds.')
-				print('Individuals of the last generation:\n')
-				self.print_all_individuals()
+			if island.individuals[0][0] >= self.max_fitness != 0:
+				self.termination_printout(island, 'fitness')
 				return True
-
 			elif self.max_time < time.time() - self.start_t and self.max_time != 0:
-				print('Evolution terminated: timeout.')
-				print('Generated', island.generation, 'generations in', time.time() - self.start_t, 'seconds.')
-				print('Individuals of the last generation:\n')
-				self.print_all_individuals()
+				self.termination_printout(island, 'timeout')
 				return True
+			else:
+				return False
 
-			return False
+	def termination_printout(self, island, reason):
+		if reason == 'timeout':
+			print('Evolution terminated: timeout.')
+		else:
+			print('Evolution terminated: maximum fitness has been achieved.')
+		print('Generated', island.generation, 'generations in', "{:.2f}".format(time.time() - self.start_t), 'seconds.')
+		self.print_migration_success_rates()
+		print('Individuals of the last generation:\n')
+		self.print_all_individuals()
+
+	def print_migration_success_rates(self):
+		rates = [i.replacement_policy.migration_policy.get_success_rate() for i in self.islands]
+		print('Migration success rates', ["{:.2f} %".format(rate) for rate in rates])
 
 	def initialize_log(self):
 		path = 'exp/logs/' + self.experiment_name
@@ -66,20 +73,20 @@ class Experiment():
 	def run(self):
 			for island in self.islands:
 				if len(island.processes) > 0:
-					self.collect_fitness()
+					self.collect_fitness(island)
 				else:
 					self.organize_island(island)
 					if self.termination_check(island):
 						self.quit_experiment()
 					else:
-						self.next_generation()
+						self.next_generation(island)
 
 	def organize_island(self, island):
 		island.sort_individuals()
 		self.update_log(island)
 
 	def next_generation(self, island):
-		island.replacement_policy.migration_policy.migrate_out(island.individuals[0])
+		island.replacement_policy.migration_policy.migrate_out(island.individuals)
 		island.evolve()
 		open_processes(island)
 
@@ -94,6 +101,6 @@ class Experiment():
 	def quit_experiment(self):
 		for island in self.islands:
 			kill_all_processes(island.processes)
-			remove_tmp(island.replacement_policy.migration_policy.migration_file)
+			clean_dir(self.tmp_dir)
 		os.removedirs(self.tmp_dir)
 		sys.exit()

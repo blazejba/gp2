@@ -1,6 +1,14 @@
 from time import localtime
+from os import walk
 import os
 import subprocess
+
+
+def clean_dir(dir):
+    for (dirpath, dirnames, filenames) in walk(dir):
+        for name in filenames:
+            path = dir + '/' + name
+            remove_file(path)
 
 
 def accumulate_vector(vector):
@@ -31,7 +39,7 @@ def decode_stdout(stdout):
     return index, fitness
 
 
-def remove_tmp(path):
+def remove_file(path):
     if os.path.exists(path):
         os.remove(path)
 

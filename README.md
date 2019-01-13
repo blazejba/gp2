@@ -9,7 +9,6 @@
 Head of Embodied Systems for Robotics and Learning at University of Southern Denmark, also `Blazej`'s thesis supervisor.
 
 ## 1 Run
-  
 > $ python3 master.py <experiment_name>
 
 ## 2 Glossary
@@ -41,6 +40,8 @@ exp/
 -------- one_max_1is_<date>_<time>.log
 -------- one_max_2is_<date>_<time>.log
 -------- times_plus_one_max_1is_<date>_<time>.log
+scripts/
+--- progress_plotter.py
 ```
 
 ## 4 Experiment configuration file  
@@ -50,7 +51,10 @@ The experiment file is located in:
 > exp/<experiment_name>.xml
 
 All parameters with asterisk (*) next to their name are necessary to be specified. The parameters without asterisk
-will be set to defaults if no value has been assigned. An exemplary experiment configuration structure has been shown below.
+will be set to defaults if no value has been assigned. The default values are written in square parenthesis in italic,
+after the type.
+
+An exemplary experiment configuration structure has been shown below.
 
 ```xml
 <experiment chromosome_length="16" max_fitness="16" max_time="0">
@@ -64,22 +68,66 @@ will be set to defaults if no value has been assigned. An exemplary experiment c
 ```
 
 #### 4.1 Experiment customization
-[*] **`chromosome_length`**  = Int  
+[*] **`chromosome_length`**  = Integer    
 Number of letters encoding a chromosome.
 
-[*] **`termination_condition`** = [fitness],[time],[Int {if fitness=true}],[Int {if time=true}]   
-At least one of the termination conditions has to be true. The time condition has a priority over the fitness condition.  
-* `fitness` = [true/false]  
-* `time` = [true/false]
+[*] **`max_fitness`** = Integer  
+At least one of the termination conditions has to be true.  
+
+[*] **`max_time`** = Integer  
+ The time condition has a priority over the fitness condition.
 
 #### 4.2 Island customization  
 
-[*] **`population_size*`** = integer  
+[*] **`population_size`** = Integer  
 The size of a population  
 
-**`evaluator*`**  
-Name of fitness evaluation function  
+[*] **`evaluator`** = String  
+Name of fitness evaluation function. The evaluator has be defined in **eval/** folder.  
 
+**`genotype_repair`** = Boolean, def. *[false]*     
+If chosen, individuals with broken dna (e.g. invalid format for the given problem) will not be discarded. 
+In order to preserve potentially valuable information of the code, such individuals will populate an repair island
+and stay there until their dna has been fixed. Repaired individuals will then migrate to other islands.
+When this property has been enabled for at least one island in the experiment, a repair island is created, 
+assuming that the chosen evaluator allows repairing. 
+To determine whether the repair for a given problem is available 
+look at the **`genotype_repair`** parameter in the evaluator's config.xml file.
+
+##### 4.2.1 Replacement policy
+**`replacement_policy`**   
+Defines replacement strategy. Variants: 
+* `elite`  
+Elitism, a certain number of the fittest individuals is injected to the next generation by default.
+    * `num_of_elites` = Int  
+      Number of elites left in each generation. If not defined the default value is 2.
+* `stead-state`
+    * todo
+
+##### 4.2.2 Migration policy
+**`migration_policy`**  
+* `periodical`  
+    * `period` = Integer   
+    Defines the number of generations between accepting a immigrant to an island. 
+* `probabilistic`  
+    * `probability` = Float  
+    Where 1 is 100%. A probability to take an immigrant in each generation. 
+* `migration_out` = Boolean, def. *[false]*
+* `migration_in` = Boolean, def. *[false]*
+* `emmigrants` = Integer, def. *[2]*  
+Defines how many migrants will be available for other islands. 
+* `immigrants` = Integer, def. *[1]*  
+Defines how many migrants will be taken in each period/call.
+
+
+##### 4.2.3 Selection policy
+**`selection_policy`** = [roulette_wheel/rank/truncation/tournament]
+* `roulette_wheel` 
+* `rank`
+* `truncation`
+* `tournament`
+
+##### 4.2.4 Reproduction policy
 **`parents`**  
 The algorithm allows multi-parent recombination. The default value is 2 parents.  
 
@@ -88,40 +136,6 @@ Number of points for crossover
 
 **`mutation_rate`**  
 A chance for a gene to mutate, given in %  
-
-**`replacement_policy`** = [elite/ss],[num_of_elites {if elite}]  
-Defines replacement strategy. Variants: 
-* `elite`  
-Elitism, a certain number of the fittest individuals is injected to the next generation by default.
-    * `num_of_elites` = Int  
-      Number of elites left in each generation. If not defined the default value is 2.
-* `stead-state`
-    * todo
-    
-**`selection_policy`** = [roulette_wheel/rank/truncation/tournament]
-* `roulette_wheel` 
-* `rank`
-* `truncation`
-* `tournament`
-
-    
-**`migration_policy`** = [out],[in],[periodical/every_generation], [period{if=periodical}]
-* `periodical`  
-    * `period` = Integer   
-    Defines the number of generations between accepting a immigrant to an island. 
-* `probabilistic`  
-    * `probability` = Float  
-    Where 1 is 100%. A probability to take an immigrant in each generation. 
-* `migration_out` = [true/false] 
-* `migration_in` = [true/false]
-
-**`dna_repair`**  
-If chosen, individuals with broken dna (e.g. invalid format for the given problem) will not be discarded. 
-In order to preserve potentially valuable information of the code, such individuals will populate an repair island
-and stay there until their dna has been fixed. Repaired individuals will then migrate to other islands.
-When this property has been enabled for at least one island in the experiment, a repair island is created, 
-assuming that the chosen evaluator allows repairing. 
-To determine whether the repair for a given problem is available look at the **`dna_repair`** parameter in the evaluator's config.xml file.
 
 ## 5 Evaluation functions
 #### 5.1 Available evaluators
@@ -147,12 +161,11 @@ The **eval/config.xml** file contains definitions of all the evaluation function
 ```
 
 ## 6 Implementation
-![alt text](docs/gpec_general_flowchart.png)
-
 ### 6.0 Parallel processing
 ![alt text](docs/parallel_processing.png)
 
 ### 6.1 The island model
+![alt text](docs/gpec_general_flowchart.png)  
 Is an example of a distributed population model. 
 - Coarse grain 
 - Micro grain
@@ -167,7 +180,7 @@ todo
 ##### 6.2.2 Stead-state
 todo
 
-##### 6.2.3 Migration
+##### 6.2.3 Migration policy
 - Pettey (1987) designed a distributed model based on the polytypic concept of a species being represented
 by several types that are capable of mating and producing viable offspring. Every generation, migration sent
 the best individuals in each population to each neighbour, replacing the worst individuals. 
@@ -178,6 +191,8 @@ selected based on fitness in the receiving population.
 in the local population according to a predefined ordering, effectively simulating a more random migrant selection strategy. 
 
 - Probabilistic migration
+- Migration success rate - depends on whether the island could find a migrant when it wanted. If you migration rate
+is less than 80%, consider increasing `emmigrants` or reducing `immigrants` in island customization file. 
 
 ### 6.3 Reproduction
 Different reproduction methods implemented. TODO
