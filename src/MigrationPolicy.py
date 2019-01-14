@@ -1,6 +1,6 @@
 from os import rename, walk
 from random import random, randint
-from src.selection import roulette_wheel, rank_based, sort_by_scores
+from src.selection import roulette_wheel, rank_based, truncation, sort_by_scores
 from src.utilities import remove_file
 
 class MigrationPolicy(object):
@@ -13,27 +13,41 @@ class MigrationPolicy(object):
 		self.total_migrations       = 0
 
 		# Policy settings
-		self.entry_policy           = config['entry_policy']
-		self.immigrant_selection    = config['selection_policy']
-		self.in_allowed             = config['in'] == 'true'
+		try:
+			self.out_allowed    = config['out'] == 'true'
+			self.in_allowed     = config['in'] == 'true'
+		except:
+			self.in_allowed     = False
+			self.out_allowed    = False
+
 		if self.in_allowed:
 			try:
-				self.num_of_immigrants = int(config['immigrants'])
+				self.num_of_immigrants      = int(config['immigrants'])
+				self.entry_policy           = config['entry_policy']
+				self.immigrant_selection    = config['selection_policy']
 			except:
-				self.num_of_immigrants = 1
-		self.out_allowed = config['out'] == 'true'
+				self.num_of_immigrants      = 1
+				self.entry_policy           = 'probabilistic'
+				self.immigrant_selection    = 'roulette_wheel'
+
 		if self.out_allowed:
 			try:
 				self.num_of_emigrants = int(config['emigrants'])
 			except:
-				self.num_of_emigrants = 2
+				self.num_of_emigrants = 1
 
 		# Policy specific settings
 		if self.entry_policy == 'periodical':
-			self.period                      = int(config['period'])
+			try:
+				self.period = int(config['period'])
+			except:
+				self.period = 5
 			self.generations_since_migration = 0
 		if self.entry_policy == 'probabilistic':
-			self.migration_probability       = float(config['probabilistic'])
+			try:
+				self.probability    = float(config['chance'])
+			except:
+				self.probability    = 10
 
 	def get_success_rate(self):
 		return float((self.successful_migrations/self.total_migrations)*100) if self.total_migrations != 0 else 0
@@ -48,9 +62,14 @@ class MigrationPolicy(object):
 		candidates_fitness = [candidate[1] for candidate in candidates]
 		indexes = []
 		if self.immigrant_selection == 'roulette_wheel':
-			indexes = roulette_wheel(candidates_fitness, self.num_of_immigrants)
-		elif self.immigrant_selection == 'rank':
-			indexes = rank_based(self.num_of_immigrants)
+			indexes = roulette_wheel(self.num_of_immigrants, candidates_fitness)
+		elif self.immigrant_selection == 'rank_based':
+			indexes = rank_based(self.num_of_immigrants, len(candidates))
+		elif self.immigrant_selection == 'truncation':
+			indexes = truncation(self.num_of_immigrants)
+		elif self.immigrant_selection == 'tournament':
+			indexes = []
+			print('tournament to  be implemented!')
 		selected_candidates = [candidates[index] for index in indexes]
 		return [self.get_immigrant(candidate) for candidate in selected_candidates]
 
@@ -92,7 +111,7 @@ class MigrationPolicy(object):
 
 	def probabilistic_migration(self):
 		R = random()
-		if R * 100 < self.migration_probability:
+		if R * 100 < self.probability:
 			return True
 		return False
 

@@ -51,7 +51,9 @@ class Experiment():
 
 	def print_migration_success_rates(self):
 		rates = [i.replacement_policy.migration_policy.get_success_rate() for i in self.islands]
-		print('Migration success rates', ["{:.2f} %".format(rate) for rate in rates])
+		total_migrations = [island.replacement_policy.migration_policy.total_migrations for island in self.islands]
+		print('Total migrations', [value for value in total_migrations], '.')
+		print('Migration success rates', ["{:.2f} %".format(rate) for rate in rates], '.')
 
 	def initialize_log(self):
 		path = 'exp/logs/' + self.experiment_name

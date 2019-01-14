@@ -44,6 +44,9 @@ scripts/
 --- progress_plotter.py
 ```
 
+
+
+
 ## 4 Experiment configuration file  
 
 The experiment file is located in:
@@ -94,7 +97,7 @@ assuming that the chosen evaluator allows repairing.
 To determine whether the repair for a given problem is available 
 look at the **`genotype_repair`** parameter in the evaluator's config.xml file.
 
-##### 4.2.1 Replacement policy
+###### 4.2.1 Replacement policy
 **`replacement_policy`**   
 Defines replacement strategy. Variants: 
 * `elite`  
@@ -104,35 +107,38 @@ Elitism, a certain number of the fittest individuals is injected to the next gen
 * `stead-state`
     * todo
 
-##### 4.2.2 Migration policy
-**`entry_policy`**  
+###### 4.2.2 Migration policy
+[*] Bool **`migration_out`** = False  
+
+[*] Bool **`migration_in`** = False
+
+Choice **`entry_policy`** = probabilistic
 * `periodical`  
-    * `period` = Integer   
+    * Int `period` = 5  
     Defines the number of generations between accepting a immigrant to an island. 
 * `probabilistic`  
-    * `probability` = Float  
-    Where 1 is 100%. A probability to take an immigrant in each generation.   
+    * Float `chance` = 10  
+    A probability to take an immigrant in each generation.   
 
-**`selection_policy`**  
+Choice **`selection_policy`** = roulette_wheel   
+The strategy for selecting an immigrant from a list of candidates. 
+The candidates are considered to be all available migrants from the different islands than the one opening its boarders.
 Same options as in Section **4.2.3 Selection policy**.  
 
-**`migration_out`** = Boolean, def. *[false]*  
-**`migration_in`** = Boolean, def. *[false]*  
-**`emmigrants`** = Integer, def. *[2]*  
-Defines how many migrants will be available for other islands.   
-**`immigrants`** = Integer, def. *[1]*  
+Int **`emigrants`** = 1  
+Defines how many migrants will be available for other islands. 
+  
+Int **`immigrants`** = 1  
 Defines how many migrants will be taken in each period/call.
 
-
-
-##### 4.2.3 Selection policy
+###### 4.2.3 Selection policy
 **`selection_policy`** = [roulette_wheel/rank/truncation/tournament]
 * `roulette_wheel` 
 * `rank`
 * `truncation`
 * `tournament`
 
-##### 4.2.4 Reproduction policy
+###### 4.2.4 Reproduction policy
 **`parents`**  
 The algorithm allows multi-parent recombination. The default value is 2 parents.  
 
@@ -142,16 +148,27 @@ Number of points for crossover
 **`mutation_rate`**  
 A chance for a gene to mutate, given in %  
 
+
+
+
+
 ## 5 Evaluation functions
 #### 5.1 Available evaluators
-**Genetic Algorithms:**
-1. **One max** - The score is proportional to the number of ones in a binary string of a fixed length. 
-2. what else?
+###### 5.1.1 Genetic Algorithms
+- **One max** - The score is proportional to the number of ones in a binary string of a fixed length. 
 
-**Genetic programming:**
-1. **Times plus one max** - The score is a result of multiplying (times) and adding (plus) ones. 
-2. **Beam structure in COMSOL** - The strength of a beam of given length and volume is evaluated in COMSOL Multiphysics
-simulation tool.  **TODO**
+- what else?
+
+###### 5.1.2 Genetic programming
+- **Times plus one max** - The score is a result of multiplying (times) and adding (plus) ones. 
+
+- **Max surface const volume** - Generating a model made out of adjacent cubes. The volume of the final model is constant
+what is being optimized is the size of the cubes and their position in order to maximize the surface of the model.
+**to be implemented**
+
+- **Beam structure in COMSOL** - The strength of a beam of given length and volume is evaluated in COMSOL Multiphysics
+simulation tool.  
+**to be implemented**
 
 #### 5.2 Adding a new definition of evaluator
 The **eval/config.xml** file contains definitions of all the evaluation functions. 
@@ -165,27 +182,33 @@ The **eval/config.xml** file contains definitions of all the evaluation function
 </evaluator>
 ```
 
+
+
+
+
 ## 6 Implementation
-### 6.0 Parallel processing
+#### 6.1 Parallel processing
 ![alt text](docs/parallel_processing.png)
 
-### 6.1 The island model
+###### 6.1.1 The island model
 ![alt text](docs/gpec_general_flowchart.png)  
 Is an example of a distributed population model. 
-- Coarse grain 
-- Micro grain
-- Fine grain
+- **Coarse grain**
+ 
+- **Micro grain**
 
-### 6.2 Replacement
+- **Fine grain**
+
+#### 6.2 Replacement
 Replacement policies
 
-##### 6.2.1 Elitism
+###### 6.2.1 Elitism
 todo
 
-##### 6.2.2 Stead-state
+###### 6.2.2 Stead-state
 todo
 
-##### 6.2.3 Migration
+###### 6.2.3 Migration
 - Belding (1995) extended the work of Tanese (1989) where migrants were selected by choosing the first $n$ individuals 
 in the local population according to a predefined ordering, effectively simulating a more random migrant selection strategy. 
 
@@ -202,49 +225,58 @@ selected based on fitness in the receiving population. That would be a periodica
 - Migration success rate - depends on whether the island could find a migrant when it wanted. If you migration rate
 is less than 80%, consider increasing `emmigrants` or reducing `immigrants` in island customization file. 
 
-### 6.3 Reproduction
+#### 6.3 Reproduction
 Different reproduction methods implemented. TODO
  
-##### 6.3.1 Mutation
+###### 6.3.1 Mutation
 Mutation rate. TODO
 
-##### 6.3.2 Crossover
+###### 6.3.2 Crossover
 One-point crossover and multi-point crossover. TODO
 
-##### 6.3.3 Recombination
+###### 6.3.3 Recombination
 Multi-parental and single parents recombination.
 
-### 6.4 Selection
+#### 6.4 Selection
 Different selection policies implemented.
 
-##### 6.4.1 Roulette Wheel
+###### 6.4.1 Roulette Wheel
 Evolutionary robotics p. 29
 
-##### 6.4.2 Rank based
+###### 6.4.2 Rank based
 Individuals are ranked from the best to the worst. The probability of making offspring is proportional to their rank, 
 not to their fitness value. [Evolutionary robotics p. 30]
 
-##### 6.4.3 Truncation selection
+###### 6.4.3 Truncation
 Ranking the individuals, selecting the top M of them and let them make O copies of their chromosomes, such that M x O = N.
 
-##### 6.4.4 Tournament based
+###### 6.4.4 Tournament
 Good for parallel computation. Probably won't be implemented tho.
 
-##### 6.4.5 Similarity-based
+###### 6.4.5 Similarity-based
 Todo 
 
-### 6.5 Evaluation
+#### 6.5 Evaluation
 - In case of GP, a decoding might be needed. Reverse Polish Notation.
 - Fitness evaluation. 
 - Phenotype validity check
     - if chromosome is not properly encoded an individual can be send to a repair island. 
         - Information preservation.
+
+
+
+
+
 ## 7 Results
 #### 7.1 One Max
 todo
 
 #### 7.2 Times Plus One Max
 Todo: deriving a math formula for finding maximum fitness for a tree of any size.
+
+
+
+
 
 ## 8 Techniques of Evolutionary Computation
 **Self-organization**  
@@ -267,6 +299,10 @@ Emergence of complex abilities from a process of autonomous interaction between 
 
 **Common issues related to Evolutionary Computation**
 - Pre-mature convergence
+
+
+
+
 
 ## 9 References
 Evolutionary Robotics, Dario Floreano

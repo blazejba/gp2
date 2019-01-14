@@ -13,7 +13,7 @@ class Island(object):
                 self.dna_length         = f[0].attrib['dna_length']
                 self.dna_repair         = f[0].attrib['dna_repair'] == 'true'
                 self.genotype_letters   = [letter for letter in f[0].attrib['dna_letters'].split(',')]
-        self.evaluation_function_path   = 'eval/src/' + configs.attrib['evaluator'] + '.py'
+        self.evaluation_function_path   = 'eval/' + configs.attrib['evaluator'] + '/code.py'
 
         # Evolution settings
         self.chromosome_length  = chromosome_length
