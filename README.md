@@ -105,19 +105,24 @@ Elitism, a certain number of the fittest individuals is injected to the next gen
     * todo
 
 ##### 4.2.2 Migration policy
-**`migration_policy`**  
+**`entry_policy`**  
 * `periodical`  
     * `period` = Integer   
     Defines the number of generations between accepting a immigrant to an island. 
 * `probabilistic`  
     * `probability` = Float  
-    Where 1 is 100%. A probability to take an immigrant in each generation. 
-* `migration_out` = Boolean, def. *[false]*
-* `migration_in` = Boolean, def. *[false]*
-* `emmigrants` = Integer, def. *[2]*  
-Defines how many migrants will be available for other islands. 
-* `immigrants` = Integer, def. *[1]*  
+    Where 1 is 100%. A probability to take an immigrant in each generation.   
+
+**`selection_policy`**  
+Same options as in Section **4.2.3 Selection policy**.  
+
+**`migration_out`** = Boolean, def. *[false]*  
+**`migration_in`** = Boolean, def. *[false]*  
+**`emmigrants`** = Integer, def. *[2]*  
+Defines how many migrants will be available for other islands.   
+**`immigrants`** = Integer, def. *[1]*  
 Defines how many migrants will be taken in each period/call.
+
 
 
 ##### 4.2.3 Selection policy
@@ -180,17 +185,20 @@ todo
 ##### 6.2.2 Stead-state
 todo
 
-##### 6.2.3 Migration policy
-- Pettey (1987) designed a distributed model based on the polytypic concept of a species being represented
-by several types that are capable of mating and producing viable offspring. Every generation, migration sent
-the best individuals in each population to each neighbour, replacing the worst individuals. 
-- Tanese (1987,1989) presented a parallel genetic algorithm implemented on a hypercube structure. 
-Migration occurred periodically, where migrants where selected according to fitness and replaced individuals 
-selected based on fitness in the receiving population.
+##### 6.2.3 Migration
 - Belding (1995) extended the work of Tanese (1989) where migrants were selected by choosing the first $n$ individuals 
 in the local population according to a predefined ordering, effectively simulating a more random migrant selection strategy. 
 
-- Probabilistic migration
+- Entry policies: Probabilistic or Periodical
+    - Pettey (1987) designed a distributed model based on the polytypic concept of a species being represented
+by several types that are capable of mating and producing viable offspring. Every generation, migration sent
+the best individuals in each population to each neighbour, replacing the worst individuals. That would be a periodical entry
+migration with `period` set to 1.
+    - Tanese (1987,1989) presented a parallel genetic algorithm implemented on a hypercube structure. 
+Migration occurred periodically, where migrants where selected according to fitness and replaced individuals 
+selected based on fitness in the receiving population. That would be a periodical migration with rank based selection.
+
+- Selection policies: Look at Section **6.4 Selection**. The same strategies are available for immigrant selection.
 - Migration success rate - depends on whether the island could find a migrant when it wanted. If you migration rate
 is less than 80%, consider increasing `emmigrants` or reducing `immigrants` in island customization file. 
 
