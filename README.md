@@ -71,24 +71,24 @@ An exemplary experiment configuration structure has been shown below.
 ```
 
 #### 4.1 Experiment customization
-[*] **`chromosome_length`**  = Integer    
+[*] Int **`chromosome_length`**   
 Number of letters encoding a chromosome.
 
-[*] **`max_fitness`** = Integer  
+[*] Int **`max_fitness`**    
 At least one of the termination conditions has to be true.  
 
-[*] **`max_time`** = Integer  
+[*] Int **`max_time`**   
  The time condition has a priority over the fitness condition.
 
 #### 4.2 Island customization  
 
-[*] **`population_size`** = Integer  
+[*] Int **`population_size`**   
 The size of a population  
 
-[*] **`evaluator`** = String  
+[*] Int **`evaluator`**  
 Name of fitness evaluation function. The evaluator has be defined in **eval/** folder.  
 
-**`genotype_repair`** = Boolean, def. *[false]*     
+Bool **`genotype_repair`** = False    
 If chosen, individuals with broken dna (e.g. invalid format for the given problem) will not be discarded. 
 In order to preserve potentially valuable information of the code, such individuals will populate an repair island
 and stay there until their dna has been fixed. Repaired individuals will then migrate to other islands.
@@ -98,11 +98,11 @@ To determine whether the repair for a given problem is available
 look at the **`genotype_repair`** parameter in the evaluator's config.xml file.
 
 ###### 4.2.1 Replacement policy
-**`replacement_policy`**   
+Choice **`replacement_policy`** = elitism   
 Defines replacement strategy. Variants: 
-* `elite`  
+* `elitism`  
 Elitism, a certain number of the fittest individuals is injected to the next generation by default.
-    * `num_of_elites` = Int  
+    * Int `num_of_elites` = 2  
       Number of elites left in each generation. If not defined the default value is 2.
 * `stead-state`
     * todo
@@ -132,20 +132,20 @@ Int **`immigrants`** = 1
 Defines how many migrants will be taken in each period/call.
 
 ###### 4.2.3 Selection policy
-**`selection_policy`** = [roulette_wheel/rank/truncation/tournament]
+Choice **`selection_policy`** = roulette_wheel
 * `roulette_wheel` 
 * `rank`
 * `truncation`
 * `tournament`
 
 ###### 4.2.4 Reproduction policy
-**`parents`**  
+Int **`parents`** = 2  
 The algorithm allows multi-parent recombination. The default value is 2 parents.  
 
-**`crossover_points`**  
+Int **`crossover_points`** = 2  
 Number of points for crossover  
 
-**`mutation_rate`**  
+Int **`mutation_rate`** = 10  
 A chance for a gene to mutate, given in %  
 
 
@@ -278,28 +278,35 @@ Todo: deriving a math formula for finding maximum fitness for a tree of any size
 
 
 
-## 8 Techniques of Evolutionary Computation
-**Self-organization**  
+## 8 Techniques
+#### 8.1 Evolutionary computation
+###### 8.1.1 Self-organization  
 adaptation process usually involves a large number of evaluations of the interactions between the system and the environment.
 Using self-organization does not require any human supervision. The main advantage of relying on self-organization is
 the fact that designer does not need to find the optimal solution. His efforts are redirected towards an implementation
 of the environment, in this case, the evaluator. 
 Emergence of complex abilities from a process of autonomous interaction between the agent and the environment. 
 
-**Schemata**
+###### 8.1.2 Schemata
 - Evolutionary Robotics book
 - Almost all components of genetic algorithms are stochastic
 - implicit parallelism, schemata 
     - schemata is major genetic operator because it generates innovation
     - mutation is a local search operator 
 
-**Speedup**
+###### 8.1.3 Speedup
 - Linear speedup
 - Super-linear speedup
 
-**Common issues related to Evolutionary Computation**
-- Pre-mature convergence
+###### 8.1.4 Pre-mature convergence
 
+#### 8.2 Solid modeling
+###### 8.2.1 Procedural modeling
+
+###### 8.2.2 Constructive solid geometry
+
+###### 8.2.3 OpenSCAD 
+ 
 
 
 
