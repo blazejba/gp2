@@ -101,7 +101,7 @@ look at the **`genotype_repair`** parameter in the evaluator's config.xml file.
 Choice **`replacement_policy`** = elitism   
 Defines replacement strategy. Variants: 
 * `elitism`  
-Elitism, a certain number of the fittest individuals is injected to the next generation by default.
+Elitism, also known as \theta<tab>, a certain number of the fittest individuals is injected to the next generation by default.
     * Int `num_of_elites` = 2  
       Number of elites left in each generation. If not defined the default value is 2.
 * `stead-state`
@@ -300,6 +300,7 @@ Emergence of complex abilities from a process of autonomous interaction between 
 
 ###### 8.1.4 Pre-mature convergence
 
+
 #### 8.2 Solid modeling
 ###### 8.2.1 Procedural modeling
 
@@ -308,6 +309,8 @@ Emergence of complex abilities from a process of autonomous interaction between 
 ###### 8.2.3 OpenSCAD 
  
 
+#### 8.3 Simulation
+###### 8.3.1 COMSOL Multiphysics
 
 
 
