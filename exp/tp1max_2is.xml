@@ -1,4 +1,4 @@
-<experiment chromosome_length="20" max_fitness="0" max_time="20">
+<experiment chromosome_length="11" max_fitness="0" max_time="6">
     <island population_size="10" evaluator="times_plus_one_max" dna_repair="false">
         <reproduction crossover_points="6" mutation_rate="10" num_of_parents="3"/>
         <selection policy="roulette_wheel"/>

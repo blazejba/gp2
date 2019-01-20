@@ -7,27 +7,29 @@ from src.utilities import decode_stdout, get_date_in_string, clean_dir, kill_all
 
 
 class Experiment():
-	def __init__(self, experiment_xml_config, evaluators_xml_config, name):
+	def __init__(self, experiment_xml_config, evaluators_xml_list, operators_xml_list, name):
 		self.start_t = time.time()
 		self.tmp_dir = tempfile.mkdtemp(dir='/tmp')
 
 		# Experiment settings
 		self.max_fitness        = int(experiment_xml_config.attrib['max_fitness'])
 		self.max_time           = int(experiment_xml_config.attrib['max_time'])
+		self.max_generation     = int(experiment_xml_config.attrib['max_generation'])
 		self.chromosome_length  = int(experiment_xml_config.attrib['chromosome_length'])
 		self.experiment_name    = name
 
 		# Islands settings
 		self.island_configs = []
-		self.islands        = self.initialize_islands(experiment_xml_config, evaluators_xml_config)
+		self.islands        = self.initialize_islands(experiment_xml_config, evaluators_xml_list, operators_xml_list)
 		for island in self.islands:
 			open_processes(island)
 
 		# Logs
 		self.log = self.initialize_log()
 
-	def initialize_islands(self, experiment, evaluators):
-		return [Island(name, island, self.chromosome_length, evaluators, self.tmp_dir) for name, island in enumerate(experiment)]
+	def initialize_islands(self, experiment, evaluators, operators_xml_list):
+		return [Island(name, island, self.chromosome_length, evaluators, operators_xml_list, self.tmp_dir)
+		        for name, island in enumerate(experiment)]
 
 	def termination_check(self, island):
 			if island.individuals[0][0] >= self.max_fitness != 0:
@@ -36,14 +38,19 @@ class Experiment():
 			elif self.max_time < time.time() - self.start_t and self.max_time != 0:
 				self.termination_printout(island, 'timeout')
 				return True
+			elif island.generation == self.max_generation and self.max_generation != 0:
+				self.termination_printout(island, 'generation')
+				return True
 			else:
 				return False
 
 	def termination_printout(self, island, reason):
 		if reason == 'timeout':
 			print('Evolution terminated: timeout.')
-		else:
+		elif reason == 'fitness':
 			print('Evolution terminated: maximum fitness has been achieved.')
+		elif reason == 'generation':
+			print('Evolution terminated: maximum generation has been reached.')
 		print('Generated', island.generation, 'generations in', "{:.2f}".format(time.time() - self.start_t), 'seconds.')
 		self.print_migration_success_rates()
 		print('Individuals of the last generation:\n')

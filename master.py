@@ -13,11 +13,13 @@ from src.Experiment import Experiment
 
 def main():
     experiment_name = sys.argv[1]
-    evaluation_xml_path = 'eval/config.xml'
+    evaluation_xml_path = 'eval/evaluators.xml'
     experiment_xml_path = 'exp/' + experiment_name + '.xml'
+    operators_xml_path = 'eval/operators.xml'
 
     experiment = Experiment(ET.parse(experiment_xml_path).getroot(),
                             ET.parse(evaluation_xml_path).getroot(),
+                            ET.parse(operators_xml_path).getroot(),
                             experiment_name)
 
     while 1:

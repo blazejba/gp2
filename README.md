@@ -72,24 +72,32 @@ An exemplary experiment configuration structure has been shown below.
 
 #### 4.1 Experiment customization
 [*] Int **`chromosome_length`**   
-Number of letters encoding a chromosome.
+>Number of letters encoding a chromosome.
 
+###### 4.1.0 Termination conditions
+All the conditions are inclusive, which means that all of them can be set at once. The termination
+will occur when the any of them is met. When a condition is set to zero it does not take an effect.
+  
 [*] Int **`max_fitness`**    
-At least one of the termination conditions has to be true.  
+>At least one of the termination conditions has to be true.  
 
 [*] Int **`max_time`**   
- The time condition has a priority over the fitness condition.
+>The time condition has a priority over the fitness condition. This condition is inclusive with **`max_generations`**.
+ 
+[*] Int **`max_generations`**   
+>Number of generations to evolve before terminating the experiment. This condition is inclusive with
+**`max_time`**.
 
 #### 4.2 Island customization  
 
 [*] Int **`population_size`**   
-The size of a population  
+>The size of a population  
 
 [*] Int **`evaluator`**  
-Name of fitness evaluation function. The evaluator has be defined in **eval/** folder.  
+>Name of fitness evaluation function. The evaluator has be defined in **eval/** folder.  
 
 Bool **`genotype_repair`** = False    
-If chosen, individuals with broken dna (e.g. invalid format for the given problem) will not be discarded. 
+>If chosen, individuals with broken dna (e.g. invalid format for the given problem) will not be discarded. 
 In order to preserve potentially valuable information of the code, such individuals will populate an repair island
 and stay there until their dna has been fixed. Repaired individuals will then migrate to other islands.
 When this property has been enabled for at least one island in the experiment, a repair island is created, 
@@ -98,13 +106,15 @@ To determine whether the repair for a given problem is available
 look at the **`genotype_repair`** parameter in the evaluator's config.xml file.
 
 ###### 4.2.1 Replacement policy
-Choice **`replacement_policy`** = elitism   
-Defines replacement strategy. Variants: 
+Choice **`replacement_policy`** = elitism  
+>Defines replacement strategy. Variants: 
 * `elitism`  
-Elitism, also known as \theta<tab>, a certain number of the fittest individuals is injected to the next generation by default.
-    * Int `num_of_elites` = 2  
-      Number of elites left in each generation. If not defined the default value is 2.
-* `stead-state`
+Elitism, also known as (mu+lambda??), a certain number of the fittest individuals is injected to the next generation by default.  
+Int `num_of_elites` = 2  
+    Number of elites left in each generation. If not defined the default value is 2.
+
+* `stead-state`  
+Also known as (mu, lambda)
     * todo
 
 ###### 4.2.2 Migration policy
@@ -187,6 +197,48 @@ The **eval/config.xml** file contains definitions of all the evaluation function
 
 
 ## 6 Implementation
+#### 6.0 GA and GP representation
+a little about data sctrcture used in both cases.
+###### 6.0.1 GA
+
+###### 6.0.2 GP
+- Primitive set: terminals and functions
+    - **Type consistency** 
+        - subtree crossover mixes up and joins nodes arbitrarily. 
+        As a result it is necessary that any of the argument positions can be used in any possible way
+        for any function in the function set, because it is always possible that the artificial evolution
+        will generate such a combination. 
+        - Or alternative with mixing only within the same type.
+    - **evaluation safety**
+        - protected functions etc.
+        - trapping run-time exceptions and reducing fitness to zero
+- Sufix and prefix notation
+- Tree creation methods:
+    - **Full** - it generates full trees, i.e. all leaves are at the same depth. 
+    nodes are taken at random from the function set until the maximum tree depth is reached. 
+    Beyond that depth, only terminals can be chosen. 
+    Although, the full method generates trees where all the leaves are at the same depth,
+    this does not necessarily mean that all initial trees will have an identical number of nodes
+     (often referred to as the size of a tree) or the same shape. 
+     This only happens, in fact, when all the functions in the primitive set have an equal arity.
+    - **Grow** - The grow method allows for the creation of trees of more varied sizes and shapes. 
+    Nodes are selected from the whole primitive set until the depth limit is reached. 
+    Once the depth limit is reached only terminals may be chosen.
+    - **Ramped half-and-half** - Half the initial population is constructed using full and half is constructed using grow. 
+    This is done using a range of depth limits (hence the term “ramped”) 
+    to help ensure that we generate trees having a variety of sizes and shapes.
+- Subtree crossover
+    - **homologous** - crossover where some of the genetic positioning is being preserved.
+        - **one-point crossover**  
+        - **uniform crossover** 
+- Subtree mutation
+    - **point mutation** - a random node is selected and the primitive stored there is replaced with another, 
+    randomly chosen primitive from the same set and of the same arity. It applied on a per-node basis, where each
+    node is separately considered with a certain probability of mutation.  
+    - **headless chicken crossover** - subtree mutation is sometimes implemented as
+    crossover between a program and a newly generated random program. When subtree mutation is applied it
+    involves the modification of only one subtree. 
+- mulit-objective optimization
 #### 6.1 Parallel processing
 ![alt text](docs/parallel_processing.png)
 
@@ -280,21 +332,29 @@ Todo: deriving a math formula for finding maximum fitness for a tree of any size
 
 ## 8 Techniques
 #### 8.1 Evolutionary computation
-###### 8.1.1 Self-organization  
+###### 8.1.1 Genetric Programming
+- At the most abstract level GP is a systematic, domain-independent method for getting computers 
+to solve problems automatically starting from a high-level state-ment of what needs to be done.[2]
+- In genetic programming we evolve a population of computer programs. 
+That is, generation by generation, GP stochastically transforms populations of programs into new, hopefully better, populations of programs.
+GP, like nature, is a random process, and it can never guarantee results.
+GP’s essential randomness, however, can lead it to escape traps which deterministic methods may be captured by. 
+Like nature, GP has been very successful at evolving novel and unexpected ways of solving problems.[2]
+###### 8.1.2 Self-organization  
 adaptation process usually involves a large number of evaluations of the interactions between the system and the environment.
 Using self-organization does not require any human supervision. The main advantage of relying on self-organization is
 the fact that designer does not need to find the optimal solution. His efforts are redirected towards an implementation
 of the environment, in this case, the evaluator. 
 Emergence of complex abilities from a process of autonomous interaction between the agent and the environment. 
 
-###### 8.1.2 Schemata
+###### 8.1.3 Schemata
 - Evolutionary Robotics book
 - Almost all components of genetic algorithms are stochastic
 - implicit parallelism, schemata 
     - schemata is major genetic operator because it generates innovation
     - mutation is a local search operator 
 
-###### 8.1.3 Speedup
+###### 8.1.4 Speedup
 - Linear speedup
 - Super-linear speedup
 
@@ -315,4 +375,5 @@ Emergence of complex abilities from a process of autonomous interaction between 
 
 
 ## 9 References
-Evolutionary Robotics, Dario Floreano
+[1] *Evolutionary Robotics*, by D. Floreano  
+[2] *A Field Guide to Genetic Programming*, by R. Poli, W. B. Langdon, N. F. McPhee

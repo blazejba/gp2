@@ -1,22 +1,19 @@
-<?xml version="1.0" encoding="UTF-8" ?>
 <evaluation_functions>
-
     <function name="one_max">
         <parameters
                 ea_type="ga"
-                dna_letters="0,1"
-                dna_length="fixed"
-                dna_repair="false"
+                terminal_set="0,1"
+                repair="false"
         />
     </function>
 
     <function name="times_plus_one_max">
         <parameters
                 ea_type="gp"
-                dna_letters="1,*,+"
-                dna_length="fixed"
-                dna_repair="true"
+                terminal_set="1"
+                function_set="*,+"
+                restriction="size"
+                repair="false"
         />
     </function>
-
 </evaluation_functions>

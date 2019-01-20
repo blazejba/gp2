@@ -23,7 +23,7 @@ def normalize_vector(vector):
     total = 0
     for entry in vector:
         total += entry
-    return [entry / total for entry in vector] if total != 0 else 1 / len(vector)
+    return [entry / total for entry in vector] if total != 0 else [1 / len(vector) for _ in range(len(vector))]
 
 
 def get_date_in_string():

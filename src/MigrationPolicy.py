@@ -30,24 +30,23 @@ class MigrationPolicy(object):
 				self.entry_policy           = 'probabilistic'
 				self.immigrant_selection    = 'roulette_wheel'
 
+			if self.entry_policy == 'periodical':
+				try:
+					self.period = int(config['period'])
+				except:
+					self.period = 5
+				self.generations_since_migration = 0
+			if self.entry_policy == 'probabilistic':
+				try:
+					self.probability = float(config['chance'])
+				except:
+					self.probability = 10
+
 		if self.out_allowed:
 			try:
 				self.num_of_emigrants = int(config['emigrants'])
 			except:
 				self.num_of_emigrants = 1
-
-		# Policy specific settings
-		if self.entry_policy == 'periodical':
-			try:
-				self.period = int(config['period'])
-			except:
-				self.period = 5
-			self.generations_since_migration = 0
-		if self.entry_policy == 'probabilistic':
-			try:
-				self.probability    = float(config['chance'])
-			except:
-				self.probability    = 10
 
 	def get_success_rate(self):
 		return float((self.successful_migrations/self.total_migrations)*100) if self.total_migrations != 0 else 0
