@@ -1,6 +1,6 @@
 from os import rename, walk
 from random import random, randint
-from src.selection import roulette_wheel, rank_based, truncation, sort_by_scores
+from src.selection import roulette_wheel, rank_based, truncation, tournament, sort_by_scores
 from src.utilities import remove_file
 
 class MigrationPolicy(object):
@@ -67,8 +67,7 @@ class MigrationPolicy(object):
 		elif self.immigrant_selection == 'truncation':
 			indexes = truncation(self.num_of_immigrants)
 		elif self.immigrant_selection == 'tournament':
-			indexes = []
-			print('tournament to  be implemented!')
+			indexes = tournament(self.num_of_immigrants, candidates_fitness)
 		selected_candidates = [candidates[index] for index in indexes]
 		return [self.get_immigrant(candidate) for candidate in selected_candidates]
 

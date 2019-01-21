@@ -1,4 +1,4 @@
-from random import random
+from random import random, randint
 from src.utilities import normalize_vector, accumulate_vector
 
 
@@ -30,8 +30,21 @@ def truncation(quantity):
 	return [i for i in range(quantity)]
 
 
-def tournament():
-	print('tobedone')
+def tournament(quantity, scores):
+	indexes = []
+	for _ in range(quantity):
+		parent1 = randint(0, len(scores) - 1)
+		parent2 = randint(0, len(scores) - 1)
+		while parent1 == parent2:
+			parent2 = randint(0, len(scores) - 1)
+		if scores[parent1] > scores[parent2]:
+			indexes.append(parent1)
+		elif scores[parent1] == scores[parent2]:
+			indexes.append(parent1 if randint(0,1) == 1 else parent2)
+		else:
+			indexes.append(parent2)
+	print(indexes)
+	return indexes
 
 
 def sort_by_scores(scores):

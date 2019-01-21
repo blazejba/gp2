@@ -1,4 +1,4 @@
-from src.selection import roulette_wheel, rank_based, truncation
+from src.selection import roulette_wheel, rank_based, truncation, tournament
 
 
 class SelectionPolicy(object):
@@ -19,5 +19,5 @@ class SelectionPolicy(object):
 		elif self.policy == 'truncation':
 			indexes = truncation(self.num_of_parents)
 		elif self.policy == 'tournament':
-			print('tournament not implemented')
+			indexes = tournament(self.num_of_parents, fitness_list)
 		return [individuals[index][1] for index in indexes]

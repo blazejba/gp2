@@ -22,6 +22,7 @@ def main():
 	sys.stdout.write(individual + ',' + str(fitness))
 	sys.exit(1)
 
+
 def execute_tree(tree):
 	if len(tree) == 0:
 		return 0, []

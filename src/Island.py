@@ -53,9 +53,7 @@ class Island(object):
         # More variables
         self.generation     = 0
         self.individuals    = self.initiate_individuals()
-        for i in self.individuals:
-            print(i, 'asd')
-        print('\n')
+
         self.island_name    = name
         self.processes      = []
 
@@ -147,4 +145,4 @@ class Island(object):
         # New generation
         self.individuals = new_generation + from_old_generation
         self.generation += 1
-        print('island', self.island_name, 'new generation', self.generation)
+        print('evolving island', self.island_name, 'into a new generation', self.generation)
