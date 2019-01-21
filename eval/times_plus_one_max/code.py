@@ -16,34 +16,35 @@ def main():
 	individual = sys.argv[2]
 
 	# evaluation
-	stack = []
-	for symbol in genome: # reverse polish notation
-		if symbol == '+':
-			if len(stack) > 1:
-				stack[len(stack) - 2] = stack[len(stack) - 2] + stack[len(stack) - 1]
-				del stack[len(stack) - 1]
-			else:
-				stack = []
-				break
-
-		elif symbol == '*':
-			if len(stack) > 1:
-				stack[len(stack) - 2] = stack[len(stack) - 2] * stack[len(stack) - 1]
-				del stack[len(stack) - 1]
-			else:
-				stack = []
-				break
-		else:
-			stack.append(int(symbol))
-
-	if len(stack) == 1:
-		fitness = stack[0] if stack[0] != '+' or stack[0] != '*' else 0
-	else:
-		fitness = 0
+	fitness, _ = execute_tree([i for i in reversed(genome)])
 
 	# fill stdout
 	sys.stdout.write(individual + ',' + str(fitness))
 	sys.exit(1)
+
+def execute_tree(tree):
+	if len(tree) == 0:
+		return 0, []
+	if len(tree) > 1:
+		if tree[0] == '1':
+			return 1, tree[1:len(tree)]
+		if len(tree) > 2:
+			try:
+				arg_1, rest = execute_tree(tree[1:len(tree)])
+			except:
+				return 0, []
+			try:
+				arg_2, rest = execute_tree(rest)
+			except:
+				return 0, []
+			if tree[0] == '+':
+				return arg_1 + arg_2, rest
+			elif tree[0] == '*':
+				return arg_1 * arg_2, rest
+		else:
+			return 0, []
+	else:
+		return int(tree[0]), []
 
 
 if __name__ == '__main__':

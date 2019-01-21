@@ -11,6 +11,7 @@ class Island(object):
             if f.attrib['name'] == configs.attrib['evaluator']:
                 self.ga_type        = f[0].attrib['ea_type']
                 self.terminal_set   = [letter for letter in f[0].attrib['terminal_set'].split(',')]
+                self.operator_set   = []
                 if self.ga_type == 'gp':
                     self.gp_restriction = f[0].attrib['restriction']
                     if self.gp_restriction == 'depth':
@@ -18,7 +19,6 @@ class Island(object):
                         self.gp_method      = f[0].attrib['method']
                     if self.gp_restriction == 'size':
                         self.gp_max_size    = chromosome_length
-                    self.operator_set   = []
                     operator_set        = [letter for letter in f[0].attrib['function_set'].split(',')]
                     for operation in operator_set:
                         for o in all_operators:
@@ -48,13 +48,14 @@ class Island(object):
         self.replacement_policy     = ReplacementPolicy(replacement_config, migration_config, tmp_dir,
                                                         name, self.population_size)
         self.reproduction_policy    = ReproductionPolicy(self.population_size, reproduction_config,
-                                                         chromosome_length, self.terminal_set)
+                                                         chromosome_length, self.terminal_set, self.operator_set)
 
         # More variables
         self.generation     = 0
         self.individuals    = self.initiate_individuals()
         for i in self.individuals:
-            print(i,'\n')
+            print(i, 'asd')
+        print('\n')
         self.island_name    = name
         self.processes      = []
 
@@ -70,25 +71,29 @@ class Island(object):
             expression.append(operator[0])
             return expression
 
-    def size_restricted_tree_growth(self, max_size):
-        if max_size == 0 or random()<(0.45):
-            return self.choose_random_element(self.terminal_set), 0
+    def size_restricted_tree_growth(self, max_size, free_nodes):
+        free_nodes -= 1
+        if max_size == 0 or (random() > 0.9 and free_nodes > 0):
+            return self.choose_random_element(self.terminal_set), max_size
         else:
             space_left = -1
             while self.tree_growth_deadlock(space_left):
                 operator = self.choose_random_element(self.operator_set)
                 space_left = max_size - operator[1]
+            free_nodes += operator[1]
+            max_size = space_left
             expression = []
             for branch in range(operator[1]):
-                chromosome, space_left = self.size_restricted_tree_growth(max_size)
-                max_size -= space_left
+                chromosome, max_size = self.size_restricted_tree_growth(max_size, free_nodes)
                 for gene in chromosome:
                     expression.append(gene)
+                free_nodes -= 1
             expression.append(operator[0])
             return expression, max_size
 
     def unconstrained_tree_growth(self):
         print("not implemented")
+        return 1
 
     def tree_growth_deadlock(self, space_left):
         if space_left < 0:
@@ -103,11 +108,12 @@ class Island(object):
 
     def initiate_tree(self):
         if self.gp_restriction == 'depth':
-            return self.depth_restricted_tree_growth(self.gp_max_depth)
+            tree = self.depth_restricted_tree_growth(self.gp_max_depth)
         elif self.gp_restriction == 'size':
-            return self.size_restricted_tree_growth(self.gp_max_size)[0]
+            tree = self.size_restricted_tree_growth(self.gp_max_size-1, 1)[0]
         elif self.gp_restriction == 'none':
-            return self.unconstrained_tree_growth()
+            tree = self.unconstrained_tree_growth()
+        return tree
 
     def initiate_string(self):
         return [self.terminal_set[randint(0, len(self.terminal_set) - 1)] for _ in range(self.chromosome_length)]

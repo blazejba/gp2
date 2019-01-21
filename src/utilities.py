@@ -34,6 +34,7 @@ def get_date_in_string():
 
 
 def decode_stdout(stdout):
+    print(stdout)
     stdout = stdout.decode('ascii')
     index, fitness = [x for x in stdout.split(',')]
     return index, fitness
@@ -51,7 +52,6 @@ def open_processes(island):
         genome = ''.join(str(gene) for gene in individual[1])
         island.processes.append(subprocess.Popen(["python3", island.evaluation_function_path, genome, str(index)],
                                                  stdout=subprocess.PIPE))
-
 
 def kill_all_processes(processes):
     for process in processes:

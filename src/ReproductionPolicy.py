@@ -2,13 +2,13 @@ from random import randint, random
 
 
 class ReproductionPolicy(object):
-	def __init__(self, population_size, reproduction_config, chromosome_length, letters):
+	def __init__(self, population_size, reproduction_config, chromosome_length, terminal_set, function_set):
 		self.num_of_crossover_points    = int(reproduction_config['crossover_points'])
 		self.num_of_parents             = int(reproduction_config['num_of_parents'])
 		self.mutation_rate              = float(reproduction_config['mutation_rate'])
 		self.population_size            = population_size
 		self.chromosome_length          = chromosome_length
-		self.genotype_letters           = letters
+		self.genotype_letters           = terminal_set + [i[0] for i in function_set]
 		self.crossover_points           = self.find_crossover_points()
 
 	def reproduce(self, parents):

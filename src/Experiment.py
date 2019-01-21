@@ -105,6 +105,7 @@ class Experiment():
 				index, fitness = decode_stdout(process.communicate()[0])
 				island.individuals[int(index)][0] = int(fitness)
 				island.individuals[int(index)][2] = True
+				print(island.individuals[int(index)][1])
 				island.processes.remove(process)
 
 	def quit_experiment(self):
