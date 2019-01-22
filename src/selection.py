@@ -43,7 +43,6 @@ def tournament(quantity, scores):
 			indexes.append(parent1 if randint(0,1) == 1 else parent2)
 		else:
 			indexes.append(parent2)
-	print(indexes)
 	return indexes
 
 

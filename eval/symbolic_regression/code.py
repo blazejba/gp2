@@ -1,25 +1,20 @@
 #!/usr/bin/env python3
-
-'''
-Score board
-genome_size     fitness
-11              9
-15              16
-'''
-
 import sys
+from math import pow
+
+arguments = [x*0.1 for x in range(-10,11)]
 
 
 def main():
-	# init
+	# read stdin
 	genome = sys.argv[1]
-	individual = sys.argv[2]
+	ref_num = sys.argv[2]
 
-	# evaluation
+	# evaluate
 	fitness, _ = execute_tree(genome)
 
 	# fill stdout
-	sys.stdout.write(individual + ',' + str(fitness))
+	sys.stdout.write(ref_num + ',' + str(fitness))
 	sys.exit(1)
 
 
@@ -27,9 +22,9 @@ def execute_tree(tree):
 	if len(tree) == 0:
 		return 0, []
 	if len(tree) > 1:
-		if tree[0] == '1':
+		if tree[0] == 'x':
 			return 1, tree[1:len(tree)]
-		if len(tree) > 2:
+		elif len(tree) > 2:
 			try:
 				arg_1, rest = execute_tree(tree[1:len(tree)])
 			except:
@@ -38,10 +33,15 @@ def execute_tree(tree):
 				arg_2, rest = execute_tree(rest)
 			except:
 				return 0, []
+
 			if tree[0] == '+':
 				return arg_1 + arg_2, rest
 			elif tree[0] == '*':
 				return arg_1 * arg_2, rest
+			elif tree[0] == '%':
+				return arg_1 / arg_2 if arg_2 != 0 else 0
+			elif tree[0] == '^':
+				return pow(arg_1, arg_2)
 		else:
 			return 0, []
 	else:

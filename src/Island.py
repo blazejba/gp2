@@ -2,10 +2,10 @@ from random import randint, random
 from src.SelectionPolicy import SelectionPolicy
 from src.ReproductionPolicy import ReproductionPolicy
 from src.ReplacementPolicy import ReplacementPolicy
-
+from src.GeneticProgramming import GeneticProgramming
 
 class Island(object):
-    def __init__(self, name, configs, chromosome_length, all_evaluators, all_operators, tmp_dir):
+    def __init__(self, name, configs, chromosome_length, all_evaluators, tmp_dir):
         # Evaluation function
         for f in all_evaluators:
             if f.attrib['name'] == configs.attrib['evaluator']:
@@ -19,11 +19,11 @@ class Island(object):
                         self.gp_method      = f[0].attrib['method']
                     if self.gp_restriction == 'size':
                         self.gp_max_size    = chromosome_length
-                    operator_set        = [letter for letter in f[0].attrib['function_set'].split(',')]
-                    for operation in operator_set:
-                        for o in all_operators:
-                            if o.attrib['name'] == operation:
-                                self.operator_set.append([o.attrib['name'], int(o.attrib['arity'])])
+
+                    for func in [func for func in f[0].attrib['function_set'].split(',')]:
+                        operator, arity = func.split('_')
+                        self.operator_set.append([operator, int(arity)])
+
                 self.dna_repair         = f[0].attrib['repair'] == 'true'
         self.evaluation_function_path   = 'eval/' + configs.attrib['evaluator'] + '/code.py'
 
@@ -62,11 +62,10 @@ class Island(object):
             return self.choose_random_element(self.terminal_set)
         else:
             operator = self.choose_random_element(self.operator_set)
-            expression = []
+            expression = [operator]
             for branch in range(operator[1]):
                 for symbol in self.depth_restricted_tree_growth(max_depth - 1):
                     expression.append(symbol)
-            expression.append(operator[0])
             return expression
 
     def size_restricted_tree_growth(self, max_size, free_nodes):
@@ -80,13 +79,12 @@ class Island(object):
                 space_left = max_size - operator[1]
             free_nodes += operator[1]
             max_size = space_left
-            expression = []
+            expression = [operator]
             for branch in range(operator[1]):
                 chromosome, max_size = self.size_restricted_tree_growth(max_size, free_nodes)
                 for gene in chromosome:
                     expression.append(gene)
                 free_nodes -= 1
-            expression.append(operator[0])
             return expression, max_size
 
     def unconstrained_tree_growth(self):
@@ -134,6 +132,9 @@ class Island(object):
                     best_individual = index
             self.individuals.append(tmp_individuals[best_individual])
             tmp_individuals.remove(tmp_individuals[best_individual])
+        print('is', self.island_name,
+              'the fittest', self.individuals[0][0],
+              'in gen', self.generation)
 
     def evolve(self):
         # Replacement
@@ -145,4 +146,3 @@ class Island(object):
         # New generation
         self.individuals = new_generation + from_old_generation
         self.generation += 1
-        print('evolving island', self.island_name, 'into a new generation', self.generation)

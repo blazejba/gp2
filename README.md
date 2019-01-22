@@ -53,14 +53,10 @@ The experiment file is located in:
 
 > exp/<experiment_name>.xml
 
-All parameters with asterisk (*) next to their name are necessary to be specified. The parameters without asterisk
-will be set to defaults if no value has been assigned. The default values are written in square parenthesis in italic,
-after the type.
-
 An exemplary experiment configuration structure has been shown below.
 
 ```xml
-<experiment chromosome_length="16" max_fitness="16" max_time="0">
+<experiment chromosome_length="16" max_fitness="16" max_time="0"  max_generation="0">
     <island population_size="5" evaluator="one_max" genotype_repair="false">
             <reproduction crossover_points="5" mutation_rate="5" num_of_parents="2"/>
             <replacement policy="elite" num_of_elites="2"/>
@@ -70,34 +66,40 @@ An exemplary experiment configuration structure has been shown below.
 </experiment>
 ```
 
+The available variations of different techniques have been listed below.
+All parameters with asterisk before the name are required. 
+The remaining parameters will be set to corresponding defaults, given after equality sign,
+if no value has been assigned to them.
+
+
 #### 4.1 Experiment customization
 [*] Int **`chromosome_length`**   
->Number of letters encoding a chromosome.
+Number of letters encoding a chromosome.
 
 ###### 4.1.0 Termination conditions
 All the conditions are inclusive, which means that all of them can be set at once. The termination
 will occur when the any of them is met. When a condition is set to zero it does not take an effect.
   
 [*] Int **`max_fitness`**    
->At least one of the termination conditions has to be true.  
+At least one of the termination conditions has to be true.  
 
 [*] Int **`max_time`**   
->The time condition has a priority over the fitness condition. This condition is inclusive with **`max_generations`**.
+The time condition has a priority over the fitness condition. This condition is inclusive with **`max_generations`**.
  
 [*] Int **`max_generations`**   
->Number of generations to evolve before terminating the experiment. This condition is inclusive with
+Number of generations to evolve before terminating the experiment. This condition is inclusive with
 **`max_time`**.
 
 #### 4.2 Island customization  
 
 [*] Int **`population_size`**   
->The size of a population  
+The size of a population  
 
 [*] Int **`evaluator`**  
->Name of fitness evaluation function. The evaluator has be defined in **eval/** folder.  
+Name of fitness evaluation function. The evaluator has be defined in **eval/** folder.  
 
 Bool **`genotype_repair`** = False    
->If chosen, individuals with broken dna (e.g. invalid format for the given problem) will not be discarded. 
+If chosen, individuals with broken dna (e.g. invalid format for the given problem) will not be discarded. 
 In order to preserve potentially valuable information of the code, such individuals will populate an repair island
 and stay there until their dna has been fixed. Repaired individuals will then migrate to other islands.
 When this property has been enabled for at least one island in the experiment, a repair island is created, 
@@ -107,7 +109,7 @@ look at the **`genotype_repair`** parameter in the evaluator's config.xml file.
 
 ###### 4.2.1 Replacement policy
 Choice **`replacement_policy`** = elitism  
->Defines replacement strategy. Variants: 
+Defines replacement strategy. Variants: 
 * `elitism`  
 Elitism, also known as (mu+lambda??), a certain number of the fittest individuals is injected to the next generation by default.  
 Int `num_of_elites` = 2  

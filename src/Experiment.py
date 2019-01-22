@@ -7,7 +7,7 @@ from src.utilities import decode_stdout, get_date_in_string, clean_dir, kill_all
 
 
 class Experiment():
-	def __init__(self, experiment_xml_config, evaluators_xml_list, operators_xml_list, name):
+	def __init__(self, experiment_xml_config, evaluators_xml_list, name):
 		self.start_t = time.time()
 		self.tmp_dir = tempfile.mkdtemp(dir='/tmp')
 
@@ -20,15 +20,15 @@ class Experiment():
 
 		# Islands settings
 		self.island_configs = []
-		self.islands        = self.initialize_islands(experiment_xml_config, evaluators_xml_list, operators_xml_list)
+		self.islands        = self.initialize_islands(experiment_xml_config, evaluators_xml_list)
 		for island in self.islands:
 			open_processes(island)
 
 		# Logs
 		self.log = self.initialize_log()
 
-	def initialize_islands(self, experiment, evaluators, operators_xml_list):
-		return [Island(name, island, self.chromosome_length, evaluators, operators_xml_list, self.tmp_dir)
+	def initialize_islands(self, experiment, evaluators):
+		return [Island(name, island, self.chromosome_length, evaluators, self.tmp_dir)
 		        for name, island in enumerate(experiment)]
 
 	def termination_check(self, island):
@@ -105,7 +105,6 @@ class Experiment():
 				index, fitness = decode_stdout(process.communicate()[0])
 				island.individuals[int(index)][0] = int(fitness)
 				island.individuals[int(index)][2] = True
-				print(island.individuals[int(index)][1])
 				island.processes.remove(process)
 
 	def quit_experiment(self):
