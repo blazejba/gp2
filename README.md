@@ -12,7 +12,6 @@ then modify one of the existing experiment configurations or write your own.
 Copyright 2018-2019 Blazej Banaszewski  
 The 3-Clause BSD License
 
-
 ## 1 Author
 `Blazej Banaszewski`, MSc student of Robotics at University of Southern Denmark.
 
