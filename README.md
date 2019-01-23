@@ -119,33 +119,37 @@ An evaluator has to be properly defined. An instruction has been provided in **S
 
 ###### 4.2.1 Replacement policy
 Choice **`replacement_policy`** = elitism  
-Defines replacement strategy. Variants: 
 * `elitism`  
-Elitism, also known as (mu+lambda??), a certain number of the fittest individuals is injected to the next generation by default.  
-Int `num_of_elites` = 2  
+A certain number of the fittest individuals is injected to the next generation. This strategy keeps the best results
+through the generations making sure that the best discovered combinations of genes survive 
+the stochastic processes of selection and reproduction.
+    * Int `num_of_elites` = 2  
     Number of elites left in each generation. If not defined the default value is 2.
 
 * `stead-state`  
-Also known as (mu, lambda)
-    * todo
+To be implemented.
 
 ###### 4.2.2 Migration policy
-[*] Bool **`migration_out`** = False  
+Although the migration is a sub-part of the replacement policy, for the clarity it has been defined as a separate policy.
 
-[*] Bool **`migration_in`** = False
+**!** Bool **`migration_out`** = False  
+When set to False the island is not sending out any emigrants.
+
+**!** Bool **`migration_in`** = False  
+When set to False the island is not taking in any immigrants.
 
 Choice **`entry_policy`** = probabilistic
 * `periodical`  
     * Int `period` = 5  
-    Defines the number of generations between accepting a immigrant to an island. 
+    In periodical migration an island takes immigrants frequently, with a `period` separation between each migration. 
 * `probabilistic`  
     * Float `chance` = 10  
-    A probability to take an immigrant in each generation.   
+    Immigrants will be accepted `chance`% of the time.   
 
 Choice **`selection_policy`** = roulette_wheel   
 The strategy for selecting an immigrant from a list of candidates. 
 The candidates are considered to be all available migrants from the different islands than the one opening its boarders.
-Same options as in Section **4.2.3 Selection policy**.  
+For the available strategies look into Section **4.2.3 Selection policy**.  
 
 Int **`emigrants`** = 1  
 Defines how many migrants will be available for other islands. 
@@ -179,18 +183,29 @@ A chance for a gene to mutate, given in %
 ###### 5.1.1 Genetic Algorithms
 - **One max** - The score is proportional to the number of ones in a binary string of a fixed length. 
 
-- what else?
-
 ###### 5.1.2 Genetic programming
-- **Times plus one max** - The score is a result of multiplying (times) and adding (plus) ones. 
+- **Times plus one max** - The score is a result of multiplying (times) and adding (plus) ones. For this problem the
+set of primitives consists of:  
 
-- **Max surface const volume** - Generating a model made out of adjacent cubes. The volume of the final model is constant
-what is being optimized is the size of the cubes and their position in order to maximize the surface of the model.
-**to be implemented**
+terminals| functions  
+--- | --- 
+1 | multiplication, *, arity 2
+. | addition, +, arity 2 
 
-- **Beam structure in COMSOL** - The strength of a beam of given length and volume is evaluated in COMSOL Multiphysics
-simulation tool.  
-**to be implemented**
+
+- **Symbolic regression** - Evaluates how well a provided expression models a polynomial function. 
+The polynomial against which the expression is tested can be arbitrarily changed inside of the evaluator.
+
+terminals| functions  
+--- | --- 
+x | multiplication, *, arity 2
+real| addition, +, arity 2
+. | subtraction, -, arity 2
+. | exponentiation, ^, 2
+. | protected division, %, 2 
+
+
+
 
 #### 5.2 Plugging new evaluator
 The **eval/evaluators.xml** file contains definitions of all the evaluation functions. 
