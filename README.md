@@ -1,27 +1,16 @@
-# GPEC lib
-### General Purpose Evolutionary Computation library
-##### `python library` | `parallel computation` | `ga/gp supported` | `island-based` | `highly customizable`
-Description of the project.
+# General Purpose Evolutionary Computation
+GPEC has been written in order to tame the power of evolutionary computation, 
+namely making it easily applicable to variety of real-life up-to-date engineering problems. 
+GPEC is a Python lightweight piece of software, which gives an user an open hand in creating programs and optimizing parameters in evolutionary manner, 
+embracing many state-of-art techniques, supporting parallel processing and providing an in-depth documentation. 
+
+To start evolving your own programs, plug in an evaluator of your choice, 
+by following the instructions given in the documentation, 
+then modify one of the existing experiment configurations or write your own.
 
 ## 0 Licensing
-Copyright <YEAR> <COPYRIGHT HOLDER>
-          
-Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-          
-  1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-          
-  2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-          
-  3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
-          
-<span style="color:red">
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
-INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. 
-IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; 
-OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-</span>
- 
- 
+Copyright 2018-2019 Blazej Banaszewski  
+The 3-Clause BSD License
 
 
 ## 1 Author
@@ -31,14 +20,14 @@ OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
 Special acknowledgements to `John Hallam` for the support, broadening the perspectives and being an inspiration.
 
 ## 3 Run
-> $ python3 master.py <experiment_name>
+> $ python3 master.py experiment_name
 
 
 ## 4 Experiment configuration file  
 
 The experiment files should be placed in:
 
-> exp/<experiment_name>.xml
+> exp/experiment_name.xml
 
 Each experiment has to consist of at least one island and one termination condition.
 For each island a set of reproduction, replacement, selection and migration policies has to be defined.
@@ -253,8 +242,8 @@ Genetic programming represented as a string of primitives from `terminal_set` an
     * **!** Choice `restriction`  
     Methods for tree creation. 
         * `size`   
-        The size, number of genes in the chromosome, is limited. The length is defined in the island configuration under
-        `chromosome_length` parameter (see **Sec. 4.1 Experiment customization**).
+        The size, number of genes in the chromosome, is limited. When this restriction has been chosen, 
+        `chromosome_length` parameter (see **Sec. 4.1 Experiment customization**) defines the size of all generated trees.
         * `depth`  
         The structure of the tree is limited by its depth. 
             * **!** Int `max_depth`
