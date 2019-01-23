@@ -22,24 +22,32 @@ Head of Embodied Systems for Robotics and Learning at University of Southern Den
 README.md
 master.py
 eval/
+--- config.xml
 --- one_max/
 -------- code.py
--------- config.xml
 --- times_plus_one_max/
 -------- code.py
--------- config.py
+--- symbolic_regression/
+-------- code.py
 src/
 --- Experiment.py
+--- GeneticProgramming.py
 --- Island.py
+--- MigrationPolicy.py
+--- ReplacementPolicy.py
+--- ReproductionPolicy.py
+--- SelectionPolicy.py
+--- selection.py
 --- utilities.py
 exp/
 --- one_max_1is.xml
 --- one_max_2is.xml
---- times_plus_one_max_2is.xml
+--- tp1max_1is.xml
+--- tp1max_2is.xml
 --- logs/
 -------- one_max_1is_<date>_<time>.log
 -------- one_max_2is_<date>_<time>.log
--------- times_plus_one_max_1is_<date>_<time>.log
+-------- tp1max_1is_<date>_<time>.log
 scripts/
 --- progress_plotter.py
 ```
@@ -49,63 +57,65 @@ scripts/
 
 ## 4 Experiment configuration file  
 
-The experiment file is located in:
+The experiment files should be placed in:
 
 > exp/<experiment_name>.xml
 
-An exemplary experiment configuration structure has been shown below.
+Each experiment has to consist of at least one island and one termination condition.
+For each island a set of reproduction, replacement, selection and migration policies has to be defined.
+
+The following code shows how to prepare an experiment involving two identical islands,
+working together on the same problem and sporadically exchanging individuals: 
 
 ```xml
-<experiment chromosome_length="16" max_fitness="16" max_time="0"  max_generation="0">
-    <island population_size="5" evaluator="one_max" genotype_repair="false">
-            <reproduction crossover_points="5" mutation_rate="5" num_of_parents="2"/>
-            <replacement policy="elite" num_of_elites="2"/>
-            <selection policy="roulette_wheel"/>
-            <migration policy="periodical" in="true" out="true" period="5"/>
+<experiment chromosome_length="11" max_fitness="0" max_time="6">
+    <island population_size="10" evaluator="times_plus_one_max" dna_repair="false">
+        <reproduction crossover_points="6" mutation_rate="10" num_of_parents="3"/>
+        <selection policy="roulette_wheel"/>
+        <migration entry_policy="periodical" in="true" out="true" period="5"
+                   selection_policy="roulette_wheel" immigrants="1" emigrants="1"/>
+        <replacement policy="elitism" num_of_elites="2"/>
+    </island>
+
+    <island population_size="10" evaluator="times_plus_one_max" dna_repair="false">
+        <reproduction crossover_points="6" mutation_rate="10" num_of_parents="3"/>
+        <selection policy="roulette_wheel"/>
+        <migration entry_policy="probabilistic" in="true" out="true" chance="5"
+                   selection_policy="roulette_wheel" immigrants="1" emigrants="1"/>
+        <replacement policy="elitism" num_of_elites="2"/>
     </island>
 </experiment>
 ```
 
 The available variations of different techniques have been listed below.
-All parameters with asterisk before the name are required. 
-The remaining parameters will be set to corresponding defaults, given after equality sign,
-if no value has been assigned to them.
+All parameters with an exclamation mark before the name are required and if not provided,
+GPEC will return an error or output an unreliable result. 
+The remaining parameters will be set to corresponding defaults if a configuration value has not been provided.
 
 
 #### 4.1 Experiment customization
-[*] Int **`chromosome_length`**   
-Number of letters encoding a chromosome.
+**!** Int **`chromosome_length`**   
+Number of genes encoding a chromosome. 
+A gene can represent for a numerical value, including its sign, or a mathematical function.
 
 ###### 4.1.0 Termination conditions
-All the conditions are inclusive, which means that all of them can be set at once. The termination
-will occur when the any of them is met. When a condition is set to zero it does not take an effect.
+Termination conditions are inclusive, which means that termination will occur when the any of them has been met.
+All of the conditions need a value assigned to them. Assigning a zero disables a condition.
   
-[*] Int **`max_fitness`**    
-At least one of the termination conditions has to be true.  
+**!** Int **`max_fitness`**    
 
-[*] Int **`max_time`**   
-The time condition has a priority over the fitness condition. This condition is inclusive with **`max_generations`**.
+**!** Int **`max_time`**   
  
-[*] Int **`max_generations`**   
-Number of generations to evolve before terminating the experiment. This condition is inclusive with
-**`max_time`**.
+**!** Int **`max_generations`**   
 
 #### 4.2 Island customization  
 
-[*] Int **`population_size`**   
-The size of a population  
+**!** Int **`population_size`**   
 
-[*] Int **`evaluator`**  
-Name of fitness evaluation function. The evaluator has be defined in **eval/** folder.  
-
-Bool **`genotype_repair`** = False    
-If chosen, individuals with broken dna (e.g. invalid format for the given problem) will not be discarded. 
-In order to preserve potentially valuable information of the code, such individuals will populate an repair island
-and stay there until their dna has been fixed. Repaired individuals will then migrate to other islands.
-When this property has been enabled for at least one island in the experiment, a repair island is created, 
-assuming that the chosen evaluator allows repairing. 
-To determine whether the repair for a given problem is available 
-look at the **`genotype_repair`** parameter in the evaluator's config.xml file.
+**!** Int **`evaluator`**  
+Name of the fitness evaluation function. 
+Islands within an experiment do not have to be evaluated by the same function.
+An evaluator has to be properly defined. An instruction has been provided in **Sec. 5.2 Plugging new evaluator**.
 
 ###### 4.2.1 Replacement policy
 Choice **`replacement_policy`** = elitism  
@@ -182,19 +192,75 @@ what is being optimized is the size of the cubes and their position in order to 
 simulation tool.  
 **to be implemented**
 
-#### 5.2 Adding a new definition of evaluator
-The **eval/config.xml** file contains definitions of all the evaluation functions. 
+#### 5.2 Plugging new evaluator
+The **eval/evaluators.xml** file contains definitions of all the evaluation functions. 
 
 ```xml
-<evaluator name="one_max">
-    <param ea_type="ga"/>
-    <param letters="0,1"/>
-    <param chromosome_length="fixed"/>
-    <param genotype_repair="false"/>
-</evaluator>
+<evaluator_functions>
+    <evaluator name="one_max">
+        <param ea_type="ga"/>
+        <param terminal_set="0,1"/>
+        <param genotype_repair="false"/>
+    </evaluator>
+
+    <evaluator name="times_plus_one_max">
+        <param ea_type="gp"/>
+        <param terminal_set="0,1"/>
+        <param function_set="*_2,+_2"/>
+        <param restriction="size"/>
+        <param genotype_repair="false"/>
+    </evaluator>
+
+    <evaluator name="symbolic_regression">
+        <param ea_type="gp"/>
+        <param terminal_set="x,real"/>
+        <param function_set="*_2,+_2,%_2,^_2"/>
+        <param restriction="depth"/>
+        <param max_depth="5"/>
+        <param method="ramped"/>
+        <param genotype_repair="false"/>
+    </evaluator>
+</evaluator_functions>
+
 ```
+**!** List **`terminal_set`**  
+Defines the terminal primitives for the problem. Ephemeral random constants from different sets are available under
+the `real`, `bool` or `natural` parameters.
 
+**!** Bool **`genotype_repair`**  
+If chosen, individuals with broken dna (e.g. invalid format for the given problem) will not be discarded. 
+In order to preserve potentially valuable information of the code, such individuals will populate an repair island
+and stay there until their dna has been fixed. Repaired individuals will then migrate to other islands.
+When repair has been enabled, the invalid solutions from all the islands in the experiment will populate the repair island
+and stay there until a valid code has been created.
 
+**!** Choice **`ea_type`**  
+* `ga`
+* `gp`
+    * **!** List **`function_set`**  
+    Defines the function primitives for the problem. Each operation has to be defined and protected in the evaluator code.
+    The list consists of the parameters and their corresponding arities.
+    * **!** Choice **`restriction`**  
+    Methods for tree creation. 
+        * `size`   
+        The size, number of genes in the chromosome, is limited. The length is defined in the island configuration under
+        `chromosome_length` parameter.
+        * `depth`  
+        The structure of the tree is limited by its depth. 
+            * **!** Int **`max_depth`**
+            * **!** Choice **`method`**  
+                * `full`  
+                Generates full trees, which means that all leaves are at the same depth.
+                * `grow`  
+                This method allows for the creation of trees of more varied sizes and shapes. 
+                Nodes are selected from the primitive set until the `max_depth` is reached.
+                Then only terminal nodes can be chosen.
+                * `ramped`  
+                Half of the initial population is created using `full` method and the other half using `grow` method. 
+                This is achieved by using a range of depth limits smaller or equal to `max_depth`. 
+                This method ensures trees having a variety of sizes and shapes.
+        * `none`  
+        Unconstrained size and depth of the evolved programmes.
 
 
 
@@ -215,20 +281,6 @@ a little about data sctrcture used in both cases.
         - protected functions etc.
         - trapping run-time exceptions and reducing fitness to zero
 - Sufix and prefix notation
-- Tree creation methods:
-    - **Full** - it generates full trees, i.e. all leaves are at the same depth. 
-    nodes are taken at random from the function set until the maximum tree depth is reached. 
-    Beyond that depth, only terminals can be chosen. 
-    Although, the full method generates trees where all the leaves are at the same depth,
-    this does not necessarily mean that all initial trees will have an identical number of nodes
-     (often referred to as the size of a tree) or the same shape. 
-     This only happens, in fact, when all the functions in the primitive set have an equal arity.
-    - **Grow** - The grow method allows for the creation of trees of more varied sizes and shapes. 
-    Nodes are selected from the whole primitive set until the depth limit is reached. 
-    Once the depth limit is reached only terminals may be chosen.
-    - **Ramped half-and-half** - Half the initial population is constructed using full and half is constructed using grow. 
-    This is done using a range of depth limits (hence the term “ramped”) 
-    to help ensure that we generate trees having a variety of sizes and shapes.
 - Subtree crossover
     - **homologous** - crossover where some of the genetic positioning is being preserved.
         - **one-point crossover**  
