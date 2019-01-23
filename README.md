@@ -155,18 +155,28 @@ code increases, it is recommended to keep this value low.
 A chance for `k` genes to mutate in a chromosome of length `n` for the mutation rate `m` can be calculated from the
 combination of binomial coefficient (**E1**) and cumulative probability (**E2**).
 
+.  
+
 ![binomial_coefficient](./docs/k_permutations_of_n.png)    
+.  
 
 **E1** *Formula for finding k-permutations of n.* 
 
+.  
+
 ![cumulative_probability](./docs/gene_mutation_probability.png)   
+.  
 
 **E2** *Probability of mutation.*
 
 Using the **one_max** problem described in **Sec. 5.1.1 Genetic Algorithms** as an example, a chance for at least
 one gene mutating in a whole chromosome for the default value of 5% mutation has been shown on **E3**.  
 
+.  
+
 ![experiment_class](./docs/gene_mutation_example.png)  
+
+.  
 
 **E3** *Probability of mutation for One Max problem of chromosome length 11.* 
 
@@ -185,19 +195,6 @@ terminals| functions
 --- | --- 
 1 | multiplication, *, arity 2
 . | addition, +, arity 2 
-
-
-- **Symbolic regression** - Evaluates how well a provided expression models a polynomial function. 
-The polynomial against which the expression is tested can be arbitrarily changed inside of the evaluator.
-
-terminals| functions  
---- | --- 
-x | multiplication, *, arity 2
-real| addition, +, arity 2
-. | subtraction, -, arity 2
-. | exponentiation, ^, 2
-. | protected division, %, 2 
-
 
 
 
@@ -273,10 +270,9 @@ Genetic programming represented as a string of primitives from `terminal_set` an
 
 
 
-## 6 Implementation
-The following section aims in providing an insight into the architecture of GPEC. 
+## 6 Implementation of parallelism
+The following section aims in providing an insight into the architecture of GPEC.
 
-#### 6.1 Parallel processing
 Evolutionary Computation can benefit from the emergent properties of parallel searching. 
 W. Punch in his paper [3], points out to a property called *superlinear speedup*. 
 It emerges in many applications of GA, 
@@ -288,24 +284,48 @@ an architecture support parallel computation has been designed. The overview of 
 
 .  
 .  
+. 
+ 
 ![experiment_class](./docs/experiment_class.png)  
 .  
-.
+.  
+.  
 
 **F1** *The flowchart of parallel evaluation handled in the experiment class.*
 
-###### 6.1.1 The island model
+One of the popular models supporting parallel computation is called **the island model**, 
+based on the idea of divergence within a species in separated populations due to e.g. a natural catastrophe.  
+
+#### 6.1 The island model
+On the **F2** the implementation of the island class has been presented. 
+In the Punch's article three approaches for utilizing parallelism in GA have been brought up.
+
 .  
 .  
+. 
+ 
 ![island_class](./docs/island_class.png)  
+
 .  
 .  
+.  
+
 **F2** *The flowchart of replacement, migration, selection and reproduction of a population has been implemented in GPEC.*
 
-Is an example of a distributed population model. 
-- **Coarse grain**
- 
-- **Micro grain**
+###### 6.1.1 Micro-grain
+ Is the simplest form of parallelism in GA, where only the evaluation functions are asynchronous,
+and stepping into next generation occurs when all individuals have been tested. This approach can be used in GPEC
+experiments by defining only one island.
+
+###### 6.1.2 Fine-grain 
+Here spatial distribution of individuals is used to take a full advantage of the parallelism.
+The support of this approach in GPEC has not been provided yet. For more information see **Sec. 7.3 Fine grain**.
+
+###### 6.1.3 Coarse-grain
+
+
+
+
 
 
 
@@ -342,19 +362,33 @@ individuals. In order to reduce the convergence of the population to the genotyp
 similarity between islands will be taken into consideration in the migration process. In order words, the diversity of the
 population will be promoted when choosing which individual to take in from other islands. 
 
-#### 7.3 Fine grain
+#### 7.3 Fine-grain
 Fine grain stands as the most parallel friendly implementation of the island model, where each individual in a
 population evolves asynchronously. This approach will tested with a task of finding a solution to a complex problem, 
 potentially the one described in **Sec. 7.4.1 Surface Max** or **Sec. 7.4.2 Beam Strength Max**, 
 and the results compared with the Coarse- and Micro-grain methodologies.
 
-#### 7.4 Evaluators 
-###### 7.4.1 Surface Max
+#### 7.4 Evaluators
+###### 7.4.1 Symbolic regression
+Evaluates how well a provided expression models a polynomial function. 
+The polynomial against which the expression is tested can be arbitrarily changed inside of the evaluator.
+
+terminals| functions  
+--- | --- 
+x | multiplication, *, arity 2
+real| addition, +, arity 2
+. | subtraction, -, arity 2
+. | exponentiation, ^, 2
+. | protected division, %, 2 
+
+Symbolic regression uses depth-restricted tree growth which also is in the development stage.
+
+###### 7.4.2 Surface Max
 Evolved programmes will be procedurally modeling a 3D structure in OpenSCAD. 
 A volume and a surface of a generated polyhedron will be measured and used to calculate a fitness. 
 The volume will have an inversely proportional, and the surface a proportional effect on the score.
 
-###### 7.4.2 Beam Strength Max
+###### 7.4.3 Beam Strength Max
 In part similarly to evaluator in **7.4.1 Surface Max**, generated programmes will be performing a procedural modeling in OpenSCAD.
 Created models will have a structure of a beam. The results will be used in a COMSOL Multiphysics simulation,
 where the models will be tested against different forces. 
@@ -378,11 +412,28 @@ Repair Island.
 
 
 ## 8 Results
+GA is robust, will perform well even if the parameters are not optimal. 
+Finding the optimal settings is problem sensitive.
+In all the tests the time and number of generations needed for finding the optimal solution have been measured
+and used for detemrining which set of parameters performs better for the given problem.
+
 #### 8.1 One Max
-todo
+
+
+###### 8.1.1 Test 1: Micro-grain versus Coarse-grain
+
+###### 8.1.2 Test 2: Influence of population size
+
+###### 8.1.3 Test 3: Influence of mutation rate
 
 #### 8.2 Times Plus One Max
-Todo: deriving a math formula for finding maximum fitness for a tree of any size.
+###### 8.2.1 Test 1: Micro-grain versus Coarse-grain
+
+###### 8.2.2 Test 2: Influence of population size
+
+###### 8.2.3 Test 3: Influence of mutation rate
+
+todo: deriving a math formula for finding maximum fitness for a tree of any size.
 
 
 
