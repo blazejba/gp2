@@ -153,24 +153,29 @@ other element from the primitive set. Since the longer the chromosome the chance
 code increases, it is recommended to keep this value low.
 
 A chance for `k` genes to mutate in a chromosome of length `n` for the mutation rate `m` can be calculated from the
-following formulas:   
+combination of binomial coefficient (**E1**) and cumulative probability (**E2**).
 
-![experiment_class](./docs/k_permutations_of_n.png)    
+![binomial_coefficient](./docs/k_permutations_of_n.png)    
 
-![experiment_class](./docs/gene_mutation_probability.png)  
+**E1** *Formula for finding k-permutations of n.* 
+
+![cumulative_probability](./docs/gene_mutation_probability.png)   
+
+**E2** *Probability of mutation.*
 
 Using the **one_max** problem described in **Sec. 5.1.1 Genetic Algorithms** as an example, a chance for at least
-one gene mutating in a whole chromosome for the default value of 5% mutation rate equals:  
+one gene mutating in a whole chromosome for the default value of 5% mutation has been shown on **E3**.  
 
-![experiment_class](./docs/gene_mutation_example.png)
+![experiment_class](./docs/gene_mutation_example.png)  
 
+**E3** *Probability of mutation for One Max problem of chromosome length 11.* 
 
 
 
 ## 5 Evaluation functions
 #### 5.1 Available evaluators
 ###### 5.1.1 Genetic Algorithms
-- **One max** - The score is proportional to the number of ones in a binary string of a fixed length. 
+- **One max** - The score is proportional to the number of ones in a binary string of fixed length. 
 
 ###### 5.1.2 Genetic programming
 - **Times plus one max** - The score is a result of multiplying (times) and adding (plus) ones. For this problem the
@@ -269,11 +274,34 @@ Genetic programming represented as a string of primitives from `terminal_set` an
 
 
 ## 6 Implementation
+The following section aims in providing an insight into the architecture of GPEC. 
+
 #### 6.1 Parallel processing
-![experiment_class](./docs/experiment_class.png)
+Evolutionary Computation can benefit from the emergent properties of parallel searching. 
+W. Punch in his paper [3], points out to a property called *superlinear speedup*. 
+It emerges in many applications of GA, 
+resulting in total amount of work (in this case evaluations) needed for finding a good solution,
+decreasing for each extra parallel evolutionary subprocess at the disposal of the searching device. 
+
+In order to create a tool which utilizes superlinear speedup and enables using GA for complex and time-consuming problems,
+an architecture support parallel computation has been designed. The overview of the system can be seen on **F1**.   
+
+.  
+.  
+![experiment_class](./docs/experiment_class.png)  
+.  
+.
+
+**F1** *The flowchart of parallel evaluation handled in the experiment class.*
 
 ###### 6.1.1 The island model
+.  
+.  
 ![island_class](./docs/island_class.png)  
+.  
+.  
+**F2** *The flowchart of replacement, migration, selection and reproduction of a population has been implemented in GPEC.*
+
 Is an example of a distributed population model. 
 - **Coarse grain**
  
@@ -288,33 +316,62 @@ Is an example of a distributed population model.
 
 
 ## 7 In development
+This section covers all the techniques that has not been implemented yet, but are planned to be before moving to the
+next stage of the project, namely the master thesis experiments.  
+
 #### 7.1 Genetic Programming
-###### 7.1.1 Pruning
-###### 7.1.2 Headless chicken mutation
-Subtree mutation implemented as crossover between an individual, namely a program, and a newly generated random program. 
-When applied only one modification of such kind is allowed per tree.
+###### 7.1.1 Depth restricted and unrestricted tree growth
+These methods will allow to use evaluators of additional data type structures, namely trees with limited depth and
+completely unrestricted trees (free size and depth). **Sec. 7.1.2 Pruning** and **Sec. 7.1.3 Headless chicken mutation**
+will be first steps to implement these methods.
+
+
+###### 7.1.2 Pruning
+Sometimes tree has to be pruned. This method will be used for reducing the depth of the trees that exceeded the `max_depth`
+in depth-restricted genetic programming experiments, e.g. in a result of the subtree crossover. 
+
+###### 7.1.3 Headless chicken mutation
+It is a subtree mutation method implemented as crossover between an individual, namely a program, and a newly generated random program. 
+When applied only one modification of such kind is allowed per tree. 
+This method will be working inclusively with `point-mutation` method which has been already implemented.  
 
 #### 7.2 Similarity-based selection
-Part of multi-objective evaluation
+Part of multi-objective evaluation yet instead of performed in evaluators will be computed by GPEC main body. 
+A matrix of `n x n` dimension, where `n = total number of individuals` will contain information about similarity between
+individuals. In order to reduce the convergence of the population to the genotype of the leading individuals, 
+similarity between islands will be taken into consideration in the migration process. In order words, the diversity of the
+population will be promoted when choosing which individual to take in from other islands. 
 
 #### 7.3 Fine grain
-A support for Fine grain in the island model.
+Fine grain stands as the most parallel friendly implementation of the island model, where each individual in a
+population evolves asynchronously. This approach will tested with a task of finding a solution to a complex problem, 
+potentially the one described in **Sec. 7.4.1 Surface Max** or **Sec. 7.4.2 Beam Strength Max**, 
+and the results compared with the Coarse- and Micro-grain methodologies.
 
 #### 7.4 Evaluators 
 ###### 7.4.1 Surface Max
-Procedural modeling in OpenSCAD. Constructive solid geometry. To maximize the surface of a fixed-volume polyhedron.
+Evolved programmes will be procedurally modeling a 3D structure in OpenSCAD. 
+A volume and a surface of a generated polyhedron will be measured and used to calculate a fitness. 
+The volume will have an inversely proportional, and the surface a proportional effect on the score.
 
 ###### 7.4.2 Beam Strength Max
-Procedural modeling in OpenSCAD then simulation based testing in COMSOL Multiphysics.
+In part similarly to evaluator in **7.4.1 Surface Max**, generated programmes will be performing a procedural modeling in OpenSCAD.
+Created models will have a structure of a beam. The results will be used in a COMSOL Multiphysics simulation,
+where the models will be tested against different forces. 
+The idea is to grow novel structures for a beam by prioritizing reduction in a volume and optimizing for a strength.
+Finally, the most interesting approaches will be 3D printed and their strength evaluated in a real-life stress experiment.  
  
 #### 7.5 Stead-state replacement policy
+Extending the replacement policy by the option of stead-state evolution.
 
 #### 7.6 Genotype repair 
-If chosen, individuals with broken dna (e.g. invalid format for the given problem) will not be discarded. 
-In order to preserve potentially valuable information of the code, such individuals will populate an repair island
-and stay there until their dna has been fixed. Repaired individuals will then migrate to other islands.
-When repair has been enabled, the invalid solutions from all the islands in the experiment will populate the repair island
-and stay there until a valid code has been created.
+In order to preserve potentially valuable information of the code, 
+individuals with invalid genotypes (e.g. invalid format for the given problem) will not be discarded. 
+An option of initiating a special island will be given to users, called Repair Island. 
+The individuals with invalid genotypes will migrate to Repair Island and stay there until their code has been fixed.
+Repaired individuals will then migrate to other islands. 
+When repair has been enabled, the invalid solutions from all the islands in the experiment will populate the same
+Repair Island.
 
 
 
@@ -329,49 +386,19 @@ Todo: deriving a math formula for finding maximum fitness for a tree of any size
 
 
 
-
-
-## 8 Techniques
-#### 8.1 Evolutionary computation
-###### 8.1.1 Genetric Programming
-- At the most abstract level GP is a systematic, domain-independent method for getting computers 
-to solve problems automatically starting from a high-level state-ment of what needs to be done.[2]
-- In genetic programming we evolve a population of computer programs. 
-That is, generation by generation, GP stochastically transforms populations of programs into new, hopefully better, populations of programs.
-GP, like nature, is a random process, and it can never guarantee results.
-GP’s essential randomness, however, can lead it to escape traps which deterministic methods may be captured by. 
-Like nature, GP has been very successful at evolving novel and unexpected ways of solving problems.[2]
-
-###### 8.1.2 Self-organization  
-adaptation process usually involves a large number of evaluations of the interactions between the system and the environment.
-Using self-organization does not require any human supervision. The main advantage of relying on self-organization is
-the fact that designer does not need to find the optimal solution. His efforts are redirected towards an implementation
-of the environment, in this case, the evaluator. 
-Emergence of complex abilities from a process of autonomous interaction between the agent and the environment. 
-
-###### 8.1.3 Schemata
-- Evolutionary Robotics book
-- Almost all components of genetic algorithms are stochastic
-- implicit parallelism, schemata 
-    - schemata is major genetic operator because it generates innovation
-    - mutation is a local search operator 
-
-###### 8.1.4 Speedup
-- Linear speedup
-- Super-linear speedup
-
-###### 8.1.4 Pre-mature convergence
-
-
- 
-
 ## 9 Glossary
 **[EA]** - Evolutionary Algorithm  
 **[EC]** - Evolutionary Computation   
 **[GA]** - Genetic Algorithm  
 **[GP]** - Genetic Programming  
+**[GPEC]** - General Purpose Evolutionary Computation  
+**[RI]** - Repair Island  
+**[TP1max]** Times Plus One Max
 
 
 ## 10 References
-[1] *Evolutionary Robotics*, by D. Floreano  
-[2] *A Field Guide to Genetic Programming*, by R. Poli, W. B. Langdon, N. F. McPhee
+1. *Evolutionary Robotics*,  by D. Floreano  
+2. *A Field Guide to Genetic Programming*,  by R. Poli, W. B. Langdon, N. F. McPhee
+https://dces.essex.ac.uk/staff/rpoli/gp-field-guide/A_Field_Guide_to_Genetic_Programming.pdf
+3. *The problem-dependent nature of parallel processing in genetic programming*, W. F. Punch
+http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.408.8428&rep=rep1&type=pdf
