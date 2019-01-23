@@ -64,20 +64,20 @@ The experiment files should be placed in:
 Each experiment has to consist of at least one island and one termination condition.
 For each island a set of reproduction, replacement, selection and migration policies has to be defined.
 
-The following code shows how to prepare an experiment involving two identical islands,
+The following code shows how to prepare an experiment terminated after 6 seconds, involving two identical islands,
 working together on the same problem and sporadically exchanging individuals: 
 
 ```xml
-<experiment chromosome_length="11" max_fitness="0" max_time="6">
-    <island population_size="10" evaluator="times_plus_one_max" dna_repair="false">
+<experiment chromosome_length="11" max_fitness="0" max_time="6" max_generations="0">
+    <island population_size="10" evaluator="times_plus_one_max" genotype_repair="false">
         <reproduction crossover_points="6" mutation_rate="10" num_of_parents="3"/>
-        <selection policy="roulette_wheel"/>
+        <selection policy="roulette_wheel" num_of_parents="3" mutli-parent="true"/>
         <migration entry_policy="periodical" in="true" out="true" period="5"
                    selection_policy="roulette_wheel" immigrants="1" emigrants="1"/>
         <replacement policy="elitism" num_of_elites="2"/>
     </island>
 
-    <island population_size="10" evaluator="times_plus_one_max" dna_repair="false">
+    <island population_size="10" evaluator="times_plus_one_max" genotype_repair="false">
         <reproduction crossover_points="6" mutation_rate="10" num_of_parents="3"/>
         <selection policy="roulette_wheel"/>
         <migration entry_policy="probabilistic" in="true" out="true" chance="5"
@@ -94,51 +94,51 @@ The remaining parameters will be set to corresponding defaults if a configuratio
 
 
 #### 4.1 Experiment customization
-**!** Int **`chromosome_length`**   
+**!** Int `chromosome_length`   
 Number of genes encoding a chromosome. 
 A gene can represent for a numerical value, including its sign, or a mathematical function.
 
 ###### 4.1.0 Termination conditions
-Termination conditions are inclusive, which means that termination will occur when the any of them has been met.
+Termination conditions are inclusive, which means that termination will occur when the first of them is met.
 All of the conditions need a value assigned to them. Assigning a zero disables a condition.
   
-**!** Int **`max_fitness`**    
+**!** Int `max_fitness`  
 
-**!** Int **`max_time`**   
+**!** Int `max_time`   
  
-**!** Int **`max_generations`**   
+**!** Int `max_generations`   
 
 #### 4.2 Island customization  
 
-**!** Int **`population_size`**   
+**!** Int `population_size`   
 
-**!** Int **`evaluator`**  
+**!** Int `evaluator` 
 Name of the fitness evaluation function. 
 Islands within an experiment do not have to be evaluated by the same function.
 An evaluator has to be properly defined. An instruction has been provided in **Sec. 5.2 Plugging new evaluator**.
 
 ###### 4.2.1 Replacement policy
-Choice **`replacement_policy`** = elitism  
+Choice `replacement_policy` = elitism  
 * `elitism`  
 A certain number of the fittest individuals is injected to the next generation. This strategy keeps the best results
 through the generations making sure that the best discovered combinations of genes survive 
 the stochastic processes of selection and reproduction.
     * Int `num_of_elites` = 2  
-    Number of elites left in each generation. If not defined the default value is 2.
+    Number of elites injected to next generation.
 
 * `stead-state`  
 To be implemented.
 
 ###### 4.2.2 Migration policy
-Although the migration is a sub-part of the replacement policy, for the clarity it has been defined as a separate policy.
+Although the migration is a sub-part of the replacement, for the clarity it has been defined as a separate policy.
 
-**!** Bool **`migration_out`** = False  
+**!** Bool `migration_out` = false  
 When set to False the island is not sending out any emigrants.
 
-**!** Bool **`migration_in`** = False  
+**!** Bool `migration_in` = false  
 When set to False the island is not taking in any immigrants.
 
-Choice **`entry_policy`** = probabilistic
+Choice `entry_policy` = probabilistic
 * `periodical`  
     * Int `period` = 5  
     In periodical migration an island takes immigrants frequently, with a `period` separation between each migration. 
@@ -146,27 +146,39 @@ Choice **`entry_policy`** = probabilistic
     * Float `chance` = 10  
     Immigrants will be accepted `chance`% of the time.   
 
-Choice **`selection_policy`** = roulette_wheel   
+Choice `selection_policy` = roulette_wheel   
 The strategy for selecting an immigrant from a list of candidates. 
-The candidates are considered to be all available migrants from the different islands than the one opening its boarders.
+The candidates are considered to be all emigrants available on the other islands.
 For the available strategies look into Section **4.2.3 Selection policy**.  
 
-Int **`emigrants`** = 1  
+Int `emigrants` = 1  
 Defines how many migrants will be available for other islands. 
   
-Int **`immigrants`** = 1  
+Int `immigrants` = 1  
 Defines how many migrants will be taken in each period/call.
 
 ###### 4.2.3 Selection policy
-Choice **`selection_policy`** = roulette_wheel
-* `roulette_wheel` 
-* `rank`
-* `truncation`
-* `tournament`
+Int `parents` = 2  
+Number of parents used for making offspring each generation. 
+
+Bool `multi_parent` = true  
+When mutli-parent recombination is allowed all selected parents can contribute(it's stochastic, so sometimes they would
+sometimes not) their genetic material to an offspring. Conversely, a pair of parents is selected to make each single offspring.
+
+Choice `selection_policy` = roulette_wheel
+* `roulette_wheel`  
+The chance of an individual being selected is proportional to its fitness.
+* `rank`  
+The individuals are sorted based on their fitness from best to worst and the probability of making offspring is
+proportional to their rank.
+* `truncation`  
+The individuals are sorted based on their fitness from best to worst and M best becomes parents.
+Number M depends on the value assigned to `parents`.
+* `tournament`  
+Each parent is selected by randomly choosing two individuals from a generation and comparing their scores.
+The fitter one becomes a parent.
 
 ###### 4.2.4 Reproduction policy
-Int **`parents`** = 2  
-The algorithm allows multi-parent recombination. The default value is 2 parents.  
 
 Int **`crossover_points`** = 2  
 Number of points for crossover  
@@ -280,34 +292,6 @@ and stay there until a valid code has been created.
 
 
 ## 6 Implementation
-#### 6.0 GA and GP representation
-a little about data sctrcture used in both cases.
-###### 6.0.1 GA
-
-###### 6.0.2 GP
-- Primitive set: terminals and functions
-    - **Type consistency** 
-        - subtree crossover mixes up and joins nodes arbitrarily. 
-        As a result it is necessary that any of the argument positions can be used in any possible way
-        for any function in the function set, because it is always possible that the artificial evolution
-        will generate such a combination. 
-        - Or alternative with mixing only within the same type.
-    - **evaluation safety**
-        - protected functions etc.
-        - trapping run-time exceptions and reducing fitness to zero
-- Sufix and prefix notation
-- Subtree crossover
-    - **homologous** - crossover where some of the genetic positioning is being preserved.
-        - **one-point crossover**  
-        - **uniform crossover** 
-- Subtree mutation
-    - **point mutation** - a random node is selected and the primitive stored there is replaced with another, 
-    randomly chosen primitive from the same set and of the same arity. It applied on a per-node basis, where each
-    node is separately considered with a certain probability of mutation.  
-    - **headless chicken crossover** - subtree mutation is sometimes implemented as
-    crossover between a program and a newly generated random program. When subtree mutation is applied it
-    involves the modification of only one subtree. 
-- mulit-objective optimization
 #### 6.1 Parallel processing
 ![alt text](docs/parallel_processing.png)
 
@@ -318,81 +302,35 @@ Is an example of a distributed population model.
  
 - **Micro grain**
 
-- **Fine grain**
+## 7 In development
+#### 7.1 Genetic Programming
+###### 7.1.1 Pruning
+###### 7.1.2 Headless chicken mutation
+Subtree mutation implemented as crossover between an individual, namely a program, and a newly generated random program. 
+When applied only one modification of such kind is allowed per tree.
 
-#### 6.2 Replacement
-Replacement policies
+#### 7.2 Similarity-based selection
+Part of multi-objective evaluation
 
-###### 6.2.1 Elitism
-todo
+#### 7.3 Fine grain
+A support for Fine grain in the island model.
 
-###### 6.2.2 Stead-state
-todo
+#### 7.4 Evaluators 
+###### 7.4.1 Surface Max
+Procedural modeling in OpenSCAD. Constructive solid geometry. To maximize the surface of a fixed-volume polyhedron.
 
-###### 6.2.3 Migration
-- Belding (1995) extended the work of Tanese (1989) where migrants were selected by choosing the first $n$ individuals 
-in the local population according to a predefined ordering, effectively simulating a more random migrant selection strategy. 
-
-- Entry policies: Probabilistic or Periodical
-    - Pettey (1987) designed a distributed model based on the polytypic concept of a species being represented
-by several types that are capable of mating and producing viable offspring. Every generation, migration sent
-the best individuals in each population to each neighbour, replacing the worst individuals. That would be a periodical entry
-migration with `period` set to 1.
-    - Tanese (1987,1989) presented a parallel genetic algorithm implemented on a hypercube structure. 
-Migration occurred periodically, where migrants where selected according to fitness and replaced individuals 
-selected based on fitness in the receiving population. That would be a periodical migration with rank based selection.
-
-- Selection policies: Look at Section **6.4 Selection**. The same strategies are available for immigrant selection.
-- Migration success rate - depends on whether the island could find a migrant when it wanted. If you migration rate
-is less than 80%, consider increasing `emmigrants` or reducing `immigrants` in island customization file. 
-
-#### 6.3 Reproduction
-Different reproduction methods implemented. TODO
+###### 7.4.2 Beam Strength Max
+Procedural modeling in OpenSCAD then simulation based testing in COMSOL Multiphysics.
  
-###### 6.3.1 Mutation
-Mutation rate. TODO
-
-###### 6.3.2 Crossover
-One-point crossover and multi-point crossover. TODO
-
-###### 6.3.3 Recombination
-Multi-parental and single parents recombination.
-
-#### 6.4 Selection
-Different selection policies implemented.
-
-###### 6.4.1 Roulette Wheel
-Evolutionary robotics p. 29
-
-###### 6.4.2 Rank based
-Individuals are ranked from the best to the worst. The probability of making offspring is proportional to their rank, 
-not to their fitness value. [Evolutionary robotics p. 30]
-
-###### 6.4.3 Truncation
-Ranking the individuals, selecting the top M of them and let them make O copies of their chromosomes, such that M x O = N.
-
-###### 6.4.4 Tournament
-Good for parallel computation. Probably won't be implemented tho.
-
-###### 6.4.5 Similarity-based
-Todo 
-
-#### 6.5 Evaluation
-- In case of GP, a decoding might be needed. Reverse Polish Notation.
-- Fitness evaluation. 
-- Phenotype validity check
-    - if chromosome is not properly encoded an individual can be send to a repair island. 
-        - Information preservation.
 
 
 
 
-
-## 7 Results
-#### 7.1 One Max
+## 8 Results
+#### 8.1 One Max
 todo
 
-#### 7.2 Times Plus One Max
+#### 8.2 Times Plus One Max
 Todo: deriving a math formula for finding maximum fitness for a tree of any size.
 
 
@@ -409,6 +347,7 @@ That is, generation by generation, GP stochastically transforms populations of p
 GP, like nature, is a random process, and it can never guarantee results.
 GP’s essential randomness, however, can lead it to escape traps which deterministic methods may be captured by. 
 Like nature, GP has been very successful at evolving novel and unexpected ways of solving problems.[2]
+
 ###### 8.1.2 Self-organization  
 adaptation process usually involves a large number of evaluations of the interactions between the system and the environment.
 Using self-organization does not require any human supervision. The main advantage of relying on self-organization is
@@ -429,17 +368,6 @@ Emergence of complex abilities from a process of autonomous interaction between 
 
 ###### 8.1.4 Pre-mature convergence
 
-
-#### 8.2 Solid modeling
-###### 8.2.1 Procedural modeling
-
-###### 8.2.2 Constructive solid geometry
-
-###### 8.2.3 OpenSCAD 
- 
-
-#### 8.3 Simulation
-###### 8.3.1 COMSOL Multiphysics
 
 
 
