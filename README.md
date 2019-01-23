@@ -1,58 +1,37 @@
 # GPEC lib
 ### General Purpose Evolutionary Computation library
 ##### `python library` | `parallel computation` | `ga/gp supported` | `island-based` | `highly customizable`
+Description of the project.
 
-## 0 Authors
-`Blazej Banaszewski`, MSc student of Robotics at University of Southern Denmark 
+## 0 Licensing
+Copyright <YEAR> <COPYRIGHT HOLDER>
+          
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+          
+  1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+          
+  2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+          
+  3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+          
+<span style="color:red">
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. 
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; 
+OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>
+ 
+ 
 
-`John Hallam`, Professor at Mærsk Mc-Kinney Møller Institute, 
-Head of Embodied Systems for Robotics and Learning at University of Southern Denmark, also `Blazej`'s thesis supervisor.
 
-## 1 Run
+## 1 Author
+`Blazej Banaszewski`, MSc student of Robotics at University of Southern Denmark.
+
+## 2 Acknowledgements
+Special acknowledgements to `John Hallam` for the support, broadening the perspectives and being an inspiration.
+
+## 3 Run
 > $ python3 master.py <experiment_name>
-
-## 2 Glossary
-**[EA]** - Evolutionary Algorithm  
-**[EC]** - Evolutionary Computation   
-**[GA]** - Genetic Algorithm  
-**[GP]** - Genetic Programming  
-  
-## 3 Filesystem
-```
-README.md
-master.py
-eval/
---- config.xml
---- one_max/
--------- code.py
---- times_plus_one_max/
--------- code.py
---- symbolic_regression/
--------- code.py
-src/
---- Experiment.py
---- GeneticProgramming.py
---- Island.py
---- MigrationPolicy.py
---- ReplacementPolicy.py
---- ReproductionPolicy.py
---- SelectionPolicy.py
---- selection.py
---- utilities.py
-exp/
---- one_max_1is.xml
---- one_max_2is.xml
---- tp1max_1is.xml
---- tp1max_2is.xml
---- logs/
--------- one_max_1is_<date>_<time>.log
--------- one_max_2is_<date>_<time>.log
--------- tp1max_1is_<date>_<time>.log
-scripts/
---- progress_plotter.py
-```
-
-
 
 
 ## 4 Experiment configuration file  
@@ -250,32 +229,36 @@ The **eval/evaluators.xml** file contains definitions of all the evaluation func
 </evaluator_functions>
 
 ```
-**!** List **`terminal_set`**  
+**!** List `terminal_set`  
 Defines the terminal primitives for the problem. Ephemeral random constants from different sets are available under
 the `real`, `bool` or `natural` parameters.
 
-**!** Bool **`genotype_repair`**  
+**!** Bool `genotype_repair`  
 If chosen, individuals with broken dna (e.g. invalid format for the given problem) will not be discarded. 
 In order to preserve potentially valuable information of the code, such individuals will populate an repair island
 and stay there until their dna has been fixed. Repaired individuals will then migrate to other islands.
 When repair has been enabled, the invalid solutions from all the islands in the experiment will populate the repair island
 and stay there until a valid code has been created.
 
-**!** Choice **`ea_type`**  
-* `ga`
-* `gp`
-    * **!** List **`function_set`**  
+**!** Choice `ea_type`  
+Type of evolutionary algorithm used for the problem. The data structure is customized here.
+* `ga`  
+Genetic algorithm represented as a fixed-length (see `chromosome_length` in **Sec. 4.1 Experiment customization**) 
+string of values from `terminal_set`.
+* `gp`  
+Genetic programming represented as a string of primitives from `terminal_set` and `function_set`.
+    * **!** List `function_set`  
     Defines the function primitives for the problem. Each operation has to be defined and protected in the evaluator code.
     The list consists of the parameters and their corresponding arities.
-    * **!** Choice **`restriction`**  
+    * **!** Choice `restriction`  
     Methods for tree creation. 
         * `size`   
         The size, number of genes in the chromosome, is limited. The length is defined in the island configuration under
-        `chromosome_length` parameter.
+        `chromosome_length` parameter (see **Sec. 4.1 Experiment customization**).
         * `depth`  
         The structure of the tree is limited by its depth. 
-            * **!** Int **`max_depth`**
-            * **!** Choice **`method`**  
+            * **!** Int `max_depth`
+            * **!** Choice `method`  
                 * `full`  
                 Generates full trees, which means that all leaves are at the same depth.
                 * `grow`  
@@ -322,7 +305,7 @@ Procedural modeling in OpenSCAD. Constructive solid geometry. To maximize the su
 ###### 7.4.2 Beam Strength Max
 Procedural modeling in OpenSCAD then simulation based testing in COMSOL Multiphysics.
  
-
+#### 7.5 Stead-state replacement policy
 
 
 
@@ -369,8 +352,15 @@ Emergence of complex abilities from a process of autonomous interaction between 
 ###### 8.1.4 Pre-mature convergence
 
 
+ 
+
+## 9 Glossary
+**[EA]** - Evolutionary Algorithm  
+**[EC]** - Evolutionary Computation   
+**[GA]** - Genetic Algorithm  
+**[GP]** - Genetic Programming  
 
 
-## 9 References
+## 10 References
 [1] *Evolutionary Robotics*, by D. Floreano  
 [2] *A Field Guide to Genetic Programming*, by R. Poli, W. B. Langdon, N. F. McPhee
