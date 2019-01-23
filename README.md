@@ -93,16 +93,13 @@ the stochastic processes of selection and reproduction.
     * Int `num_of_elites` = 2  
     Number of elites injected to next generation.
 
-* `stead-state`  
-To be implemented.
-
 ###### 4.2.2 Migration policy
 Although the migration is a sub-part of the replacement, for the clarity it has been defined as a separate policy.
 
 **!** Bool `migration_out` = false  
 When set to False the island is not sending out any emigrants.
 
-**!** Bool `migration_in` = false  
+`! Bool  migration_in = false`  
 When set to False the island is not taking in any immigrants.
 
 Choice `entry_policy` = probabilistic
@@ -115,11 +112,11 @@ Choice `entry_policy` = probabilistic
 
 Choice `selection_policy` = roulette_wheel   
 The strategy for selecting an immigrant from a list of candidates. 
-The candidates are considered to be all emigrants available on the other islands.
+The list consists of all emigrants sent out on the other islands.
 For the available strategies look into Section **4.2.3 Selection policy**.  
 
 Int `emigrants` = 1  
-Defines how many migrants will be available for other islands. 
+Defines how many migrants will be send out for other islands. 
   
 Int `immigrants` = 1  
 Defines how many migrants will be taken in each period/call.
@@ -129,8 +126,8 @@ Int `parents` = 2
 Number of parents used for making offspring each generation. 
 
 Bool `multi_parent` = true  
-When mutli-parent recombination is allowed all selected parents can contribute(it's stochastic, so sometimes they would
-sometimes not) their genetic material to an offspring. Conversely, a pair of parents is selected to make each single offspring.
+When mutli-parent recombination is allowed all selected parents can contribute their genetic material to an offspring. 
+Conversely, a pair of parents is selected to make each single offspring.
 
 Choice `selection_policy` = roulette_wheel
 * `roulette_wheel`  
@@ -139,7 +136,7 @@ The chance of an individual being selected is proportional to its fitness.
 The individuals are sorted based on their fitness from best to worst and the probability of making offspring is
 proportional to their rank.
 * `truncation`  
-The individuals are sorted based on their fitness from best to worst and M best becomes parents.
+The individuals are sorted based on their fitness from best to worst and M best become parents.
 Number M depends on the value assigned to `parents`.
 * `tournament`  
 Each parent is selected by randomly choosing two individuals from a generation and comparing their scores.
@@ -194,7 +191,6 @@ The **eval/evaluators.xml** file contains definitions of all the evaluation func
     <evaluator name="one_max">
         <param ea_type="ga"/>
         <param terminal_set="0,1"/>
-        <param genotype_repair="false"/>
     </evaluator>
 
     <evaluator name="times_plus_one_max">
@@ -202,7 +198,6 @@ The **eval/evaluators.xml** file contains definitions of all the evaluation func
         <param terminal_set="0,1"/>
         <param function_set="*_2,+_2"/>
         <param restriction="size"/>
-        <param genotype_repair="false"/>
     </evaluator>
 
     <evaluator name="symbolic_regression">
@@ -211,22 +206,16 @@ The **eval/evaluators.xml** file contains definitions of all the evaluation func
         <param function_set="*_2,+_2,%_2,^_2"/>
         <param restriction="depth"/>
         <param max_depth="5"/>
-        <param method="ramped"/>
-        <param genotype_repair="false"/>
+        <param method="ramped"/> 
     </evaluator>
 </evaluator_functions>
 
 ```
+`! String` **`name`**
+
 **!** List `terminal_set`  
 Defines the terminal primitives for the problem. Ephemeral random constants from different sets are available under
 the `real`, `bool` or `natural` parameters.
-
-**!** Bool `genotype_repair`  
-If chosen, individuals with broken dna (e.g. invalid format for the given problem) will not be discarded. 
-In order to preserve potentially valuable information of the code, such individuals will populate an repair island
-and stay there until their dna has been fixed. Repaired individuals will then migrate to other islands.
-When repair has been enabled, the invalid solutions from all the islands in the experiment will populate the repair island
-and stay there until a valid code has been created.
 
 **!** Choice `ea_type`  
 Type of evolutionary algorithm used for the problem. The data structure is customized here.
@@ -264,14 +253,22 @@ Genetic programming represented as a string of primitives from `terminal_set` an
 
 ## 6 Implementation
 #### 6.1 Parallel processing
-![alt text](docs/parallel_processing.png)
+![alt text](./docs/parallel_processing.png)
 
 ###### 6.1.1 The island model
-![alt text](docs/gpec_general_flowchart.png)  
+![alt text](./docs/gpec_general_flowchart.png)  
 Is an example of a distributed population model. 
 - **Coarse grain**
  
 - **Micro grain**
+
+
+
+
+
+
+
+
 
 ## 7 In development
 #### 7.1 Genetic Programming
@@ -294,6 +291,15 @@ Procedural modeling in OpenSCAD. Constructive solid geometry. To maximize the su
 Procedural modeling in OpenSCAD then simulation based testing in COMSOL Multiphysics.
  
 #### 7.5 Stead-state replacement policy
+
+#### 7.6 Genotype repair 
+If chosen, individuals with broken dna (e.g. invalid format for the given problem) will not be discarded. 
+In order to preserve potentially valuable information of the code, such individuals will populate an repair island
+and stay there until their dna has been fixed. Repaired individuals will then migrate to other islands.
+When repair has been enabled, the invalid solutions from all the islands in the experiment will populate the repair island
+and stay there until a valid code has been created.
+
+
 
 
 
