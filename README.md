@@ -45,11 +45,7 @@ working together on the same problem and sporadically exchanging individuals:
     </island>
 
     <island population_size="10" evaluator="times_plus_one_max" genotype_repair="false">
-        <reproduction crossover_points="6" mutation_rate="10" num_of_parents="3"/>
-        <selection policy="roulette_wheel"/>
-        <migration entry_policy="probabilistic" in="true" out="true" chance="5"
-                   selection_policy="roulette_wheel" immigrants="1" emigrants="1"/>
-        <replacement policy="elitism" num_of_elites="2"/>
+        ...
     </island>
 </experiment>
 ```
@@ -61,7 +57,7 @@ The remaining parameters will be set to corresponding defaults if a configuratio
 
 
 #### 4.1 Experiment customization
-**!** Int `chromosome_length`   
+**`! Int chromosome_length`**  
 Number of genes encoding a chromosome. 
 A gene can represent for a numerical value, including its sign, or a mathematical function.
 
@@ -69,87 +65,104 @@ A gene can represent for a numerical value, including its sign, or a mathematica
 Termination conditions are inclusive, which means that termination will occur when the first of them is met.
 All of the conditions need a value assigned to them. Assigning a zero disables a condition.
   
-**!** Int `max_fitness`  
+**`! Int max_fitness`**  
 
-**!** Int `max_time`   
+**`! Int max_time`**   
  
-**!** Int `max_generations`   
+**`! Int max_generations`**   
 
 #### 4.2 Island customization  
 
-**!** Int `population_size`   
+**`! Int population_size`**   
 
-**!** Int `evaluator` 
+**`! Int evaluator`**  
 Name of the fitness evaluation function. 
 Islands within an experiment do not have to be evaluated by the same function.
-An evaluator has to be properly defined. An instruction has been provided in **Sec. 5.2 Plugging new evaluator**.
+An evaluator has to be properly defined. An instruction has been provided in **Sec. 5.2 Plugging in new evaluator**.
 
 ###### 4.2.1 Replacement policy
-Choice `replacement_policy` = elitism  
-* `elitism`  
+**`Choice replacement_policy = elitism`** 
+* **`elitism`**  
 A certain number of the fittest individuals is injected to the next generation. This strategy keeps the best results
 through the generations making sure that the best discovered combinations of genes survive 
 the stochastic processes of selection and reproduction.
-    * Int `num_of_elites` = 2  
+    * **`Int num_of_elites = 2`**  
     Number of elites injected to next generation.
 
 ###### 4.2.2 Migration policy
 Although the migration is a sub-part of the replacement, for the clarity it has been defined as a separate policy.
 
-**!** Bool `migration_out` = false  
+**`! Bool migration_out = false`**  
 When set to False the island is not sending out any emigrants.
 
-`! Bool  migration_in = false`  
+**`! Bool  migration_in = false`**  
 When set to False the island is not taking in any immigrants.
 
-Choice `entry_policy` = probabilistic
-* `periodical`  
-    * Int `period` = 5  
+**`Choice entry_policy = probabilistic`**
+* **`periodical`**  
+    * **`Int period = 5`**  
     In periodical migration an island takes immigrants frequently, with a `period` separation between each migration. 
-* `probabilistic`  
-    * Float `chance` = 10  
+
+* **`probabilistic`**  
+    * **`Float chance = 10`**  
     Immigrants will be accepted `chance`% of the time.   
 
-Choice `selection_policy` = roulette_wheel   
+**`Choice selection_policy = roulette_wheel`**  
 The strategy for selecting an immigrant from a list of candidates. 
 The list consists of all emigrants sent out on the other islands.
 For the available strategies look into Section **4.2.3 Selection policy**.  
 
-Int `emigrants` = 1  
+**`Int emigrants = 1`**  
 Defines how many migrants will be send out for other islands. 
   
-Int `immigrants` = 1  
+**`Int immigrants = 1`**  
 Defines how many migrants will be taken in each period/call.
 
 ###### 4.2.3 Selection policy
-Int `parents` = 2  
+**`Int parents = 2`**  
 Number of parents used for making offspring each generation. 
 
-Bool `multi_parent` = true  
+**`Bool multi_parent = true`**  
 When mutli-parent recombination is allowed all selected parents can contribute their genetic material to an offspring. 
 Conversely, a pair of parents is selected to make each single offspring.
 
-Choice `selection_policy` = roulette_wheel
-* `roulette_wheel`  
+**`Choice selection_policy = roulette_wheel`**
+* **`roulette_wheel`**  
 The chance of an individual being selected is proportional to its fitness.
-* `rank`  
+
+* **`rank`**  
 The individuals are sorted based on their fitness from best to worst and the probability of making offspring is
 proportional to their rank.
-* `truncation`  
+
+* **`truncation`**  
 The individuals are sorted based on their fitness from best to worst and M best become parents.
 Number M depends on the value assigned to `parents`.
-* `tournament`  
+
+* **`tournament`**  
 Each parent is selected by randomly choosing two individuals from a generation and comparing their scores.
 The fitter one becomes a parent.
 
 ###### 4.2.4 Reproduction policy
 
-Int **`crossover_points`** = 2  
+**`Int crossover_points = 2`**  
 Number of points for crossover  
 
-Int **`mutation_rate`** = 10  
-A chance for a gene to mutate, given in %  
+**`Int mutation_rate = 2`**  
+A chance for a gene to mutate, given in %. This chance applies for a single gene, and the gene has to change into
+other element from the primitive set. Since the longer the chromosome the chance for the mutation to occur in the 
+code increases, it is recommended to keep this value low.
 
+A chance for `k` genes to mutate in a chromosome of length `n` for the mutation rate `m` can be calculated from the
+following formulas:   
+
+![experiment_class](./docs/k_permutations_of_n.png)    
+
+![experiment_class](./docs/gene_mutation_probability.png)  
+
+Using the **one_max** problem described in **Sec. 5.1.1 Genetic Algorithms** as an example, a chance for at least
+one gene mutating in a whole chromosome for the default value of 5% mutation rate equals:  
+
+![experiment_class](./docs/gene_mutation_example.png)
 
 
 
@@ -183,8 +196,8 @@ real| addition, +, arity 2
 
 
 
-#### 5.2 Plugging new evaluator
-The **eval/evaluators.xml** file contains definitions of all the evaluation functions. 
+#### 5.2 Plugging in new evaluator
+The **./eval/evaluators.xml** file contains definitions of all the evaluation functions. 
 
 ```xml
 <evaluator_functions>
@@ -211,52 +224,56 @@ The **eval/evaluators.xml** file contains definitions of all the evaluation func
 </evaluator_functions>
 
 ```
-`! String` **`name`**
+**`! String name`**  
+The evaluator name has to match the directory name in **./eval/**.
 
-**!** List `terminal_set`  
+**`! List terminal_set`**             
 Defines the terminal primitives for the problem. Ephemeral random constants from different sets are available under
 the `real`, `bool` or `natural` parameters.
 
-**!** Choice `ea_type`  
+**`! Choice ea_type`**              
 Type of evolutionary algorithm used for the problem. The data structure is customized here.
-* `ga`  
+* **`ga`**  
 Genetic algorithm represented as a fixed-length (see `chromosome_length` in **Sec. 4.1 Experiment customization**) 
 string of values from `terminal_set`.
-* `gp`  
+
+* **`gp`**  
 Genetic programming represented as a string of primitives from `terminal_set` and `function_set`.
-    * **!** List `function_set`  
+    * **`! List function_set`**  
     Defines the function primitives for the problem. Each operation has to be defined and protected in the evaluator code.
     The list consists of the parameters and their corresponding arities.
-    * **!** Choice `restriction`  
+    
+    * **`! Choice restriction`**  
     Methods for tree creation. 
-        * `size`   
+        * **`size`**   
         The size, number of genes in the chromosome, is limited. When this restriction has been chosen, 
         `chromosome_length` parameter (see **Sec. 4.1 Experiment customization**) defines the size of all generated trees.
-        * `depth`  
+        
+        * **`depth`**  
         The structure of the tree is limited by its depth. 
-            * **!** Int `max_depth`
-            * **!** Choice `method`  
-                * `full`  
+            * **`! Int max_depth`**
+            * **`! Choice method`**  
+                * **`full`**  
                 Generates full trees, which means that all leaves are at the same depth.
-                * `grow`  
+                * **`grow`**  
                 This method allows for the creation of trees of more varied sizes and shapes. 
                 Nodes are selected from the primitive set until the `max_depth` is reached.
                 Then only terminal nodes can be chosen.
-                * `ramped`  
+                * **`ramped`**  
                 Half of the initial population is created using `full` method and the other half using `grow` method. 
                 This is achieved by using a range of depth limits smaller or equal to `max_depth`. 
                 This method ensures trees having a variety of sizes and shapes.
-        * `none`  
+        * **`none`**  
         Unconstrained size and depth of the evolved programmes.
 
 
 
 ## 6 Implementation
 #### 6.1 Parallel processing
-![alt text](./docs/parallel_processing.png)
+![experiment_class](./docs/experiment_class.png)
 
 ###### 6.1.1 The island model
-![alt text](./docs/gpec_general_flowchart.png)  
+![island_class](./docs/island_class.png)  
 Is an example of a distributed population model. 
 - **Coarse grain**
  
