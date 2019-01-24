@@ -6,7 +6,7 @@ embracing many state-of-art techniques, and parallel processing oriented.
 
 Concurrently to the development of the software, an in-depth documentation is made,
  for the purpose of spreading the knowledge and understanding of Evolutionary Computation. 
- GPEC is released under an open-source license to promote free-science.
+ GPEC is released under an open-source license to promote free science.
 
 To start evolving your own programs, plug in an evaluator of your choice, 
 by following the instructions given in the documentation, 
@@ -296,7 +296,7 @@ an architecture that supports parallel computation has been designed. The overvi
 
 .  
 .  
-. 
+.  
 .  
  
 ![experiment_class](./docs/experiment_class.png)  
@@ -459,11 +459,16 @@ TP1 Max | 1 | 21 | 48 | 10 | 5 crossover points, 5% mutation rate | tournament, 
 .  
 .  
 .  
+![tp1_max](./docs/tp1_max.png)  
+
+![one_max](./docs/one_max.png)  
 .  
 .  
 .  
 .  
 .   
+
+**F3** *Fitness progress for the experiments. The colored dots on the dotted line indicate that an immigrant has been taken in that generation.*
 
 evaluator   |generations|time   |total migrations   |evaluations
 ---         |---        |---    |---                |---
