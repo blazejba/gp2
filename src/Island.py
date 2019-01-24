@@ -79,7 +79,7 @@ class Island(object):
                 space_left = max_size - operator[1]
             free_nodes += operator[1]
             max_size = space_left
-            expression = [operator]
+            expression = [operator[0]]
             for branch in range(operator[1]):
                 chromosome, max_size = self.size_restricted_tree_growth(max_size, free_nodes)
                 for gene in chromosome:

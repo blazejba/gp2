@@ -26,6 +26,7 @@ class Experiment():
 
 		# Logs
 		self.log = self.initialize_log()
+		self.total_num_of_evaluations = 0
 
 	def initialize_islands(self, experiment, evaluators):
 		return [Island(name, island, self.chromosome_length, evaluators, self.tmp_dir)
@@ -53,6 +54,7 @@ class Experiment():
 			print('Evolution terminated: maximum generation has been reached.')
 		print('Generated', island.generation, 'generations in', "{:.2f}".format(time.time() - self.start_t), 'seconds.')
 		self.print_migration_success_rates()
+		print('Total number of evaluations', self.total_num_of_evaluations)
 		print('Individuals of the last generation:\n')
 		self.print_all_individuals()
 
@@ -114,6 +116,7 @@ class Experiment():
 	def collect_fitness(self, island):
 		for process in island.processes:
 			if process.poll():
+				self.total_num_of_evaluations += 1
 				index, fitness = decode_stdout(process.communicate()[0])
 				island.individuals[int(index)][0] = int(fitness)
 				island.individuals[int(index)][2] = True

@@ -1,17 +1,25 @@
-<experiment chromosome_length="11" max_fitness="0" max_time="6">
+<experiment chromosome_length="21" max_fitness="48" max_time="0" max_generation="0">
     <island population_size="10" evaluator="times_plus_one_max" dna_repair="false">
-        <reproduction crossover_points="6" mutation_rate="10" num_of_parents="3"/>
-        <selection policy="roulette_wheel"/>
-        <migration entry_policy="periodical" in="true" out="true" period="5"
-                   selection_policy="roulette_wheel" immigrants="1" emigrants="1"/>
-        <replacement policy="elitism" num_of_elites="2"/>
+        <reproduction crossover_points="5" mutation_rate="5" num_of_parents="2"/>
+        <selection policy="tournament"/>
+        <migration entry_policy="probabilistic" in="true" out="true" chance="1"
+                   selection_policy="truncation" immigrants="1" emigrants="1"/>
+        <replacement policy="elitism" num_of_elites="1"/>
     </island>
 
-    <island population_size="10" evaluator="times_plus_one_max" dna_repair="false">
-        <reproduction crossover_points="6" mutation_rate="10" num_of_parents="3"/>
+    <island population_size="25" evaluator="times_plus_one_max" dna_repair="false">
+        <reproduction crossover_points="5" mutation_rate="5" num_of_parents="3"/>
+        <selection policy="rank_based"/>
+        <migration entry_policy="probabilistic" in="true" out="true" chance="3"
+                   selection_policy="truncation" immigrants="1" emigrants="1"/>
+        <replacement policy="elitism" num_of_elites="1"/>
+    </island>
+
+    <island population_size="50" evaluator="times_plus_one_max" dna_repair="false">
+        <reproduction crossover_points="5" mutation_rate="15" num_of_parents="4"/>
         <selection policy="roulette_wheel"/>
         <migration entry_policy="probabilistic" in="true" out="true" chance="5"
-                   selection_policy="roulette_wheel" immigrants="1" emigrants="1"/>
-        <replacement policy="elitism" num_of_elites="2"/>
+                   selection_policy="truncation" immigrants="3" emigrants="1"/>
+        <replacement policy="elitism" num_of_elites="1"/>
     </island>
 </experiment>

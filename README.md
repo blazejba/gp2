@@ -2,11 +2,14 @@
 GPEC has been written in order to tame the power of evolutionary computation, 
 namely making it easily applicable to variety of real-life up-to-date engineering problems. 
 GPEC is a Python lightweight piece of software, which gives an user an open hand in creating programs and optimizing parameters in evolutionary manner, 
-embracing many state-of-art techniques, supporting parallel processing and providing an in-depth documentation. 
+embracing many state-of-art techniques, and oriented in utilizing a parallel processing.
+Concurrently to the development of the software, an in-depth documentation is made,
+ for the purpose of spreading the knowledge and understanding of Evolutionary Computation.
 
 To start evolving your own programs, plug in an evaluator of your choice, 
 by following the instructions given in the documentation, 
-then modify one of the existing experiment configurations or write your own.
+then modify one of the existing experiment configurations or write your own,
+and let the randomness of EC surprise you with its novel human-competitive solutions.
 
 ## 0 Licensing
 Copyright 2018-2019 Blazej Banaszewski  
@@ -441,20 +444,31 @@ The **T4** shows how the performed experiments have been configured.
 
 -|islands|genes|max fitness|population|reproduction|selection|migration|replacement
 --- | --- | --- | --- | --- | --- | --- | --- | ---
-One Max | 2 identical | 50 | 50 | 6 per island | 5 crossover points, 5% mutation rate | roulette wheel, 2 parents | periodical, period of 50 gen, roulette wheel | elitism with 2 elites
-TP1 Max | 3 identical | 21 | xx | 50 per island | 3 crossover points, 5% mutation rate | tournament, 4 parents | probabilistic with 1% chance, roulette wheel | elitism with 3 elites
+One Max | 1 | 50 | 50 | 10 | 5 crossover points, 1% mutation rate | roulette wheel, 2 parents | probabilistic with 1% chance, truncation | elitism with 2 elites
+.       | 2 | 50 | 50 | 20 | 5 crossover points, 25% mutation rate | rank based, 2 parents | probabilistic with 1% chance, truncation | elitism with 2 elites
+.|.|.|.|.|.|.|.|.
+TP1 Max | 1 | 21 | 48 | 10 | 5 crossover points, 5% mutation rate | tournament, 2 parents | probabilistic with 1% chance, truncation | elitism with 1 elite
+.       | 2 | 21 | 48 | 25 | 5 crossover points, 5% mutation rate | rank based, 3 parents | probabilistic with 3% chance, truncation | elitism with 1 elite
+.       | 3 | 21 | 48 | 50 | 5 crossover points, 15% mutation rate | roulette wheel, 4 parents | probabilistic with 5% chance, truncation | elitism with 1 elite
 
 **T4** *The configuration values chosen for the two experiments performed in order to prove GPEC usability.*
 
-#### 8.1 One Max
+.  
+.  
+.  
+.  
+.  
+.  
+.  
+.  
+.  
+.  
+.   
 
-
-#### 8.2 Times Plus One Max
-
-
-
-
-
+evaluator   |generations|time   |total migrations   |evaluations
+---         |---        |---    |---                |---
+One Max     |47         |61.9 s |4                  |3950
+TP1 Max     |121        |44.9 s |3                  |3195    
 
 
 ## 9 References
