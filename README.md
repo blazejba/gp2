@@ -420,10 +420,10 @@ In all the tests the time and number of generations needed for finding the optim
 and used for determining which set of parameters performs better for the given problem.
 
 #### 8.1 One Max
-islands | chromosome length | max fitness | reproduction | selection | migration | replacement
---- | --- | --- | --- | --- | --- | ---
-2 (identical) | 50 | 50 | 5 crossover points, 5% mutation rate | roulette wheel, 2 parents | probabilistic with 1% chance, roulette wheel | elitism with 2 elites
-
+evaluator | islands | chromosome length | max fitness | population size | reproduction | selection | migration | replacement
+--- | --- | --- | --- | --- | --- | --- | --- | ---
+One Max | 2 (identical) | 50 | 50 | 6 per island | 5 crossover points, 5% mutation rate | roulette wheel, 2 parents | probabilistic with 1% chance, roulette wheel | elitism with 2 elites
+TP1 Max | 2 (identical) | 21 | xx | 50 per island | 1 crossover point, 5% mutation rate | tournament, 4 parents | probabilistic with 1% chance, roulette wheel | elitism with 2 elites
 ###### 8.1.1 Test 1: Micro-grain versus Coarse-grain
 
 ###### 8.1.2 Test 2: Influence of population size
