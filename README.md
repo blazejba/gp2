@@ -187,10 +187,10 @@ P(11, 1, m) | m
 ## 5 Evaluation functions
 #### 5.1 Available evaluators
 ###### 5.1.1 Genetic Algorithms
-- **One max** - The score is proportional to the number of ones in a binary string of fixed length. 
+- **One max [1 Max]** - The score is proportional to the number of ones in a binary string of fixed length. 
 
 ###### 5.1.2 Genetic programming
-- **Times plus one max** - The score is a result of multiplying (times) and adding (plus) ones. For this problem the
+- **Times plus one max [TP1 Max]** - The score is a result of multiplying (times) and adding (plus) ones. For this problem the
 set of primitives consists of:  
 
 terminals| functions  
@@ -198,7 +198,7 @@ terminals| functions
 1 | multiplication, *, arity 2
 . | addition, +, arity 2 
 
-
+**T2**  *The primitive set for the TP1 Max evaluator.*
 
 #### 5.2 Plugging in new evaluator
 The **./eval/evaluators.xml** file contains definitions of all the evaluation functions. 
@@ -385,7 +385,9 @@ real| addition, +, arity 2
 . | exponentiation, ^, 2
 . | protected division, %, 2 
 
-Symbolic regression uses depth-restricted tree growth which also is in the development stage.
+**T3** *The primitive set for the symbolic regression evaluator.*
+
+Symbolic regression uses depth-restricted tree growth which also is in the development stage (**Sec. 7.1 Genetic Programming**).
 
 ###### 7.4.2 Surface Max
 Evolved programmes will be procedurally modeling a 3D structure in OpenSCAD. 
@@ -411,40 +413,53 @@ Repaired individuals will then migrate to other islands.
 When repair has been enabled, the invalid solutions from all the islands in the experiment will populate the same
 Repair Island.
 
+#### 7.7 Finding optimal parameters
+By trying various variations of the parameters with different problems, a discovery of underlying patterns will be approached.
+More specifically, the knowledge about the problem-dependent influence of the genetic operators on time to find
+a solution and total amount of evaluations. 
+The tests in mind that could not be performed due to not sufficient enough maturity of current implementation of GPEC:
+- Coarse-, fine- and micro-grain comparision
+- Speedup quantification in parallel search
+- Influence of population size on Genetic Programming
+- Debunking or confirming claims about a negligible role of mutation in Genetic Programming
 
+Evolutionary Computation is to high extend a stochastic method, where the result of one experiment should not be used to 
+evaluate a GP's performance for given settings. For this reason, and in order to find the heuristics of optimality,
+a procedure will have to be implemented where the same experiment is called many times, then the gathered results averaged,
+and a standard deviation calculated.
+That is why the aforementioned tests have not been performed yet and the current "maturity" of GPEC is considered not enough to do so.
 
 
 
 ## 8 Results
-In all the tests the time and number of generations needed for finding the optimal solution have been measured
-and used for determining which set of parameters performs better for the given problem.
+The tests described in this section serve rather as a confirmation of GPEC usability for finding good solutions, 
+than comparative study of heuristics for finding optimal genetic operators,
+which was initially assumed to be the foundation for this project.
+A more detailed explanation can be find in **Sec. 7.7 Finding optimal parameters**.
+
+The **T4** shows how the performed experiments have been configured. 
+
+-|islands|genes|max fitness|population|reproduction|selection|migration|replacement
+--- | --- | --- | --- | --- | --- | --- | --- | ---
+One Max | 2 identical | 50 | 50 | 6 per island | 5 crossover points, 5% mutation rate | roulette wheel, 2 parents | periodical, period of 50 gen, roulette wheel | elitism with 2 elites
+TP1 Max | 3 identical | 21 | xx | 50 per island | 3 crossover points, 5% mutation rate | tournament, 4 parents | probabilistic with 1% chance, roulette wheel | elitism with 3 elites
+
+**T4** *The configuration values chosen for the two experiments performed in order to prove GPEC usability.*
 
 #### 8.1 One Max
--|islands|chromosome|max fitness|population|reproduction|selection|migration|replacement
---- | --- | --- | --- | --- | --- | --- | --- | ---
-One Max | 2 identical | 50 | 50 | 6 per island | 5 crossover points, 5% mutation rate | roulette wheel, 2 parents | probabilistic with 1% chance, roulette wheel | elitism with 2 elites
-TP1 Max | 2 identical | 21 | xx | 50 per island | 1 crossover point, 5% mutation rate | tournament, 4 parents | probabilistic with 1% chance, roulette wheel | elitism with 2 elites
-###### 8.1.1 Test 1: Micro-grain versus Coarse-grain
 
-###### 8.1.2 Test 2: Influence of population size
-
-###### 8.1.3 Test 3: Influence of mutation rate
 
 #### 8.2 Times Plus One Max
-###### 8.2.1 Test 1: Micro-grain versus Coarse-grain
 
-###### 8.2.2 Test 2: Influence of population size
 
-###### 8.2.3 Test 3: Influence of mutation rate
 
-todo: deriving a math formula for finding maximum fitness for a tree of any size.
 
 
 
 
 ## 9 References
-1. *Evolutionary Robotics*,  by D. Floreano  
-2. *A Field Guide to Genetic Programming*,  by R. Poli, W. B. Langdon, N. F. McPhee
-https://dces.essex.ac.uk/staff/rpoli/gp-field-guide/A_Field_Guide_to_Genetic_Programming.pdf
-3. *The problem-dependent nature of parallel processing in genetic programming*, W. F. Punch
-http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.408.8428&rep=rep1&type=pdf
+[1] *Evolutionary Robotics*,  by D. Floreano  
+[2] [*A Field Guide to Genetic Programming*](https://dces.essex.ac.uk/staff/rpoli/gp-field-guide/A_Field_Guide_to_Genetic_Programming.pdf),
+by R. Poli, W. B. Langdon, N. F. McPhee  
+[3] [*The problem-dependent nature of parallel processing in genetic programming*](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.408.8428&rep=rep1&type=pdf),
+ W. F. Punch
