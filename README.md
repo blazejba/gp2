@@ -2,7 +2,7 @@
 GPEC has been written in order to tame the power of evolutionary computation, 
 namely making it easily applicable to variety of real-life up-to-date engineering problems. 
 GPEC is a Python lightweight piece of software, which gives an user an open hand in creating programs and optimizing parameters in evolutionary manner, 
-embracing many state-of-art techniques, and parallel processing oriented.
+embracing many state-of-art techniques, and is parallel processing oriented.
 
 Concurrently to the development of the software, an in-depth documentation is made,
  for the purpose of spreading the knowledge and understanding of Evolutionary Computation. 
@@ -294,16 +294,7 @@ decreasing for each extra parallel evolutionary subprocess at the disposal of th
 In order to create a tool which utilizes superlinear speedup and enables using GA for complex and time-consuming problems,
 an architecture that supports parallel computation has been designed. The overview of the implemented architecture can be seen on **F1**.   
 
-.  
-.  
-.  
-.  
- 
 ![experiment_class](./docs/experiment_class.png)  
-.   
-.  
-.  
-.  
 
 **F1** *The flowchart of parallel evaluation handled in the experiment class.*
 
@@ -313,18 +304,8 @@ based on the idea of divergence within a species occurring when populations has 
 #### 6.1 The island model
 On the **F2** the implementation of the island class has been presented. 
 In the Punch's article three approaches for utilizing parallelism in GA have been brought up.
-
-.  
-.  
-.  
-.  
  
 ![island_class](./docs/island_class.png)  
-
-.  
-.  
-.  
-.  
 
 **F2** *The flowchart of replacement, migration, selection and reproduction of a population has been implemented in GPEC.*
 
@@ -452,21 +433,10 @@ TP1 Max | 1 | 21 | 48 | 10 | 5 crossover points, 5% mutation rate | tournament, 
 .       | 3 | 21 | 48 | 50 | 5 crossover points, 15% mutation rate | roulette wheel, 4 parents | probabilistic with 5% chance, truncation | elitism with 1 elite
 
 **T4** *The configuration values chosen for the two experiments performed in order to prove GPEC usability.*
-
-.  
-.  
-.  
-.  
-.  
-.  
+   
 ![tp1_max](./docs/tp1_max.png)  
 
 ![one_max](./docs/one_max.png)  
-.  
-.  
-.  
-.  
-.   
 
 **F3** *Fitness progress for the experiments. The colored dots on the dotted line indicate that an immigrant has been taken in that generation.*
 
