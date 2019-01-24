@@ -169,16 +169,18 @@ combination of binomial coefficient (**E1**) and cumulative probability (**E2**)
 
 **E2** *Probability of mutation.*
 
-Using the **one_max** problem described in **Sec. 5.1.1 Genetic Algorithms** as an example, a chance for at least
-one gene mutating in a whole chromosome for the default value of 5% mutation has been shown on **E3**.  
+A chance for at least one gene mutating in a whole chromosome consisting of 11 genes,
+for different values of mutation rate has been shown on **T1**.  
 
-.  
+P(11, 1, m) | m  
+--- | --- 
+22.5% | 2%
+57.9% | 5% 
+70.2% | 6%
+82.8% | 7%
+95.7% | 8%
 
-![experiment_class](./docs/gene_mutation_example.png)  
-
-.  
-
-**E3** *Probability of mutation for One Max problem of chromosome length 11.* 
+**T1** *The table showing probability of mutation occurring at least once and at least twice in a chromosome of 11 genes.*
 
 
 
@@ -313,16 +315,18 @@ In the Punch's article three approaches for utilizing parallelism in GA have bee
 **F2** *The flowchart of replacement, migration, selection and reproduction of a population has been implemented in GPEC.*
 
 ###### 6.1.1 Micro-grain
- Is the simplest form of parallelism in GA, where only the evaluation functions are asynchronous,
-and stepping into next generation occurs when all individuals have been tested. This approach can be used in GPEC
-experiments by defining only one island.
+Is the simplest form of parallelism in GA, where only the evaluation functions are asynchronous,
+and stepping into next generation occurs when all individuals have been tested, hence evolution is not parallel. 
+This approach can be used in GPEC experiments by defining only one island.
 
 ###### 6.1.2 Fine-grain 
 Here spatial distribution of individuals is used to take a full advantage of the parallelism.
 The support of this approach in GPEC has not been provided yet. For more information see **Sec. 7.3 Fine grain**.
 
 ###### 6.1.3 Coarse-grain
-
+The parallelism occurs both in evaluation and evolution. This approach is not fully asynchronous in evolution, since
+before individuals can step into the next generation, all individuals from their island have to be evaluated. 
+In GPEC this approach can be used in experiments by defining more than one island in an experiment configuration file.
 
 
 
@@ -347,7 +351,7 @@ will be first steps to implement these methods.
 
 
 ###### 7.1.2 Pruning
-Sometimes tree has to be pruned. This method will be used for reducing the depth of the trees that exceeded the `max_depth`
+This method will be used for reducing the depth of the trees that exceeded the `max_depth`
 in depth-restricted genetic programming experiments, e.g. in a result of the subtree crossover. 
 
 ###### 7.1.3 Headless chicken mutation
@@ -412,13 +416,13 @@ Repair Island.
 
 
 ## 8 Results
-GA is robust, will perform well even if the parameters are not optimal. 
-Finding the optimal settings is problem sensitive.
 In all the tests the time and number of generations needed for finding the optimal solution have been measured
-and used for detemrining which set of parameters performs better for the given problem.
+and used for determining which set of parameters performs better for the given problem.
 
 #### 8.1 One Max
-
+islands | chromosome length | max fitness | reproduction | selection | migration | replacement
+--- | --- | --- | --- | --- | --- | ---
+2 (identical) | 50 | 50 | 5 crossover points, 5% mutation rate | roulette wheel, 2 parents | probabilistic with 1% chance, roulette wheel | elitism with 2 elites
 
 ###### 8.1.1 Test 1: Micro-grain versus Coarse-grain
 
@@ -437,17 +441,8 @@ todo: deriving a math formula for finding maximum fitness for a tree of any size
 
 
 
-## 9 Glossary
-**[EA]** - Evolutionary Algorithm  
-**[EC]** - Evolutionary Computation   
-**[GA]** - Genetic Algorithm  
-**[GP]** - Genetic Programming  
-**[GPEC]** - General Purpose Evolutionary Computation  
-**[RI]** - Repair Island  
-**[TP1max]** Times Plus One Max
 
-
-## 10 References
+## 9 References
 1. *Evolutionary Robotics*,  by D. Floreano  
 2. *A Field Guide to Genetic Programming*,  by R. Poli, W. B. Langdon, N. F. McPhee
 https://dces.essex.ac.uk/staff/rpoli/gp-field-guide/A_Field_Guide_to_Genetic_Programming.pdf

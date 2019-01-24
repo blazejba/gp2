@@ -11,6 +11,7 @@ class MigrationPolicy(object):
 		self.buffer_dir     = self.tmp_dir + '/' + str(self.island_name)
 		self.successful_migrations  = 0
 		self.total_migrations       = 0
+		self.migration_happened     = False
 
 		# Policy settings
 		try:
@@ -114,6 +115,7 @@ class MigrationPolicy(object):
 		return False
 
 	def migrate_in(self):
+		self.migration_happened = False
 		if self.in_allowed:
 			# The entry policy
 			if self.entry_policy == 'periodical':
@@ -123,6 +125,7 @@ class MigrationPolicy(object):
 				if not self.probabilistic_migration():
 					return []
 			self.total_migrations += 1
+			self.migration_happened = True
 			# Find candidates
 			candidates = self.find_candidates()
 			# Have enough candidates been found

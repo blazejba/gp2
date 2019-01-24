@@ -69,9 +69,21 @@ class Experiment():
 
 		return logfile
 
+	def calculate_average_fitness(self, individuals):
+		total = 0
+		for individual in individuals:
+			total += individual[0]
+		return total/len(individuals)
+
 	def update_log(self, island):
-		self.log.write(str(island.generation) + ',' + str(island.island_name) + ',' +
-					   str(island.individuals[0]) + ',' + str(island.individuals[1]) + '\n')
+		self.log.write(str(island.generation)+','+
+		               str(island.island_name)+','+
+		               str(island.individuals[0][0])+','+
+		               str(self.calculate_average_fitness(island.individuals))+','+
+		               str(island.replacement_policy.migration_policy.migration_happened)+',\n')
+
+		#self.log.write(str(island.generation) + ',' + str(island.island_name) + ',' +
+		#			   str(island.individuals[0]) + ',' + str(island.individuals[1]) + '\n')
 
 	def print_all_individuals(self):
 		for island in self.islands:
