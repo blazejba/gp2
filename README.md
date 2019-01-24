@@ -2,9 +2,11 @@
 GPEC has been written in order to tame the power of evolutionary computation, 
 namely making it easily applicable to variety of real-life up-to-date engineering problems. 
 GPEC is a Python lightweight piece of software, which gives an user an open hand in creating programs and optimizing parameters in evolutionary manner, 
-embracing many state-of-art techniques, and oriented in utilizing a parallel processing.
+embracing many state-of-art techniques, and parallel processing oriented.
+
 Concurrently to the development of the software, an in-depth documentation is made,
- for the purpose of spreading the knowledge and understanding of Evolutionary Computation.
+ for the purpose of spreading the knowledge and understanding of Evolutionary Computation. 
+ GPEC is released under an open-source license to promote free-science.
 
 To start evolving your own programs, plug in an evaluator of your choice, 
 by following the instructions given in the documentation, 
@@ -19,7 +21,7 @@ The 3-Clause BSD License
 `Blazej Banaszewski`, MSc student of Robotics at University of Southern Denmark.
 
 ## 2 Acknowledgements
-Special acknowledgements to `John Hallam` for the support, broadening the perspectives and being an inspiration.
+Special acknowledgements to `John Hallam` for the support, broadening the perspectives and being an inspiration for young scientists.
 
 ## 3 Run
 > $ python3 master.py experiment_name
@@ -34,26 +36,27 @@ The experiment files should be placed in:
 Each experiment has to consist of at least one island and one termination condition.
 For each island a set of reproduction, replacement, selection and migration policies has to be defined.
 
-The following code shows how to prepare an experiment terminated after 6 seconds, involving two identical islands,
-working together on the same problem and sporadically exchanging individuals: 
+Snippet **S1** shows how to prepare an experiment terminated after 6 seconds, involving two identical islands,
+working together on the same problem and periodically exchanging individuals. 
 
 ```xml
 <experiment chromosome_length="11" max_fitness="0" max_time="6" max_generations="0">
-    <island population_size="10" evaluator="times_plus_one_max" genotype_repair="false">
-        <reproduction crossover_points="6" mutation_rate="10" num_of_parents="3"/>
+    <island population_size="10" evaluator="times_plus_one_max">
+        <reproduction crossover_points="6" mutation_rate="10"/>
         <selection policy="roulette_wheel" num_of_parents="3" mutli-parent="true"/>
         <migration entry_policy="periodical" in="true" out="true" period="5"
-                   selection_policy="roulette_wheel" immigrants="1" emigrants="1"/>
+                   selection_policy="truncation" immigrants="1" emigrants="1"/>
         <replacement policy="elitism" num_of_elites="2"/>
     </island>
 
-    <island population_size="10" evaluator="times_plus_one_max" genotype_repair="false">
+    <island population_size="10" evaluator="times_plus_one_max">
         ...
     </island>
 </experiment>
 ```
+**S1** *An .xml configuration file for an experiment of Times Plus One Max evaluator.*
 
-The available variations of different techniques have been listed below.
+The available options for the parameters used in the configuration example have been listed below.
 All parameters with an exclamation mark before the name are required and if not provided,
 GPEC will return an error or output an unreliable result. 
 The remaining parameters will be set to corresponding defaults if a configuration value has not been provided.
@@ -86,37 +89,39 @@ An evaluator has to be properly defined. An instruction has been provided in **S
 ###### 4.2.1 Replacement policy
 **`Choice replacement_policy = elitism`** 
 * **`elitism`**  
-A certain number of the fittest individuals is injected to the next generation. This strategy keeps the best results
-through the generations making sure that the best discovered combinations of genes survive 
+A certain number of the fittest individuals are injected to the next generation. This strategy keeps the 
+`num_of_elites` best results through the generations making sure that the best discovered combinations of genes survive 
 the stochastic processes of selection and reproduction.
     * **`Int num_of_elites = 2`**  
     Number of elites injected to next generation.
 
 ###### 4.2.2 Migration policy
-Although the migration is a sub-part of the replacement, for the clarity it has been defined as a separate policy.
+Although the migration is a sub-part of the replacement, 
+for the sake of keeping GPEC as modular as possible it has been defined as a separate policy.
 
 **`! Bool migration_out = false`**  
-When set to False the island is not sending out any emigrants.
+When `false`, an island is not sending out any emigrants.
 
 **`! Bool  migration_in = false`**  
-When set to False the island is not taking in any immigrants.
+When `false`, an island is not taking in any immigrants.
 
 **`Choice entry_policy = probabilistic`**
 * **`periodical`**  
     * **`Int period = 5`**  
-    In periodical migration an island takes immigrants frequently, with a `period` separation between each migration. 
+    In periodical migration an island takes in immigrants with a constant rate equal to `period` generations. 
 
 * **`probabilistic`**  
     * **`Float chance = 10`**  
-    Immigrants will be accepted `chance`% of the time.   
+    Immigrants will be accepted `chance`% of the time a new population is evolved.   
 
-**`Choice selection_policy = roulette_wheel`**  
+**`Choice selection_policy = truncation`**  
 The strategy for selecting an immigrant from a list of candidates. 
 The list consists of all emigrants sent out on the other islands.
+Once a candidate has been taken in it is no longer available. 
 For the available strategies look into Section **4.2.3 Selection policy**.  
 
 **`Int emigrants = 1`**  
-Defines how many migrants will be send out for other islands. 
+Defines how many migrants will be made available for other islands. 
   
 **`Int immigrants = 1`**  
 Defines how many migrants will be taken in each period/call.
@@ -148,40 +153,38 @@ The fitter one becomes a parent.
 ###### 4.2.4 Reproduction policy
 
 **`Int crossover_points = 2`**  
-Number of points for crossover  
+Number of points for crossover. Points divide a chromosome on equally large parts (if possible), 
+e.g. a chromosome consisting of 10 genes with 2 `crossover_points` will be cross over at 5th gene (split in two). 
 
 **`Int mutation_rate = 2`**  
 A chance for a gene to mutate, given in %. This chance applies for a single gene, and the gene has to change into
-other element from the primitive set. Since the longer the chromosome the chance for the mutation to occur in the 
-code increases, it is recommended to keep this value low.
+other element from the primitive set. 
+Something to keep in mind - the longer the chromosome, the higher the chance for the mutation to occur in a chromosome.
 
-A chance for `k` genes to mutate in a chromosome of length `n` for the mutation rate `m` can be calculated from the
-combination of binomial coefficient (**E1**) and cumulative probability (**E2**).
-
-.  
-
-![binomial_coefficient](./docs/k_permutations_of_n.png)    
-.  
-
-**E1** *Formula for finding k-permutations of n.* 
+A chance for `k` genes to mutate in a chromosome of length `l` for the mutation rate `m` can be calculated from **E1**.
 
 .  
 
 ![cumulative_probability](./docs/gene_mutation_probability.png)   
+ 
 .  
 
-**E2** *Probability of mutation.*
+**E1** *Probability of `k` mutations in a `l`-long chromosome for a mutation rate `m`.*
 
-A chance for at least one gene mutating in a whole chromosome consisting of 11 genes,
-for different values of mutation rate has been shown on **T1**.  
+The chances for `k={1, 2}` genes mutating in a chromosome consisting of 11 genes,
+for different values of mutation rate has been shown on **T1**. For the given case and mutation rate of 7%,
+every second chromosome (every 51.60% to be more specific) will be mutated at least in one gene. 
 
-P(11, 1, m) | m  
---- | --- 
-22.5% | 2%
-57.9% | 5% 
-70.2% | 6%
-82.8% | 7%
-95.7% | 8%
+P(11, 1, m) | P(11, 2, m)   | m  
+---         | ---           | --- 
+9.56 %      | 0.18 %        | 1%
+18.29 %     | 0.69 %        | 2% 
+26.26 %     | 1.49 %        | 3%
+33.52 %     | 2.52 %        | 4%
+40.13 %     | 3.76 %        | 5%
+46.14 %     | 5.18 %        | 6%
+51.60 %     | 6.73 %        | 7%
+56.56 %     | 8.41 %        | 8%
 
 **T1** *The table showing probability of mutation occurring at least once and at least twice in a chromosome of 11 genes.*
 
@@ -190,7 +193,8 @@ P(11, 1, m) | m
 ## 5 Evaluation functions
 #### 5.1 Available evaluators
 ###### 5.1.1 Genetic Algorithms
-- **One max [1 Max]** - The score is proportional to the number of ones in a binary string of fixed length. 
+- **One max [1 Max]** - The score is proportional to the number of ones in a binary string of fixed length.
+The primitive set is (0,1).
 
 ###### 5.1.2 Genetic programming
 - **Times plus one max [TP1 Max]** - The score is a result of multiplying (times) and adding (plus) ones. For this problem the
@@ -204,7 +208,7 @@ terminals| functions
 **T2**  *The primitive set for the TP1 Max evaluator.*
 
 #### 5.2 Plugging in new evaluator
-The **./eval/evaluators.xml** file contains definitions of all the evaluation functions. 
+The **./eval/evaluators.xml** file contains definitions of evaluation functions, which has been shown on **S2**. 
 
 ```xml
 <evaluator_functions>
@@ -231,6 +235,9 @@ The **./eval/evaluators.xml** file contains definitions of all the evaluation fu
 </evaluator_functions>
 
 ```
+**S2** *Definitions of different evaluators.*
+
+
 **`! String name`**  
 The evaluator name has to match the directory name in **./eval/**.
 
@@ -281,17 +288,19 @@ The following section aims in providing an insight into the architecture of GPEC
 Evolutionary Computation can benefit from the emergent properties of parallel searching. 
 W. Punch in his paper [3], points out to a property called *superlinear speedup*. 
 It emerges in many applications of GA, 
-resulting in total amount of work (in this case evaluations) needed for finding a good solution,
+resulting in total amount of work (in this case evaluations) needed for finding a good solution
 decreasing for each extra parallel evolutionary subprocess at the disposal of the searching device. 
 
 In order to create a tool which utilizes superlinear speedup and enables using GA for complex and time-consuming problems,
-an architecture support parallel computation has been designed. The overview of the system can be seen on **F1**.   
+an architecture that supports parallel computation has been designed. The overview of the implemented architecture can be seen on **F1**.   
 
 .  
 .  
 . 
+.  
  
 ![experiment_class](./docs/experiment_class.png)  
+.   
 .  
 .  
 .  
@@ -299,7 +308,7 @@ an architecture support parallel computation has been designed. The overview of 
 **F1** *The flowchart of parallel evaluation handled in the experiment class.*
 
 One of the popular models supporting parallel computation is called **the island model**, 
-based on the idea of divergence within a species in separated populations due to e.g. a natural catastrophe.  
+based on the idea of divergence within a species occurring when populations has been separated e.g. due to a natural catastrophe.  
 
 #### 6.1 The island model
 On the **F2** the implementation of the island class has been presented. 
@@ -307,10 +316,12 @@ In the Punch's article three approaches for utilizing parallelism in GA have bee
 
 .  
 .  
-. 
+.  
+.  
  
 ![island_class](./docs/island_class.png)  
 
+.  
 .  
 .  
 .  
@@ -344,36 +355,34 @@ In GPEC this approach can be used in experiments by defining more than one islan
 
 ## 7 In development
 This section covers all the techniques that has not been implemented yet, but are planned to be before moving to the
-next stage of the project, namely the master thesis experiments.  
+next stage of the project which is the master thesis experiments.  
 
 #### 7.1 Genetic Programming
 ###### 7.1.1 Depth restricted and unrestricted tree growth
-These methods will allow to use evaluators of additional data type structures, namely trees with limited depth and
-completely unrestricted trees (free size and depth). **Sec. 7.1.2 Pruning** and **Sec. 7.1.3 Headless chicken mutation**
-will be first steps to implement these methods.
-
+These methods will allow to use evaluators of additional data type structures, namely trees with shape restrictions
+in depth and completely unrestricted trees (free to grow in size and depth). 
 
 ###### 7.1.2 Pruning
 This method will be used for reducing the depth of the trees that exceeded the `max_depth`
 in depth-restricted genetic programming experiments, e.g. in a result of the subtree crossover. 
 
 ###### 7.1.3 Headless chicken mutation
-It is a subtree mutation method implemented as crossover between an individual, namely a program, and a newly generated random program. 
-When applied only one modification of such kind is allowed per tree. 
-This method will be working inclusively with `point-mutation` method which has been already implemented.  
+It is a subtree mutation method implemented as crossover between an individual, a program, and a newly generated random program. 
+Only one modification of such kind is allowed per tree. 
+`Headless chicken` will be working inclusively with `point-mutation` which has been already implemented.  
 
 #### 7.2 Similarity-based selection
-Part of multi-objective evaluation yet instead of performed in evaluators will be computed by GPEC main body. 
-A matrix of `n x n` dimension, where `n = total number of individuals` will contain information about similarity between
+Similarity-based selection is a part of multi-objective evaluation, yet instead of performed in evaluators as scores for other objectives,
+will be computed by GPEC main body. 
+A matrix of `n x n` dimension, where `n = total number of individuals` will contain information about similarity between all
 individuals. In order to reduce the convergence of the population to the genotype of the leading individuals, 
 similarity between islands will be taken into consideration in the migration process. In order words, the diversity of the
-population will be promoted when choosing which individual to take in from other islands. 
+population will be promoted when choosing which individual to take in from other islands in a replacement phase. 
 
 #### 7.3 Fine-grain
 Fine grain stands as the most parallel friendly implementation of the island model, where each individual in a
-population evolves asynchronously. This approach will tested with a task of finding a solution to a complex problem, 
-potentially the one described in **Sec. 7.4.1 Surface Max** or **Sec. 7.4.2 Beam Strength Max**, 
-and the results compared with the Coarse- and Micro-grain methodologies.
+population evolves asynchronously. This approach will be compared with the Coarse- and Micro-grain methodologies
+to quantify the amount of reduction in amount of evaluations different kinds of parallelism can introduce to a search.
 
 #### 7.4 Evaluators
 ###### 7.4.1 Symbolic regression
@@ -410,27 +419,18 @@ Extending the replacement policy by the option of stead-state evolution.
 #### 7.6 Genotype repair 
 In order to preserve potentially valuable information of the code, 
 individuals with invalid genotypes (e.g. invalid format for the given problem) will not be discarded. 
-An option of initiating a special island will be given to users, called Repair Island. 
 The individuals with invalid genotypes will migrate to Repair Island and stay there until their code has been fixed.
 Repaired individuals will then migrate to other islands. 
-When repair has been enabled, the invalid solutions from all the islands in the experiment will populate the same
-Repair Island.
 
 #### 7.7 Finding optimal parameters
-By trying various variations of the parameters with different problems, a discovery of underlying patterns will be approached.
-More specifically, the knowledge about the problem-dependent influence of the genetic operators on time to find
-a solution and total amount of evaluations. 
-The tests in mind that could not be performed due to not sufficient enough maturity of current implementation of GPEC:
-- Coarse-, fine- and micro-grain comparision
-- Speedup quantification in parallel search
-- Influence of population size on Genetic Programming
-- Debunking or confirming claims about a negligible role of mutation in Genetic Programming
+In attempt to find underlying patterns in influence of genetic operators on problems of different nature,
+a series of comparative tests will be performed.
 
 Evolutionary Computation is to high extend a stochastic method, where the result of one experiment should not be used to 
 evaluate a GP's performance for given settings. For this reason, and in order to find the heuristics of optimality,
 a procedure will have to be implemented where the same experiment is called many times, then the gathered results averaged,
 and a standard deviation calculated.
-That is why the aforementioned tests have not been performed yet and the current "maturity" of GPEC is considered not enough to do so.
+The aforementioned tests have not been performed yet due to current GPEC's insufficient maturity to do it in a harmony with scientific method.
 
 
 
@@ -469,6 +469,8 @@ evaluator   |generations|time   |total migrations   |evaluations
 ---         |---        |---    |---                |---
 One Max     |47         |61.9 s |4                  |3950
 TP1 Max     |121        |44.9 s |3                  |3195    
+
+**T5** *Table showing the performance of two experiments run on 1 Max and TP1 Max evaluators.*
 
 
 ## 9 References
