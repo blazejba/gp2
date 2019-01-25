@@ -180,6 +180,7 @@ P(11, 1, m) | P(11, 2, m)   | m
 46.14 %     | 5.18 %        | 6%
 51.60 %     | 6.73 %        | 7%
 56.56 %     | 8.41 %        | 8%
+
 **T1** *The table showing probability of mutation occurring at least once and at least twice in a chromosome of 11 genes.*
 
 
@@ -197,6 +198,7 @@ terminals| functions
 --- | --- 
 1 | multiplication, *, arity 2
 . | addition, +, arity 2 
+
 **T2**  *The primitive set for the TP1 Max evaluator.*
 
 #### 5.2 Plugging in new evaluator
@@ -366,6 +368,7 @@ real| addition, +, arity 2
 . | subtraction, -, arity 2
 . | exponentiation, ^, 2
 . | protected division, %, 2 
+
 **T3** *The primitive set for the symbolic regression evaluator.*
 
 Symbolic regression uses depth-restricted tree growth which also is in the development stage (**Sec. 7.1 Genetic Programming**).
@@ -430,7 +433,8 @@ TP1 Max | 1 | 21 | 48 | 10 | 5 crossover points, 5% mutation rate | tournament, 
 evaluator   |generations|time   |total migrations   |evaluations
 ---         |---        |---    |---                |---
 TP1 Max     |47         |61.9 s |4                  |3950
-One Max     |121        |44.9 s |3                  |3195    
+One Max     |121        |44.9 s |3                  |3195   
+
 **T5** *Table showing the performance of two experiments run on 1 Max and TP1 Max evaluators.*
 
 
