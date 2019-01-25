@@ -163,12 +163,7 @@ Something to keep in mind - the longer the chromosome, the higher the chance for
 
 A chance for `k` genes to mutate in a chromosome of length `l` for the mutation rate `m` can be calculated from **E1**.
 
-.  
-
 ![cumulative_probability](./docs/gene_mutation_probability.png)   
- 
-.  
-
 **E1** *Probability of `k` mutations in a `l`-long chromosome for a mutation rate `m`.*
 
 The chances for `k={1, 2}` genes mutating in a chromosome consisting of 11 genes,
@@ -185,9 +180,7 @@ P(11, 1, m) | P(11, 2, m)   | m
 46.14 %     | 5.18 %        | 6%
 51.60 %     | 6.73 %        | 7%
 56.56 %     | 8.41 %        | 8%
-
 **T1** *The table showing probability of mutation occurring at least once and at least twice in a chromosome of 11 genes.*
-
 
 
 ## 5 Evaluation functions
@@ -204,7 +197,6 @@ terminals| functions
 --- | --- 
 1 | multiplication, *, arity 2
 . | addition, +, arity 2 
-
 **T2**  *The primitive set for the TP1 Max evaluator.*
 
 #### 5.2 Plugging in new evaluator
@@ -281,7 +273,6 @@ Genetic programming represented as a string of primitives from `terminal_set` an
         Unconstrained size and depth of the evolved programmes.
 
 
-
 ## 6 Implementation of parallelism
 The following section aims in providing an insight into the architecture of GPEC.
 
@@ -295,7 +286,6 @@ In order to create a tool which utilizes superlinear speedup and enables using G
 an architecture that supports parallel computation has been designed. The overview of the implemented architecture can be seen on **F1**.   
 
 ![experiment_class](./docs/experiment_class.png)  
-
 **F1** *The flowchart of parallel evaluation handled in the experiment class.*
 
 One of the popular models supporting parallel computation is called **the island model**, 
@@ -306,7 +296,6 @@ On the **F2** the implementation of the island class has been presented.
 In the Punch's article three approaches for utilizing parallelism in GA have been brought up.
  
 ![island_class](./docs/island_class.png)  
-
 **F2** *The flowchart of replacement, migration, selection and reproduction of a population has been implemented in GPEC.*
 
 ###### 6.1.1 Micro-grain
@@ -377,7 +366,6 @@ real| addition, +, arity 2
 . | subtraction, -, arity 2
 . | exponentiation, ^, 2
 . | protected division, %, 2 
-
 **T3** *The primitive set for the symbolic regression evaluator.*
 
 Symbolic regression uses depth-restricted tree growth which also is in the development stage (**Sec. 7.1 Genetic Programming**).
@@ -437,14 +425,12 @@ TP1 Max | 1 | 21 | 48 | 10 | 5 crossover points, 5% mutation rate | tournament, 
 ![tp1_max](./docs/tp1_max.png)  
 
 ![one_max](./docs/one_max.png)  
-
 **F3** *Fitness progress for the experiments. The colored dots on the dotted line indicate that an immigrant has been taken in that generation.*
 
 evaluator   |generations|time   |total migrations   |evaluations
 ---         |---        |---    |---                |---
-One Max     |47         |61.9 s |4                  |3950
-TP1 Max     |121        |44.9 s |3                  |3195    
-
+TP1 Max     |47         |61.9 s |4                  |3950
+One Max     |121        |44.9 s |3                  |3195    
 **T5** *Table showing the performance of two experiments run on 1 Max and TP1 Max evaluators.*
 
 
