@@ -4,6 +4,7 @@ from src.ReproductionPolicy import ReproductionPolicy
 from src.ReplacementPolicy import ReplacementPolicy
 from src.GeneticProgramming import GeneticProgramming
 
+
 class Island(object):
     def __init__(self, name, configs, chromosome_length, all_evaluators, tmp_dir):
         # Evaluation function

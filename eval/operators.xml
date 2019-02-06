@@ -1,6 +1,0 @@
-<operators>
-    <operator name="*" arity="2"/> <!--multiplication-->
-    <operator name="+" arity="2"/> <!--addition-->
-    <operator name="-" arity="2"/> <!--subtraction-->
-    <operator name="%" arity="2"/> <!--protected division-->
-</operators>
