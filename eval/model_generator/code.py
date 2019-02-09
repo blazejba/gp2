@@ -1,26 +1,86 @@
 import os
-from math import sqrt
-from time import sleep
-from random import randint
+import re
+from math import sqrt, pow
+from random import randint, seed
+
+
+
+class LSystem():
+	def __init__(self, grammar, max_size, rnd_seed):
+		seed(rnd_seed)
+		self.max_size = max_size
+		self.grammar = grammar
+		self.structure = self.grow()
+
+	def grow(self):
+		structure = 'S'
+		structure_tmp = []
+		while self.count_cubes(structure) < self.max_size and structure != ['']:
+			for branch in [self.transform(s) for s in structure]:
+				for symbol in branch:
+					structure_tmp.append(symbol)
+			structure = structure_tmp
+			structure_tmp = []
+		return structure
+
+	def transform(self, symbol):
+		for rule in self.grammar:
+			if rule[0] == symbol:
+				return rule[randint(1, len(rule) - 1)]
+		return ''
+
+	def count_cubes(self, structure):
+		counter = 0
+		for s in structure:
+			if s == 'C':
+				counter += 1
+		return counter
+
+
+def decode_stdin(inp):
+	comma_separated = re.sub('.n', '', inp).split(',')
+	return [rule.split('.') for rule in comma_separated[0:-2] if len(rule) > 1], int(comma_separated[-2]), int(comma_separated[-1])
+
+
+def execute_growth_instruction(instruction, name, rnd_seed):
+	seed(rnd_seed)
+	file = open(name + ".scad", "w")
+	current_translation = [0, 0, 0]
+	direction = [1, 0, 0]
+	saved_translations = []
+
+	for step in instruction:
+		if step == 'C':
+			cube_size = randint(1, 5)
+			file.write("translate(" + str(current_translation) + ") cube(" + str(cube_size) + ", center=true);\n")
+			current_translation = [compound + cube_size/2*direction[index] for index, compound in enumerate(current_translation)]
+		elif step == 'D':
+			direction = [randint(0, 1), randint(0, 1), randint(0, 1)]
+		elif step == '[':
+			saved_translations.append(current_translation)
+		elif step == ']':
+			current_translation = saved_translations[-1]
+			del saved_translations[-1]
+		print("STEP " + step + " DIR " + str(direction) + " CTR " + str(current_translation) + " CUBE " + str(cube_size))
+
+	file.close()
 
 
 def main():
-	genome  = "Z1X1X1Z2"
-	R       = str(randint(1000, 9999))
-	file    = open(R + ".scad", "w")
+	genome = "S.C[DCC][DCC].n.n.n.n,C.CC[DC].n.n.n.n,20,1"
+	grammar, size, rnd_seed = decode_stdin(genome)
+	l_system = LSystem(grammar, size, rnd_seed)
 
-	translations, cubes = accumulate_translations(genome)
-	for index, cube in enumerate(cubes):
-		file.write("translate(" + str(translations[index]) + ") cube([" + str(cube) + "," + str(cube) + "," + str(cube) + "]);\n")
+	R = str(randint(1000, 9999))
+	execute_growth_instruction(l_system.structure, R, rnd_seed)
 
-	file.close()
 	os.system("openscad -o" + R + ".stl " + R + ".scad")
 
-	sleep(2)
 	triangles = get_triangles_from_stl(R)
 	volume = calculate_volume(triangles)
 	surface = calculate_surface(triangles)
-	print(volume, surface)
+	fitness = pow(volume, 0.33)/pow(surface, 0.5)
+	print(volume, surface, fitness)
 
 
 def accumulate_translations(genome):
@@ -50,7 +110,7 @@ def calculate_volume(triangles):
 		volume += signed_triangle_volume(triangle[0], triangle[1], triangle[2])
 	return volume
 
-
+#https://math.stackexchange.com/questions/128991/how-to-calculate-area-of-3d-triangle#128999
 def calculate_surface(triangles):
 	surface = 0
 	for triangle in triangles:
