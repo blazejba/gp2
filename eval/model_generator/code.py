@@ -1,8 +1,9 @@
 import os
 import re
+import sys
 from math import sqrt, pow
 from random import randint, seed
-
+from src.utilities import get_date_in_string
 
 
 class LSystem():
@@ -55,7 +56,7 @@ def execute_growth_instruction(instruction, name, rnd_seed):
 			file.write("translate(" + str(current_translation) + ") cube(" + str(cube_size) + ", center=true);\n")
 			current_translation = [compound + cube_size/2*direction[index] for index, compound in enumerate(current_translation)]
 		elif step == 'D':
-			direction = [randint(0, 1), randint(0, 1), randint(0, 1)]
+			direction = [randint(-1, 1), randint(-1, 1), randint(-1, 1)]
 		elif step == '[':
 			saved_translations.append(current_translation)
 		elif step == ']':
@@ -68,19 +69,25 @@ def execute_growth_instruction(instruction, name, rnd_seed):
 
 def main():
 	genome = "S.C[DCC][DCC].n.n.n.n,C.CC[DC].n.n.n.n,20,1"
+	genome = sys.argv[1]
+	individual = sys.argv[2]
+
 	grammar, size, rnd_seed = decode_stdin(genome)
 	l_system = LSystem(grammar, size, rnd_seed)
 
-	R = str(randint(1000, 9999))
-	execute_growth_instruction(l_system.structure, R, rnd_seed)
+	name = get_date_in_string()
+	execute_growth_instruction(l_system.structure, name, rnd_seed)
 
-	os.system("openscad -o" + R + ".stl " + R + ".scad")
+	os.system("openscad -o" + name + ".stl " + name + ".scad")
 
-	triangles = get_triangles_from_stl(R)
+	triangles = get_triangles_from_stl(name)
 	volume = calculate_volume(triangles)
 	surface = calculate_surface(triangles)
 	fitness = pow(volume, 0.33)/pow(surface, 0.5)
+
 	print(volume, surface, fitness)
+	sys.stdout.write(individual + ',' + str(fitness))
+	sys.exit(1)
 
 
 def accumulate_translations(genome):
