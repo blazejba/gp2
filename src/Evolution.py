@@ -1,12 +1,11 @@
 import os
-import sys
 import time
 import tempfile
 from src.Island import Island
 from src.utilities import decode_stdout, get_date_in_string, clean_dir, kill_all_processes, open_processes
 
 
-class Experiment():
+class Evolution():
 	def __init__(self, experiment_xml_config, evaluators_xml_list, name):
 		self.start_t = time.time()
 		self.tmp_dir = tempfile.mkdtemp(dir='/tmp')
@@ -27,6 +26,7 @@ class Experiment():
 		# Logs
 		self.log = self.initialize_log()
 		self.total_num_of_evaluations = 0
+		self.final_conditions = []
 
 	def initialize_islands(self, experiment, evaluators):
 		return [Island(name, island, self.chromosome_length, evaluators, self.tmp_dir)
@@ -45,6 +45,7 @@ class Experiment():
 			else:
 				return False
 
+
 	def termination_printout(self, island, reason):
 		if reason == 'timeout':
 			print('Evolution terminated: timeout.')
@@ -52,11 +53,13 @@ class Experiment():
 			print('Evolution terminated: maximum fitness has been achieved.')
 		elif reason == 'generation':
 			print('Evolution terminated: maximum generation has been reached.')
-		print('Generated', island.generation, 'generations in', "{:.2f}".format(time.time() - self.start_t), 'seconds.')
+		evolution_time = time.time() - self.start_t
+		print('Generated', island.generation, 'generations in', "{:.2f}".format(evolution_time), 'seconds.')
 		self.print_migration_success_rates()
 		print('Total number of evaluations', self.total_num_of_evaluations)
 		print('Individuals of the last generation:\n')
 		self.print_all_individuals()
+		self.final_conditions = [reason, evolution_time, island.generation, self.total_num_of_evaluations]
 
 	def print_migration_success_rates(self):
 		rates = [i.replacement_policy.migration_policy.get_success_rate() for i in self.islands]
@@ -94,13 +97,15 @@ class Experiment():
 				print(individual)
 
 	def run(self):
+		while 1:
 			for island in self.islands:
 				if len(island.processes) > 0:
 					self.collect_fitness(island)
 				else:
 					self.organize_island(island)
 					if self.termination_check(island):
-						self.quit_experiment()
+						self.quit_evolution()
+						return self.final_conditions
 					else:
 						self.next_generation(island)
 
@@ -122,9 +127,8 @@ class Experiment():
 				island.individuals[int(index)][2] = True
 				island.processes.remove(process)
 
-	def quit_experiment(self):
+	def quit_evolution(self):
 		for island in self.islands:
 			kill_all_processes(island.processes)
 			clean_dir(self.tmp_dir)
 		os.removedirs(self.tmp_dir)
-		sys.exit()

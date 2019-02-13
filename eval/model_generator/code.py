@@ -69,7 +69,7 @@ def execute_growth_instruction(instruction, name, rnd_seed):
 
 def main():
 	genome = "S.C[DCC][DCC].n.n.n.n,C.CC[DC].n.n.n.n,20,1"
-	genome = sys.argv[1]
+	#genome = sys.argv[1]
 	individual = sys.argv[2]
 
 	grammar, size, rnd_seed = decode_stdin(genome)

@@ -11,4 +11,10 @@
         <parameters ea_type="gp" terminal_set="x,real" function_set="*_2,+_2,%_2,^_2" restriction="depth"
                     max_depth="5" method="ramped" repair="false"/>
     </function>
+
+    <function name="model_generator">
+        <ea type="gp" repair="false"/>
+        <tree name="instructions" terminal_set="n,string(C,D,[,])" function_set="string(C,D,[,])_3" restriction="none" unique="true" />
+        <tree name="meta" terminal_set="int" function_set="#_2" restriction="size" max_size="3" />
+    </function>
 </evaluation_functions>
