@@ -7,7 +7,6 @@ __status__ = "Prototype"
 
 
 import sys
-import os
 import xml.etree.ElementTree as ET
 from src.Evolution import Evolution
 

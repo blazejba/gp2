@@ -1,7 +1,6 @@
 from time import localtime
 from os import walk
 import os
-import subprocess
 
 
 def clean_dir(dir):
@@ -11,19 +10,26 @@ def clean_dir(dir):
             remove_file(path)
 
 
-def accumulate_vector(vector):
-    anl = [vector[0]]
-    if len(vector) >= 2:
-        for index in range(1, len(vector)):
-            anl.append(anl[index - 1] + vector[index])
+def average_tuple(t):
+    total = 0
+    for elem in t:
+        total += elem
+    return total / len(t)
+
+
+def accumulate_tuple(t):
+    anl = [t[0]]
+    if len(t) >= 2:
+        for index in range(1, len(t)):
+            anl.append(anl[index - 1] + t[index])
     return anl
 
 
-def normalize_vector(vector):
+def normalize_tuple(t):
     total = 0
-    for entry in vector:
-        total += entry
-    return [entry / total for entry in vector] if total != 0 else [1 / len(vector) for _ in range(len(vector))]
+    for elem in t:
+        total += elem
+    return [elem / total for elem in t] if total != 0 else [1 / len(t) for _ in range(len(t))]
 
 
 def get_date_in_string():
@@ -42,17 +48,3 @@ def decode_stdout(stdout):
 def remove_file(path):
     if os.path.exists(path):
         os.remove(path)
-
-
-def open_processes(island):
-    for index, individual in enumerate(island.individuals):
-        if individual[2]:  # dont evaluate elites/previously evaluated
-            continue
-        genome = ''.join(str(gene) for gene in individual[1])
-        island.processes.append(subprocess.Popen(["python3", island.evaluation_function_path, genome, str(index)],
-                                                 stdout=subprocess.PIPE))
-
-
-def kill_all_processes(processes):
-    for process in processes:
-        process.kill()

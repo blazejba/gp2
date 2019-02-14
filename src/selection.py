@@ -1,5 +1,5 @@
 from random import random, randint
-from src.utilities import normalize_vector, accumulate_vector
+from src.utilities import normalize_tuple, accumulate_tuple
 
 
 def roulette_wheel(quantity, scores):
@@ -7,7 +7,7 @@ def roulette_wheel(quantity, scores):
 	indexes = []
 	for _ in range(quantity):
 		R = random()
-		anl = accumulate_vector(normalize_vector(scores))
+		anl = accumulate_tuple(normalize_tuple(scores))
 		for index, entry in enumerate(anl):
 			if entry >= R:
 				indexes.append(index)
@@ -19,7 +19,7 @@ def rank_based(quantity, population_size):
 	indexes = []
 	for _ in range(quantity):
 		R = random()
-		anl = accumulate_vector(normalize_vector([x for x in range(population_size, 0, -1)]))
+		anl = accumulate_tuple(normalize_tuple([x for x in range(population_size, 0, -1)]))
 		for index, entry in enumerate(anl):
 			if entry >= R:
 				indexes.append(index)
