@@ -1,5 +1,6 @@
 from time import localtime
 from os import walk
+from random import randint
 import os
 
 
@@ -40,11 +41,13 @@ def get_date_in_string():
 
 
 def decode_stdout(stdout):
-    stdout = stdout.decode('ascii')
-    index, fitness = [x for x in stdout.split(',')]
-    return index, fitness
+    return float(stdout.decode('ascii'))
 
 
 def remove_file(path):
     if os.path.exists(path):
         os.remove(path)
+
+
+def choose_random_element(arr):
+    return arr[randint(0, len(arr) - 1)]

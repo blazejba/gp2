@@ -35,14 +35,14 @@ def process_data(data):
 
 
 def sum_all_columns(data):
-    sum = [0] * len(data[0])
+    total = [0] * len(data[0])
     for record in data:
         for column, variable in enumerate(record):
             if isinstance(variable, str):
                 continue
             else:
-                sum[column] += variable
-    return sum
+                total[column] += variable
+    return total
 
 
 if __name__ == '__main__':

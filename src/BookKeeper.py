@@ -4,18 +4,17 @@ from src.utilities import get_date_in_string, average_tuple
 
 class BookKeeper():
 	def __init__(self, name):
-		path = 'exp/logs/' + name
-		self.logfile = open(path + '_' + get_date_in_string() + '.log', 'w')
+		self.logfile = open('exp/logs/' + name + '_' + get_date_in_string() + '.log', 'w')
 		self.final_conditions = []
 		self.total_num_of_evaluations = 0
 		self.start_t = time.time()
 
 	def update_log(self, island):
-		average_fitness = average_tuple([individual[0] for individual in island.individuals])
+		average_fitness = average_tuple([individual.fitness for individual in island.individuals])
 
-		self.logfile.write(str(island.generation) + ',' + str(island.island_name) + ',' +
-		                   str(island.individuals[0][0]) + ','+ str(average_fitness) + ',' +
-		                   str(island.replacement_policy.migration_policy.migration_happened)+',\n')
+		self.logfile.write(str(island.generation) + ',' + str(island.pin) + ',' +
+		                   str(island.individuals[0].fitness) + ','+ str(average_fitness) + ',' +
+		                   str(island.migration.migration_happened)+',\n')
 
 	def termination_printout(self, generation, reason):
 		if reason == 'timeout':

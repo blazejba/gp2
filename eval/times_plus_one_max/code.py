@@ -13,13 +13,12 @@ import sys
 def main():
 	# init
 	genome = sys.argv[1]
-	individual = sys.argv[2]
 
 	# evaluation
 	fitness, _ = execute_tree(genome)
 
 	# fill stdout
-	sys.stdout.write(individual + ',' + str(fitness))
+	sys.stdout.write(str(fitness))
 	sys.exit(1)
 
 

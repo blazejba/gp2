@@ -1,11 +1,11 @@
-<evaluation_functions>
-    <function name="one_max">
-        <parameters ea_type="ga" terminal_set="0,1" repair="false"/>
-    </function>
+<evaluators>
+    <e evaluator='one_max'>
+        <string size='16' terminals='bool()'/>
+    </e>
 
-    <function name="times_plus_one_max">
-        <parameters ea_type="gp" terminal_set="1" function_set="*_2,+_2" restriction="size" repair="false"/>
-    </function>
+    <e name='times_plus_one_max'>
+        <tree size='11' terminals='1' functions='*_2,+_2'/>
+    </e>
 
     <function name="symbolic_regression">
         <parameters ea_type="gp" terminal_set="x,real" function_set="*_2,+_2,%_2,^_2" restriction="depth"
@@ -17,4 +17,4 @@
         <tree name="instructions" terminal_set="n,string(C,D,[,])" function_set="string(C,D,[,])_3" restriction="none" unique="true" />
         <tree name="meta" terminal_set="int" function_set="#_2" restriction="size" max_size="3" />
     </function>
-</evaluation_functions>
+</evaluators>

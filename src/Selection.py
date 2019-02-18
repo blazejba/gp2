@@ -1,13 +1,13 @@
 from src.selection import roulette_wheel, rank_based, truncation, tournament
 
 
-class SelectionPolicy(object):
+class Selection:
 	def __init__(self, selection_config, reproduction_config):
 		self.policy = selection_config['policy']
 		self.num_of_parents = int(reproduction_config['num_of_parents'])
 
 	def get_fitness_list(self, individuals):
-		return [individual[0] for individual in individuals]
+		return [individual.fitness for individual in individuals]
 
 	def select_parents(self, individuals):
 		fitness_list = self.get_fitness_list(individuals)
@@ -20,4 +20,4 @@ class SelectionPolicy(object):
 			indexes = truncation(self.num_of_parents)
 		elif self.policy == 'tournament':
 			indexes = tournament(self.num_of_parents, fitness_list)
-		return [individuals[index][1] for index in indexes]
+		return [individuals[index] for index in indexes]

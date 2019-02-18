@@ -3,7 +3,8 @@ from random import random, randint
 from src.selection import roulette_wheel, rank_based, truncation, tournament, sort_by_scores
 from src.utilities import remove_file
 
-class MigrationPolicy(object):
+
+class Migration:
 	def __init__(self, tmp_dir, island_name, config):
 		# General settings
 		self.island_name    = island_name

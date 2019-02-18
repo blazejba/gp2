@@ -6,12 +6,16 @@ def roulette_wheel(quantity, scores):
 	# Probability of being selected depends on the fitness
 	indexes = []
 	for _ in range(quantity):
-		R = random()
-		anl = accumulate_tuple(normalize_tuple(scores))
-		for index, entry in enumerate(anl):
-			if entry >= R:
-				indexes.append(index)
+		indexes.append(roll(scores))
 	return indexes
+
+
+def roll(scores):
+	R = random()
+	anl = accumulate_tuple(normalize_tuple(scores))
+	for index, entry in enumerate(anl):
+		if entry >= R:
+			return index
 
 
 def rank_based(quantity, population_size):
