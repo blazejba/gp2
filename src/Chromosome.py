@@ -1,24 +1,40 @@
 from src.Gene import Gene
+from src.PrimitiveDictionary import PrimitiveDictionary
 from random import random, randint
 from copy import deepcopy
 
 
 class Chromosome:
-	def __init__(self, instructions):
-		self.size = int(instructions.attrib['size'])
+	def __init__(self, size, tag, terminals=None, functions=None):
+		self.size = int(size)
 		if self.size == 0:
 			print('restricted growth')
-		self.type = instructions.tag
+		self.type = tag
 
-		self.terminals = instructions.attrib['terminals'].split(',')
 		if self.type == 'tree':
-			self.functions = instructions.attrib['functions']
+			self.genes = self.code_genes(terminals.split(','), functions.split(',')) if terminals and functions else []
+		else:
+			self.genes = self.code_genes(terminals.split(',')) if terminals else []
 
-		self.genes = self.code_genes()
+	def import_genes(self, genes):
+		for gene in genes:
+			open_parenthesis = gene.find('(')
+			close_parenthesis = gene.find(')')
+			role_split = gene.split('_')
 
-	def code_genes(self):
+			if len(role_split) > 1:
+				role = 'f'
+				arity = int(role_split[1])
+			else:
+				role = 's'
+				arity = None
+			expression = gene[open_parenthesis + 1:close_parenthesis]
+
+			self.genes.append(Gene(role, gene, arity=arity, expression=expression))
+
+	def code_genes(self, terminals, functions=None):
 		if self.type == 'string':
-			primitive = self.terminals[randint(0, len(self.terminals) - 1)]
+			primitive = terminals[randint(0, len(terminals) - 1)]
 			return [Gene('terminal', primitive) for _ in range(self.size)]
 
 	def mutate(self, mutation_rate):
@@ -57,8 +73,16 @@ class Chromosome:
 			points.append(new_point)
 		return points
 
-	def export(self):
+	def soft_export(self):
 		return [str(gene.expression) for gene in self.genes]
+
+	def hard_export(self):
+		string = ''.join('t' if self.type == 'tree' else 's')
+		string += ''.join(',' + str(self.size))
+		for gene in self.genes:
+			arity = '.' + gene.arity if gene.role == 'f' else ''
+			string += ''.join(',' + gene.primitive.kind + '(' + str(gene.expression) + arity + ')')
+		return string
 
 
 '''

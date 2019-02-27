@@ -1,6 +1,4 @@
 from src.Individual import Individual
-from random import randint
-import copy
 
 
 class Reproduction:

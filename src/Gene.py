@@ -3,12 +3,12 @@ from src.Primitive import Primitive
 
 
 class Gene:
-	def __init__(self, role, primitive, arity=None):
+	def __init__(self, role, primitive, arity=None, expression=None):
 		self.role = role
 		if self.role == 'f':   # f stands for function
 			self.arity = arity
 		self.primitive = Primitive(primitive)  # e.g. bool(), string(a, b, c), char(a, b, c), int(-1, 1), real(-1, 1)
-		self.expression = self.new_gene(True)
+		self.expression = self.new_gene(True) if not expression else expression
 
 	def mutate(self):
 		self.expression = self.new_gene(False)
@@ -25,4 +25,3 @@ class Gene:
 				return new_gene
 			else:
 				return self.primitive.collection[randint(0, len(self.primitive.collection) - 1)]
-

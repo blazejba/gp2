@@ -3,7 +3,6 @@ class Primitive:
 		self.kind, self.collection, self.upper_bound, self.lower_bound = self.decode(primitive_encoded)
 
 	def decode(self, encoded):
-
 		open_parenthesis = encoded.find('(')
 		close_parenthesis = encoded.find(')')
 

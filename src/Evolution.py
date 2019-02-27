@@ -72,7 +72,7 @@ class Evolution:
 		island.print_generation_summary()
 		self.book_keeper.update_log(island)
 		for individual in island.individuals:
-			print(individual.export())
+			print(individual.export_yourself('soft'))
 
 	def quit_evolution(self, reason, generation):
 		for island in self.islands:

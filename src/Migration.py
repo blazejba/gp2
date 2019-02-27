@@ -1,36 +1,37 @@
 from os import rename, walk
 from random import random, randint
 from src.selection import roulette_wheel, rank_based, truncation, tournament, sort_by_scores
+from src.Individual import Individual
 from src.utilities import remove_file
 
 
 class Migration:
 	def __init__(self, tmp_dir, island_name, config):
 		# General settings
-		self.island_name    = island_name
-		self.tmp_dir        = tmp_dir
-		self.buffer_dir     = self.tmp_dir + '/' + str(self.island_name)
-		self.successful_migrations  = 0
-		self.total_migrations       = 0
-		self.migration_happened     = False
+		self.island_name = island_name
+		self.tmp_dir = tmp_dir
+		self.buffer_dir = self.tmp_dir + '/' + str(self.island_name)
+		self.successful_migrations = 0
+		self.total_migrations = 0
+		self.migration_happened = False
 
 		# Policy settings
 		try:
-			self.out_allowed    = config['out'] == 'true'
-			self.in_allowed     = config['in'] == 'true'
+			self.out_allowed = config['out'] == 'true'
+			self.in_allowed = config['in'] == 'true'
 		except:
-			self.in_allowed     = False
-			self.out_allowed    = False
+			self.in_allowed = False
+			self.out_allowed = False
 
-		if self.in_allowed:
+		if self.in_allowed:     # Immigration allowance
 			try:
-				self.num_of_immigrants      = int(config['immigrants'])
-				self.entry_policy           = config['entry_policy']
-				self.immigrant_selection    = config['selection_policy']
+				self.num_of_immigrants = int(config['immigrants'])
+				self.entry_policy = config['entry_policy']
+				self.immigrant_selection = config['selection_policy']
 			except:
-				self.num_of_immigrants      = 1
-				self.entry_policy           = 'probabilistic'
-				self.immigrant_selection    = 'roulette_wheel'
+				self.num_of_immigrants = 1
+				self.entry_policy = 'probabilistic'
+				self.immigrant_selection = 'roulette_wheel'
 
 			if self.entry_policy == 'periodical':
 				try:
@@ -44,7 +45,7 @@ class Migration:
 				except:
 					self.probability = 10
 
-		if self.out_allowed:
+		if self.out_allowed:    # Emigration allowance
 			try:
 				self.num_of_emigrants = int(config['emigrants'])
 			except:
@@ -55,7 +56,7 @@ class Migration:
 
 	def migrate_out(self, individuals):
 		if self.out_allowed:
-			for x in range(self.num_of_emigrants):
+			for x in range(self.num_of_emigrants):  # migrate out x best of the population
 				self.create_emigrant(individuals[x])
 
 	def select_immigrants(self, candidates):
@@ -75,18 +76,19 @@ class Migration:
 
 	def get_immigrant(self, candidate):
 		file = open(candidate[0])
-		chromosome = file.readlines()[0].split(',')
-		del chromosome[len(chromosome) - 1]
+		genome_encoded = file.readlines()[0]
+		immigrant = Individual()
+		immigrant.import_yourself(genome_encoded)
 		file.close()
 		remove_file(candidate[0])
-		return candidate[1], chromosome, True
+		return immigrant
 
 	def create_emigrant(self, emigrant):
 		buffer_file = open(self.buffer_dir, 'w+t')
-		[buffer_file.write(str(gene) + ',') for gene in emigrant[1]]
+		buffer_file.write(emigrant.export_yourself('hard'))
 		buffer_file.close()
-		new_file = self.tmp_dir + '/' + str(self.island_name) + '_' + str(randint(1000, 9999)) + '_' + str(emigrant[0])
-		rename(self.buffer_dir, new_file)
+		new_file = self.tmp_dir + '/' + str(self.island_name) + '_' + str(randint(1000, 9999)) + '_' + str(int(emigrant.fitness))
+		rename(self.buffer_dir, new_file)   # atomic operation
 
 	def rank_migration(self, candidates):
 		return [candidates[i] for i in range(self.num_of_immigrants)]

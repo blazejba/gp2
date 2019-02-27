@@ -1,5 +1,5 @@
 <experiment chromosome_length="50" max_fitness="50" max_time="0" max_generation="0">
-    <island population_size="10" evaluator="one_max" dna_repair="false">
+    <island population_size="4" evaluator="one_max">
         <reproduction crossover_points="5" mutation_rate="1" num_of_parents="2"/>
         <selection policy="roulette_wheel"/>
         <migration entry_policy="probabilistic" in="true" out="true" chance="1"
@@ -7,7 +7,7 @@
         <replacement policy="elitism" num_of_elites="2"/>
     </island>
 
-    <island population_size="20" evaluator="one_max" dna_repair="false">
+    <island population_size="5" evaluator="one_max">
         <reproduction crossover_points="5" mutation_rate="25" num_of_parents="2"/>
         <selection policy="rank_based"/>
         <migration entry_policy="probabilistic" in="true" out="true" chance="1"
