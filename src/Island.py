@@ -4,9 +4,12 @@ from src.Reproduction import Reproduction
 from src.Replacement import Replacement
 from src.Migration import Migration
 from src.Individual import Individual
+from typing import List
 
 
 class Island:
+	individuals: List[Individual]
+
 	def __init__(self, pin, representation, selection, migration, replacement, reproduction, population_size, tmp_dir):
 		# Island
 		self.pin = pin
@@ -20,12 +23,12 @@ class Island:
 		self.migration = Migration(tmp_dir, pin, migration)
 
 		# Population
-		self.individuals = self.initiate_individuals(representation)
+		self.initiate_individuals(representation)
 		self.average_fitness = 0
 		self.generation = 0
 
 	def initiate_individuals(self, representation):
-		return [Individual(representation) for _ in range(self.population_size)]
+		self.individuals = [Individual(representation) for _ in range(self.population_size)]
 
 	def sort_individuals(self):
 		tmp_individuals = self.individuals
