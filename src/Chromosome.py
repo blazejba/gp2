@@ -1,5 +1,4 @@
 from src.Gene import Gene
-from src.PrimitiveDictionary import PrimitiveDictionary
 from random import random, randint
 from copy import deepcopy
 

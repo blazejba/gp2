@@ -30,8 +30,10 @@ def main():
 
 
 def process_data(data):
-    print('\n')
-    print([variable/len(data) for variable in sum_all_columns(data)])
+    headers = ['\nreasons ratio: ', 'mean evaluation time: ', 'mean generations: ', 'mean evaluations: ']
+    units = ['', ' seconds', '', '']
+    values = [str('%.1f' % (variable/len(data))) for variable in sum_all_columns(data)]
+    [print(headers[index] + values[index] + units[index]) for index in range(len(headers))]
 
 
 def sum_all_columns(data):
@@ -39,7 +41,7 @@ def sum_all_columns(data):
     for record in data:
         for column, variable in enumerate(record):
             if isinstance(variable, str):
-                continue
+                pass
             else:
                 total[column] += variable
     return total

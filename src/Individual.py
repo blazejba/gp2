@@ -35,12 +35,13 @@ class Individual:
 			chromosome.import_genes(genes)
 			self.genome.append(chromosome)
 
-	def random_genome(self, representation):
+	@staticmethod
+	def random_genome(representation):
 		genome = []
 		for instructions in representation:
-			size = instructions.attrib['size']
+			genome_length = instructions.attrib['size']
 			tag = instructions.tag
 			terminals = instructions.attrib['terminals']
 			functions = instructions.attrib['functions'] if tag == 'tree' else []
-			genome.append(Chromosome(size, tag, terminals, functions))
+			genome.append(Chromosome(genome_length, tag, terminals, functions))
 		return genome

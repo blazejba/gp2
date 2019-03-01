@@ -1,6 +1,6 @@
 <evaluators>
     <e evaluator='one_max'>
-        <string size='16' terminals='bool()'/>
+        <string size='5' terminals='bool()' functions=''/>
     </e>
 
     <e name='times_plus_one_max'>

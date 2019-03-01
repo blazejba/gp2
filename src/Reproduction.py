@@ -16,12 +16,14 @@ class Reproduction:
 			chromosome.mutate(self.mutation_rate)
 		return new_individual
 
-	def pair(self, genomes):
+	@staticmethod
+	def pair(genomes):
 		paired_chromosomes = [[] * len(genomes[0])]
 		for genome in genomes:
 			for num, chromosome in enumerate(genome):
 				paired_chromosomes[num].append(chromosome)
 		return paired_chromosomes
 
-	def extract_genomes(self, parents):
+	@staticmethod
+	def extract_genomes(parents):
 		return [parent.genome for parent in parents]
