@@ -1,14 +1,16 @@
 from src.Gene import Gene
+from src.Tree import Tree
 from random import random, randint
 from copy import deepcopy
 
 
 class Chromosome:
-	def __init__(self, size, tag, terminals=None, functions=None):
-		self.size = int(size)
-		if self.size == 0:
+	def __init__(self, length, primitives):
+		self.length = int(length)
+		if self.length == 0:
 			print('restricted growth')
-		self.type = tag
+
+
 
 		if self.type == 'tree':
 			self.genes = self.code_genes(terminals.split(','), functions.split(',')) if terminals and functions else []
@@ -32,9 +34,12 @@ class Chromosome:
 			self.genes.append(Gene(role, gene, arity=arity, expression=expression))
 
 	def code_genes(self, terminals, functions=None):
-		if self.type == 'string':
-			primitive = terminals[randint(0, len(terminals) - 1)]
-			return [Gene('terminal', primitive) for _ in range(self.size)]
+		return [Gene(self.select_primitive()) for _ in range(self.length)]
+
+	def select_primitive(self):
+		# if root -> look for a function
+			# if there is no function -> look for a terminal
+		#
 
 	def mutate(self, mutation_rate):
 		for gene in self.genes:
@@ -66,9 +71,9 @@ class Chromosome:
 	def find_crossover_points(self, num_of_points):
 		points = []
 		for _ in range(num_of_points):
-			new_point = randint(1, self.size - 2)
+			new_point = randint(1, self.length - 2)
 			while new_point in points:
-				new_point = randint(1, self.size - 2)
+				new_point = randint(1, self.length - 2)
 			points.append(new_point)
 		return points
 
@@ -77,7 +82,7 @@ class Chromosome:
 
 	def hard_export(self):
 		string = ''.join('t' if self.type == 'tree' else 's')
-		string += ''.join(',' + str(self.size))
+		string += ''.join(',' + str(self.length))
 		for gene in self.genes:
 			arity = '.' + gene.arity if gene.role == 'f' else ''
 			string += ''.join(',' + gene.primitive.kind + '(' + str(gene.expression) + arity + ')')
@@ -95,23 +100,8 @@ class Chromosome:
 		return func_b[0]
 '''
 
-'''
-		self.ga_type = evaluator[0].attrib['ea_type']
-		self.terminal_set = [letter for letter in evaluator[0].attrib['terminal_set'].split(',')]
-		self.operator_set = []
-		if self.ga_type == 'gp':
-			self.gp_restriction = evaluator[0].attrib['restriction']
-			if self.gp_restriction == 'depth':
-				self.gp_max_depth = evaluator[0].attrib['max_depth']
-				self.gp_method = evaluator[0].attrib['method']
-			if self.gp_restriction == 'size':
-				self.gp_max_size = chromosome_length
-
-			for func in [func for func in evaluator[0].attrib['function_set'].split(',')]:
-				operator, arity = func.split('_')
-				self.operator_set.append([operator, int(arity)])
-				
-					def depth_restricted_tree_growth(self, max_depth):
+'''			
+	def depth_restricted_tree_growth(self, max_depth):
 		if max_depth == 0 or (self.gp_method == 'grow' and random() < (len(self.terminal_set)/(len(self.terminal_set)+len(self.operator_set)))):
 			return choose_random_element(self.terminal_set)
 		else:
@@ -122,36 +112,11 @@ class Chromosome:
 					expression.append(symbol)
 			return expression
 
-	def size_restricted_tree_growth(self, max_size, free_nodes):
-		free_nodes -= 1
-		if max_size == 0 or (random() > 0.9 and free_nodes > 0):
-			return choose_random_element(self.terminal_set), max_size
-		else:
-			space_left = -1
-			while self.tree_growth_deadlock(space_left):
-				operator = choose_random_element(self.operator_set)
-				space_left = max_size - operator[1]
-			free_nodes += operator[1]
-			max_size = space_left
-			expression = [operator[0]]
-			for branch in range(operator[1]):
-				chromosome, max_size = self.size_restricted_tree_growth(max_size, free_nodes)
-				for gene in chromosome:
-					expression.append(gene)
-				free_nodes -= 1
-			return expression, max_size
-
 	def unconstrained_tree_growth(self):
 		print("not implemented")
 		return 1
 
-	def tree_growth_deadlock(self, space_left):
-		if space_left < 0:
-			return True
-		for operator in self.operator_set:
-			if space_left == 0 or space_left - operator[1] == 0 or space_left - operator[1] == operator[1] or space_left - operator[1] > operator[1]:
-				return False
-		return True
+
 
 	def initiate_tree(self):
 		if self.gp_restriction == 'depth':

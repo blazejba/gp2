@@ -74,7 +74,8 @@ class Migration:
 		selected_candidates = [candidates[index] for index in indexes]
 		return [self.get_immigrant(candidate) for candidate in selected_candidates]
 
-	def get_immigrant(self, candidate):
+	@staticmethod
+	def get_immigrant(candidate):
 		file = open(candidate[0])
 		genome_encoded = file.readlines()[0]
 		immigrant = Individual()

@@ -4,7 +4,6 @@ import tempfile
 from src.Island import Island
 from src.BookKeeper import BookKeeper
 from src.utilities import clean_dir
-from typing import List, Any
 
 
 class Evolution:

@@ -5,7 +5,7 @@ class Representation:
 	def __init__(self, instructions):
 		terminals = instructions.attrib['terminals'].split(',')
 		functions = instructions.attrib['functions'].split(',')
-		self.chromosome_length = instructions.attrib['size']
+		self.length = instructions.attrib['size']
 		self.primitives_dict = List[dict]
 
 		primitives = terminals + functions

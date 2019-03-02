@@ -1,20 +1,18 @@
 <evaluators>
     <e evaluator='one_max'>
-        <string size='5' terminals='bool()' functions=''/>
+        <tree size='5' primitives='bool()_1, bool()_0'/>
     </e>
 
     <e name='times_plus_one_max'>
-        <tree size='11' terminals='1' functions='*_2,+_2'/>
+        <tree size='11' primitives="char(1)_0, char(*,+)_2" />
     </e>
 
-    <function name="symbolic_regression">
-        <parameters ea_type="gp" terminal_set="x,real" function_set="*_2,+_2,%_2,^_2" restriction="depth"
-                    max_depth="5" method="ramped" repair="false"/>
-    </function>
+    <e name="symbolic_regression">
+        <tree size='0' primitives="char(x)_0, real(-4,4)_0, char(*,+,%,^)_2" restriction="depth" max_depth="5"/>
+    </e>
 
-    <function name="model_generator">
-        <ea type="gp" repair="false"/>
-        <tree name="instructions" terminal_set="n,string(C,D,[,])" function_set="string(C,D,[,])_3" restriction="none" unique="true" />
-        <tree name="meta" terminal_set="int" function_set="#_2" restriction="size" max_size="3" />
-    </function>
+    <e name="model_generator">
+        <tree primitives="char(None)_0, string(C,D,[,])_0.5, string(C,D,[,])_3.5" restriction="none" />
+        <tree primitives="int(0, 1000)_0, char(#)_2" restriction="size" max_size="3" />
+    </e>
 </evaluators>

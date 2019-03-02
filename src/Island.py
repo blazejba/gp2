@@ -14,13 +14,13 @@ class Island:
         self.pin = pin  # personal identification num
         self.population_size = population_size  # num of individuals on a island
         self.evaluator = 'eval/' + representation.attrib['evaluator'] + '/code.py'  # this is for running an evaluator
-        self.representation = [Representation(instructions) for instructions in representation]
+        representation_2 = [Representation(instructions) for instructions in representation]
 
         # Policies
         self.selection = Selection(selection, reproduction)
         self.replacement = Replacement(replacement)
-        self.reproduction = Reproduction(self.population_size, reproduction, representation)
-        self.migration = Migration(tmp_dir, pin, migration)
+        self.reproduction = Reproduction(self.population_size, reproduction, representation_2)
+        self.migration = Migration(tmp_dir, pin, migration, representation_2)
 
         # Population
         self.individuals = List[Individual]
