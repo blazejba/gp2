@@ -1,18 +1,18 @@
 <evaluators>
     <e evaluator='one_max'>
-        <tree size='5' primitives='bool()_1, bool()_0'/>
+        <tree size='5' depth='0' primitives='bool()_1, bool()_0'/>
     </e>
 
     <e name='times_plus_one_max'>
-        <tree size='11' primitives="char(1)_0, char(*,+)_2" />
+        <tree size='11' depth='0' primitives='char(1)_0, char(*,+)_2' />
     </e>
 
     <e name="symbolic_regression">
-        <tree size='0' primitives="char(x)_0, real(-4,4)_0, char(*,+,%,^)_2" restriction="depth" max_depth="5"/>
+        <tree size='0' depth='5' primitives='char(x)_0, real(-4,4)_0, char(*,+,%,^)_2' />
     </e>
 
     <e name="model_generator">
-        <tree primitives="char(None)_0, string(C,D,[,])_0.5, string(C,D,[,])_3.5" restriction="none" />
-        <tree primitives="int(0, 1000)_0, char(#)_2" restriction="size" max_size="3" />
+        <tree size='0' depth='0' primitives='char(N)_0, string(C,D,[,])_0.5, string(C,D,[,])_3.5' />
+        <tree size='3' depth='0' primitives='int(0, 1000)_0, char(#)_2' />
     </e>
 </evaluators>

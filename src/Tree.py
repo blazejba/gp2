@@ -2,6 +2,7 @@
 
 from anytree import Node, RenderTree
 from anytree.exporter import DotExporter
+from anytree.importer import JsonImporter
 from random import randint, sample, uniform, shuffle
 
 
@@ -66,19 +67,18 @@ class Tree:
     def same_arity_nodes(self, arity):  # this is invoked in headless chicken
         return [node for node in self.nodes if node.arity == arity]
 
-    def stringify(self, how):  # tree to string export
-        if how == 'soft':  # soft exports only the values
-            return ''.join(letter for letter in [str(node.value) for node in self.nodes])
-        elif how == 'hard':  # hard exports values, arities and primitive types
-            string = []
-            for index, node in enumerate(self.nodes):
-                string += ''.join(node.ptype[0] + '(' + str(node.value) + ',' + str(node.arity) + ')')
-                if index < len(self.nodes) - 1:
-                    string += ''.join(',')
-            return ''.join(letter for letter in string)
+    def stringify(self):  # tree to string export
+        string = []
+        for node in self.nodes:
+            if not node.parent:
+                string += ''.join(node.name + ',' + node.ptype + ',' + str(node.arity) + ',' + str(node.value) + '\n')
+            else:
+                string += ''.join(node.name + ',' + node.ptype + ',' + str(node.arity) + ',' + str(node.value) + ',' +
+                                  node.parent.name + '\n')
+        return ''.join(letter for letter in string)
 
-    def parse(self):  # string to tree import
-        pass
+    def parse(self, json):  # string to tree import
+        importer = JsonImporter()
 
     def grow_leaf(self):
         valid_leafs = [primitive for primitive in self.primitive_dict if primitive.get('arity') == 0]
@@ -109,6 +109,13 @@ class Tree:
                 return False
         return True
 
+    def print(self):
+        for pre, _, node in RenderTree(self.nodes[0]):
+            print('%s%s' % (pre, node.value))
+
+    def save_image(self, path):
+        DotExporter(self.nodes[0], nodenamefunc=lambda node: '%s:%s' % (node.value, node.name)).to_picture(path)
+
     @staticmethod
     def get_value(primitive):
         if primitive.get('ptype') == 'bool':
@@ -124,10 +131,6 @@ class Tree:
             length = randint(1, primitive.get('length'))
             value = [sample(collection, 1)[0] for _ in range(length)]
             return ''.join(letter for letter in value)
-
-
-def nodenamefunc(node):
-    return '%s:%s' % (node.value, node.name)
 
 
 if __name__ == '__main__':
@@ -156,10 +159,7 @@ if __name__ == '__main__':
 
     tree = Tree(max_size, max_depth, growth_constrain, dict_2)
     tree.grow()
-    print(RenderTree(tree.nodes[0]))
-    DotExporter(tree.nodes[0], nodenamefunc=nodenamefunc).to_picture("tp1_max.png")
-    print(tree.stringify('soft'))
-
-    parsing = 's(C][,3),s(]D,3),s(]D,3),s(]DDC,3),s(C],3),s(C,0),c(N,0),s(CCDCD,0),s(CC]D,0),c(N,0),c(N,0),s(]DDC,0),s(C],0),s(D]D[C,0),s(D]C],0),c(N,0)'
-
-
+    tree.print()
+    tree.save_image('tp1_max.png')
+    file = open('emigrant', 'w')
+    file.write(tree.stringify())
