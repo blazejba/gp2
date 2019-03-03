@@ -2,17 +2,18 @@
 
 from anytree import Node, RenderTree
 from anytree.exporter import DotExporter
-from random import randint, sample, uniform, random
+from random import randint, sample, uniform, shuffle
 
 
 class Tree:
-    def __init__(self, size, depth, primitives):
-        if size == 0 and depth == 0:
-            self.unconstrained = True
+    def __init__(self, size, depth, constrain, primitives):
+        if not constrain:
+            self.max_size = randint(5, size)
+            self.max_depth = randint(1, depth)
         else:
-            self.unconstrained = False
-        self.max_size = size if size != 0 else 999
-        self.max_depth = depth if depth != 0 else 99
+            self.max_size = size if size != 0 else 999
+            self.max_depth = depth if depth != 0 else 999
+        print('Depth', self.max_depth, 'Size', self.max_size)
         self.primitive_dict = primitives
         self.nodes = []
 
@@ -23,9 +24,7 @@ class Tree:
         # Growing nodes
         while True:
             size, depth, num, free_branches = self.expand(size, depth, num, free_branches)
-            if size >= self.max_size or depth >= self.max_depth and not self.unconstrained:
-                break
-            elif self.unconstrained and len(free_branches) == 0:
+            if size >= self.max_size or depth >= self.max_depth or len(free_branches) == 0:
                 break
 
         # Growing leafs
@@ -43,7 +42,7 @@ class Tree:
     def expand(self, size, depth, num, free_branches):  # expand tree by growing a new node
         space_left = self.max_size - size
         ptype, arity, value = self.grow_node(space_left)
-        if num == 0 or (self.unconstrained and random() > 0.2):
+        if num == 0:
             self.nodes.append(Node(str(num), ptype=ptype, arity=arity, value=value))
         else:
             parent = free_branches[randint(0, len(free_branches) - 1)]
@@ -89,12 +88,13 @@ class Tree:
 
     def grow_node(self, space_left):
         valid_nodes = [primitive for primitive in self.primitive_dict if primitive.get('arity') > 0]
-        while True:
-            node = valid_nodes[randint(0, len(valid_nodes) - 1)]
+        shuffle(valid_nodes)
+        for node in valid_nodes:
             if not self.deadlock(space_left - node.get('arity')):
-                break
-        value = self.get_value(node)
-        return node.get('ptype'), node.get('arity'), value
+                value = self.get_value(node)
+                return node.get('ptype'), node.get('arity'), value
+        ptype, value = self.grow_leaf()
+        return ptype, 0, value
 
     def deadlock(self, space_left):  # to identify deadlocks which might occur when size or depth of a tree is limited
         if space_left < 0:
@@ -150,14 +150,15 @@ if __name__ == '__main__':
         dict(ptype='string', arity=3, collection=['C', 'D', '[', ']'], length=5)
     ]
 
-    max_size = 0
-    max_depth = 4
+    max_size = 21
+    max_depth = 10
+    growth_constrain = False
 
-    tree = Tree(max_size, max_depth, dict_1)
+    tree = Tree(max_size, max_depth, growth_constrain, dict_2)
     tree.grow()
     print(RenderTree(tree.nodes[0]))
     DotExporter(tree.nodes[0], nodenamefunc=nodenamefunc).to_picture("tp1_max.png")
-    print(tree.stringify('hard'))
+    print(tree.stringify('soft'))
 
     parsing = 's(C][,3),s(]D,3),s(]D,3),s(]DDC,3),s(C],3),s(C,0),c(N,0),s(CCDCD,0),s(CC]D,0),c(N,0),c(N,0),s(]DDC,0),s(C],0),s(D]D[C,0),s(D]C],0),c(N,0)'
 
