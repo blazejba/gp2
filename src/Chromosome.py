@@ -10,8 +10,6 @@ class Chromosome:
 		if self.length == 0:
 			print('restricted growth')
 
-
-
 		if self.type == 'tree':
 			self.genes = self.code_genes(terminals.split(','), functions.split(',')) if terminals and functions else []
 		else:
@@ -36,10 +34,6 @@ class Chromosome:
 	def code_genes(self, terminals, functions=None):
 		return [Gene(self.select_primitive()) for _ in range(self.length)]
 
-	def select_primitive(self):
-		# if root -> look for a function
-			# if there is no function -> look for a terminal
-		#
 
 	def mutate(self, mutation_rate):
 		for gene in self.genes:
@@ -87,44 +81,3 @@ class Chromosome:
 			arity = '.' + gene.arity if gene.role == 'f' else ''
 			string += ''.join(',' + gene.primitive.kind + '(' + str(gene.expression) + arity + ')')
 		return string
-
-
-'''
-	def find_same_arity_function(self, func_a):
-		for f in self.function_set:
-			if func_a == f[0]:
-				func_a_arity = f[1]
-		func_b = self.function_set[randint(0, len(self.function_set) - 1)]
-		while not func_a_arity == func_b[1]:
-			func_b = self.function_set[randint(0, len(self.function_set) - 1)]
-		return func_b[0]
-'''
-
-'''			
-	def depth_restricted_tree_growth(self, max_depth):
-		if max_depth == 0 or (self.gp_method == 'grow' and random() < (len(self.terminal_set)/(len(self.terminal_set)+len(self.operator_set)))):
-			return choose_random_element(self.terminal_set)
-		else:
-			operator = choose_random_element(self.operator_set)
-			expression = [operator]
-			for branch in range(operator[1]):
-				for symbol in self.depth_restricted_tree_growth(max_depth - 1):
-					expression.append(symbol)
-			return expression
-
-	def unconstrained_tree_growth(self):
-		print("not implemented")
-		return 1
-
-
-
-	def initiate_tree(self):
-		if self.gp_restriction == 'depth':
-			tree = self.depth_restricted_tree_growth(self.gp_max_depth)
-		elif self.gp_restriction == 'size':
-			tree = self.size_restricted_tree_growth(self.gp_max_size-1, 1)[0]
-		elif self.gp_restriction == 'none':
-			tree = self.unconstrained_tree_growth()
-		return tree
-
-'''

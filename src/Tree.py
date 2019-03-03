@@ -7,81 +7,96 @@ from random import randint, sample, uniform, random
 
 class Tree:
     def __init__(self, size, depth, primitives):
+        if size == 0 and depth == 0:
+            self.unconstrained = True
+        else:
+            self.unconstrained = False
         self.max_size = size if size != 0 else 999
         self.max_depth = depth if depth != 0 else 99
         self.primitive_dict = primitives
         self.nodes = []
 
-    def grow(self):
+    def grow(self):  # first grow all the nodes then fill the remaining branches with leafs
         size, depth, num = [0] * 3
-        free_nodes = []
+        free_branches = []
 
         # Growing nodes
         while True:
-            size, depth, num, free_nodes = self.expand(size, depth, num, free_nodes)
-            if size >= self.max_size or depth >= self.max_depth:
+            size, depth, num, free_branches = self.expand(size, depth, num, free_branches)
+            if size >= self.max_size or depth >= self.max_depth and not self.unconstrained:
+                break
+            elif self.unconstrained and len(free_branches) == 0:
                 break
 
         # Growing leafs
-        while 0 < len(free_nodes):
-            num, free_nodes = self.grow_leafs(num, free_nodes)
+        while 0 < len(free_branches):
+            num, free_branches = self.grow_leafs(num, free_branches)
 
-    def grow_leafs(self, num, free_nodes):
-        ptype, value = self.select_leaf()
-        parent = free_nodes[randint(0, len(free_nodes) - 1)]
+    def grow_leafs(self, num, free_branches):  # grow a random terminal node
+        ptype, value = self.grow_leaf()
+        parent = free_branches[randint(0, len(free_branches) - 1)]
         self.nodes.append(Node(str(num), ptype=ptype, arity=0, value=value, parent=parent))
-        free_nodes.remove(parent)
+        free_branches.remove(parent)
         num += 1
-        return num, free_nodes
+        return num, free_branches
 
-    def expand(self, size, depth, num, free_nodes):
+    def expand(self, size, depth, num, free_branches):  # expand tree by growing a new node
         space_left = self.max_size - size
-        ptype, arity, value = self.select_node(space_left)
-        if num == 0:
+        ptype, arity, value = self.grow_node(space_left)
+        if num == 0 or (self.unconstrained and random() > 0.2):
             self.nodes.append(Node(str(num), ptype=ptype, arity=arity, value=value))
         else:
-            parent = free_nodes[randint(0, len(free_nodes) - 1)]
+            parent = free_branches[randint(0, len(free_branches) - 1)]
             self.nodes.append(Node(str(num), ptype=ptype, arity=arity, value=value, parent=parent))
-            free_nodes.remove(parent)
-        free_nodes += [self.nodes[-1]] * arity
+            free_branches.remove(parent)
+        free_branches += [self.nodes[-1]] * arity
         size += arity + 1 if num == 0 else arity
         depth = depth if self.nodes[-1].depth < depth else self.nodes[-1].depth + 1
         num += 1
-        return size, depth, num, free_nodes
+        return size, depth, num, free_branches
 
-    def crossover(self):
+    def mutate(self, node):  # node value -> node of the same arity value
+        index = self.nodes.index(node)
+        valid_primitives = self.same_arity_primitives(self.nodes[index].arity)
+        primitive = sample(valid_primitives, 1)[0]
+        self.nodes[index].value = self.get_value(primitive)
+
+    def same_arity_primitives(self, arity):  # return all primitives in the dictionary of given arity
+        return [primitive for primitive in self.primitive_dict if primitive.get('arity') == arity]
+
+    def same_arity_nodes(self, arity):  # this is invoked in headless chicken
+        return [node for node in self.nodes if node.arity == arity]
+
+    def stringify(self, how):  # tree to string export
+        if how == 'soft':  # soft exports only the values
+            return ''.join(letter for letter in [str(node.value) for node in self.nodes])
+        elif how == 'hard':  # hard exports values, arities and primitive types
+            string = []
+            for index, node in enumerate(self.nodes):
+                string += ''.join(node.ptype[0] + '(' + str(node.value) + ',' + str(node.arity) + ')')
+                if index < len(self.nodes) - 1:
+                    string += ''.join(',')
+            return ''.join(letter for letter in string)
+
+    def parse(self):  # string to tree import
         pass
 
-    def point_mutation(self, mutation_rate):
-        for node in self.nodes:
-            if random() * 100 < mutation_rate:
-
-
-    def headless_chicken_mutation(self):
-        pass
-
-    def stringify(self):
-        pass
-
-    def parse(self):
-        pass
-
-    def select_leaf(self):
+    def grow_leaf(self):
         valid_leafs = [primitive for primitive in self.primitive_dict if primitive.get('arity') == 0]
         leaf = valid_leafs[randint(0, len(valid_leafs) - 1)]
         value = self.get_value(leaf)
-        return leaf.get('name'), value
+        return leaf.get('ptype'), value
 
-    def select_node(self, space_left):
+    def grow_node(self, space_left):
         valid_nodes = [primitive for primitive in self.primitive_dict if primitive.get('arity') > 0]
         while True:
             node = valid_nodes[randint(0, len(valid_nodes) - 1)]
             if not self.deadlock(space_left - node.get('arity')):
                 break
         value = self.get_value(node)
-        return node.get('name'), node.get('arity'), value
+        return node.get('ptype'), node.get('arity'), value
 
-    def deadlock(self, space_left):
+    def deadlock(self, space_left):  # to identify deadlocks which might occur when size or depth of a tree is limited
         if space_left < 0:
             return True
         elif space_left == 0:
@@ -94,20 +109,22 @@ class Tree:
                 return False
         return True
 
-    def get_value(self, primitive):
-        if primitive.get('name') == 'Bool':
+    @staticmethod
+    def get_value(primitive):
+        if primitive.get('ptype') == 'bool':
             return randint(0, 1)
-        elif primitive.get('name') == 'Char':
+        elif primitive.get('ptype') == 'char':
             return sample(primitive.get('collection'), 1)[0]
-        elif primitive.get('name') == 'Real':
+        elif primitive.get('ptype') == 'real':
             return uniform(primitive.get('low'), primitive.get('up'))
-        elif primitive.get('name') == 'Int':
+        elif primitive.get('ptype') == 'int':
             return randint(primitive.get('low'), primitive.get('up'))
-        elif primitive.get('name') == 'String':
+        elif primitive.get('ptype') == 'string':
             collection = primitive.get('collection')
-            length = randint(0, primitive.get('length'))
+            length = randint(1, primitive.get('length'))
             value = [sample(collection, 1)[0] for _ in range(length)]
             return ''.join(letter for letter in value)
+
 
 def nodenamefunc(node):
     return '%s:%s' % (node.value, node.name)
@@ -116,28 +133,32 @@ def nodenamefunc(node):
 if __name__ == '__main__':
     # 1-max
     dict_1 = [
-        dict(name='Bool', arity=1, collection=None, up=None, low=None),
-        dict(name='Bool', arity=0, collection=None, up=None, low=None)
+        dict(ptype='bool', arity=1, collection=None, up=None, low=None),
+        dict(ptype='bool', arity=0, collection=None, up=None, low=None)
     ]
 
     # TP1-max
     dict_2 = [
-        dict(name='Char', arity=0, collection=[1]),
-        dict(name='Char', arity=2, collection=['*', '+'])
+        dict(ptype='char', arity=0, collection=[1]),
+        dict(ptype='char', arity=2, collection=['*', '+'])
     ]
 
     # ModGen
     dict_3 = [
-        dict(name='Char', arity=0, collection=['None']),
-        dict(name='String', arity=0, collection=['C', 'D', '[', ']'], length=5),
-        dict(name='String', arity=3, collection=['C', 'D', '[', ']'], length=5)
+        dict(ptype='char', arity=0, collection=['N']),
+        dict(ptype='string', arity=0, collection=['C', 'D', '[', ']'], length=5),
+        dict(ptype='string', arity=3, collection=['C', 'D', '[', ']'], length=5)
     ]
 
     max_size = 0
     max_depth = 4
 
-    tree = Tree(max_size, max_depth, dict_3)
+    tree = Tree(max_size, max_depth, dict_1)
     tree.grow()
     print(RenderTree(tree.nodes[0]))
     DotExporter(tree.nodes[0], nodenamefunc=nodenamefunc).to_picture("tp1_max.png")
+    print(tree.stringify('hard'))
+
+    parsing = 's(C][,3),s(]D,3),s(]D,3),s(]DDC,3),s(C],3),s(C,0),c(N,0),s(CCDCD,0),s(CC]D,0),c(N,0),c(N,0),s(]DDC,0),s(C],0),s(D]D[C,0),s(D]C],0),c(N,0)'
+
 
