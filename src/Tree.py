@@ -2,19 +2,17 @@
 
 from anytree import Node, RenderTree
 from anytree.exporter import DotExporter
-from anytree.importer import JsonImporter
 from random import randint, sample, uniform, shuffle
 
 
 class Tree:
-    def __init__(self, size, depth, constrain, primitives):
-        if not constrain:
+    def __init__(self, size, depth, unconstrained, primitives):
+        if unconstrained:
             self.max_size = randint(5, size)
             self.max_depth = randint(1, depth)
         else:
             self.max_size = size if size != 0 else 999
             self.max_depth = depth if depth != 0 else 999
-        print('Depth', self.max_depth, 'Size', self.max_size)
         self.primitive_dict = primitives
         self.nodes = []
 
@@ -69,16 +67,25 @@ class Tree:
 
     def stringify(self):  # tree to string export
         string = []
-        for node in self.nodes:
-            if not node.parent:
-                string += ''.join(node.name + ',' + node.ptype + ',' + str(node.arity) + ',' + str(node.value) + '\n')
-            else:
-                string += ''.join(node.name + ',' + node.ptype + ',' + str(node.arity) + ',' + str(node.value) + ',' +
-                                  node.parent.name + '\n')
+        for index, node in enumerate(self.nodes):
+            string += ''.join(node.name + ',' + node.ptype + ',' + str(node.arity) + ',' + str(node.value) + ',' +
+                              (str(node.parent.name) if node.parent else ''))
+            if index < len(self.nodes) - 1:
+                string += '\n'
         return ''.join(letter for letter in string)
 
-    def parse(self, json):  # string to tree import
-        importer = JsonImporter()
+    def parse(self, text):  # string to tree import
+        nodes = []
+        string_nodes = text.split('\n')
+        for string_node in string_nodes:
+            name, ptype, arity, value, parent = string_node.split(',')
+            if parent != '':
+                for node in nodes:
+                    if node.name == parent:
+                        parent = node
+            nodes += [Node(name, ptype=ptype, arity=arity, value=value, parent=parent) if parent != ''
+                      else Node(name, ptype=ptype, arity=arity, value=value)]
+        self.nodes = nodes
 
     def grow_leaf(self):
         valid_leafs = [primitive for primitive in self.primitive_dict if primitive.get('arity') == 0]
@@ -155,11 +162,13 @@ if __name__ == '__main__':
 
     max_size = 21
     max_depth = 10
-    growth_constrain = False
+    growth_constrain = True
 
     tree = Tree(max_size, max_depth, growth_constrain, dict_2)
     tree.grow()
     tree.print()
     tree.save_image('tp1_max.png')
-    file = open('emigrant', 'w')
-    file.write(tree.stringify())
+
+    tree2 = Tree(max_size, max_depth, growth_constrain, dict_2)
+    tree2.parse(tree.stringify())
+    tree2.print()

@@ -1,5 +1,5 @@
 import subprocess
-from src.Chromosome import Chromosome
+from src.Tree import Tree
 
 
 class Individual:
@@ -14,7 +14,10 @@ class Individual:
 			terminal_command = ["python3", evaluator, self.export_yourself('soft')]
 			self.process = subprocess.Popen(terminal_command, stdout=subprocess.PIPE)
 
-	def export_yourself(self, how):  # turn a list of Chromosomes into a string
+	def collect_fitness(self):
+		pass
+
+	def export_yourself(self, how):  # turn a genome, which is a list of trees, into a string
 		stringified = []
 		for num, chromosome in enumerate(self.genome):
 			if how == 'soft':   # soft export stringifies genes' expressions only
@@ -36,5 +39,5 @@ class Individual:
 			self.genome.append(chromosome)
 
 	@staticmethod
-	def random_genome(genome_representation):
-		return [Chromosome(chromosome.length, chromosome.primitives_dict) for chromosome in genome_representation]
+	def random_genome(representation):
+		return [Tree(tree.size, tree.depth, tree.unconstrained, tree.primitives_dict) for tree in representation]
