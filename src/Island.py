@@ -1,4 +1,4 @@
-from src.utilities import decode_stdout, average_tuple
+from src.utilities import average_tuple
 from src.Selection import Selection
 from src.Reproduction import Reproduction
 from src.Replacement import Replacement
@@ -31,7 +31,7 @@ class Island:
     def initiate_individuals(self, representation):
         self.individuals = [Individual(representation) for _ in range(self.population_size)]
 
-    def sort_individuals(self):
+    def sort_individuals(self):     # from the fittest to the least fit
         tmp_individuals = self.individuals
         self.individuals = []
         while len(tmp_individuals) > 0:
@@ -64,13 +64,13 @@ class Island:
         self.migration.migrate_out(self.individuals)
         self.evolve()
         self.generation += 1
-        self.start_evaluations()
+        self.start_evaluating()
 
-    def start_evaluations(self):
+    def start_evaluating(self):
         for individual in self.individuals:
             individual.evaluate(self.evaluator)
 
-    def still_evaluating(self):
+    def is_still_evaluating(self):
         for individual in self.individuals:
             if individual.process:
                 return True
@@ -81,7 +81,7 @@ class Island:
             if individual.process:
                 individual.process.kill()
 
-    def calculate_average_fitness(self):
+    def average_fitness(self):
         self.average_fitness = average_tuple([individual.fitness for individual in self.individuals])
 
     def print_generation_summary(self):
@@ -90,9 +90,4 @@ class Island:
 
     def collect_fitness(self):
         for individual in self.individuals:
-            if individual.process:
-                if individual.process.poll():
-                    result = individual.process.communicate()[0]
-                    individual.fitness = decode_stdout(result)
-                    individual.evaluated = True
-                    individual.process = None
+            individual.collect_fitness()

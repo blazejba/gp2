@@ -31,19 +31,7 @@ class Evolution:
             self.islands.append(Island(pin, evaluator, selection, migration, replacement, reproduction, population_size,
                                        self.tmp_dir))
 
-    @staticmethod
-    def get_evaluator(evaluators, which):
-        for evaluator in evaluators:
-            if evaluator.attrib['evaluator'] == which:
-                return evaluator
-
-    @staticmethod
-    def get_policy(policies, which):
-        for policy in policies:
-            if policy.tag == which:
-                return policy.attrib
-
-    def termination_check(self, island):
+    def is_terminated(self, island):
         if island.individuals[0].fitness >= self.max_fitness != 0:
             return True, 'fitness'
         elif self.max_time < time.time() - self.book_keeper.start_t and self.max_time != 0:
@@ -56,14 +44,14 @@ class Evolution:
     def run(self):
         while 1:
             for island in self.islands:
-                if island.still_evaluating():
+                if island.is_still_evaluating():
                     island.collect_fitness()
-                    self.book_keeper.record_evaluations(1)
+                    self.book_keeper.count_evaluations(increment=1)
                 else:
                     self.organize_island(island)
-                    status, reason = self.termination_check(island)
+                    status, reason = self.is_terminated(island)
                     if status:
-                        self.quit_evolution(reason, island.generation)
+                        self.quit_evolution(why=reason, generation=island.generation)
                         self.book_keeper.print_all_individuals(self.islands)
                         return self.book_keeper.final_conditions
                     else:
@@ -71,15 +59,27 @@ class Evolution:
 
     def organize_island(self, island):
         island.sort_individuals()
-        island.calculate_average_fitness()
+        island.average_fitness()
         island.print_generation_summary()
         self.book_keeper.update_log(island)
         for individual in island.individuals:
-            print(individual.export_yourself('soft'))
+            print(individual.export_genome('soft'))
 
-    def quit_evolution(self, reason, generation):
+    def quit_evolution(self, why, generation):
         for island in self.islands:
             island.kill_all_processes()
             clean_dir(self.tmp_dir)
         os.removedirs(self.tmp_dir)
-        self.book_keeper.termination_printout(generation, reason)
+        self.book_keeper.termination_printout(generation, why)
+
+    @staticmethod
+    def get_evaluator(evaluators, which):
+        for evaluator in evaluators:
+            if evaluator.attrib['evaluator'] == which:
+                return evaluator
+
+    @staticmethod
+    def get_policy(policies, which):
+        for policy in policies:
+            if policy.tag == which:
+                return policy.attrib

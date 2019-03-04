@@ -30,7 +30,7 @@ class BookKeeper():
         print('\nIndividuals of the last generation:')
         self.final_conditions = [reason, evolution_time, generation, self.total_num_of_evaluations]
 
-    def record_evaluations(self, increment):
+    def count_evaluations(self, increment):
         self.total_num_of_evaluations += increment
 
     @staticmethod
@@ -45,4 +45,4 @@ class BookKeeper():
         for island in islands:
             print('island [ ' + str(island.pin) + ' ]')
             for individual in island.individuals:
-                print(individual.export_yourself('soft'))
+                print(individual.export_genome('soft'))
