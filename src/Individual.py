@@ -27,11 +27,11 @@ class Individual:
 		stringified = []
 		for num, tree in enumerate(self.genome):
 			stringified += tree.stringify()
-			if num != len(self.genome):     # add separator between trees unless it's the last one
+			if num != len(self.genome) - 1:     # add separator between trees unless it's the last one
 				stringified += '\n\n'
 		return ''.join(letter for letter in stringified)
 
-	def import_yourself(self, genome_content, instructions):  # turn a string into a list of trees
+	def import_genome(self, genome_content, instructions):  # turn a string into a list of trees
 		for index, tree_content in enumerate(genome_content.split('\n\n')):
 			size, depth, unconstrained, primitives = instructions.get_tree_structure(which_tree=index)
 			tree = Tree(size, depth, unconstrained, primitives)
@@ -54,11 +54,14 @@ if __name__ == '__main__':
 	evaluation_xml_path = 'eval/evaluators.xml'
 	evaluators = ET.parse(evaluation_xml_path).getroot()
 	for evaluator in evaluators:
-		if evaluator.attrib['name'] == 'symbolic_regression':
+		if evaluator.attrib['name'] == 'model_generator':
 			representation = Representation(fitness_evaluator=evaluator)
 
 	individual = Individual()
 	individual.instantiate(representation)
+	print(individual.export_genome())
 
-	for tree in individual.genome:
-		tree.print()
+	individual2 = Individual()
+	genome = individual.export_genome()
+	individual2.import_genome(genome_content=genome, instructions=representation)
+	print(individual2.export_genome())

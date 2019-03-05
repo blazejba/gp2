@@ -79,7 +79,7 @@ class Migration:
         file = open(candidate[0])
         genome_encoded = file.readlines()[0]
         immigrant = Individual()
-        immigrant.import_yourself(genome_encoded)
+        immigrant.import_genome(genome_encoded)
         file.close()
         remove_file(candidate[0])
         return immigrant
