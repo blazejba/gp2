@@ -1,6 +1,3 @@
-import xml.etree.ElementTree as ET
-
-
 class Representation:
 	def __init__(self, fitness_evaluator):
 		self.forest = [] 	# forest is a list of tree_structures
@@ -25,13 +22,15 @@ class Representation:
 			if ptype in ['string', 'char']:
 				collection = data_type[open_parenthesis + 1:close_parenthesis].split(',')
 				if ptype == 'string':
-					length, arity = arity.split('.')
+					arity, length = arity.split('.')
 			elif ptype == 'int':
 				low, up = data_type[open_parenthesis + 1:close_parenthesis].split(',')
 			elif ptype == 'real':
-				low, up = float(data_type[open_parenthesis + 1:close_parenthesis].split(','))
+				low, up = data_type[open_parenthesis + 1:close_parenthesis].split(',')
+
 			primitive_dictionary.append(dict(
-				ptype=ptype, arity=int(arity), collection=collection, up=int(up), low=int(low), length=int(length)))
+				ptype=ptype, arity=int(arity), collection=collection, up=float(up), low=float(low), length=int(length)))
+
 		return primitive_dictionary
 
 	def get_tree_structure(self, which_tree):
@@ -40,6 +39,9 @@ class Representation:
 
 
 if __name__ == '__main__':
+	import xml.etree.ElementTree as ET
+
+	representation = object
 	evaluation_xml_path = '../eval/evaluators.xml'
 	evaluators = ET.parse(evaluation_xml_path).getroot()
 	for evaluator in evaluators:

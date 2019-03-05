@@ -75,7 +75,7 @@ class Evolution:
     @staticmethod
     def get_evaluator(evaluators, which):
         for evaluator in evaluators:
-            if evaluator.attrib['evaluator'] == which:
+            if evaluator.attrib['name'] == which:
                 return evaluator
 
     @staticmethod

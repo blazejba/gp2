@@ -10,9 +10,9 @@ class Individual:
 		self.evaluated = False
 		self.genome = [] 	# genome is represented as a forest where each tree is a chromosome
 
-	def evaluate(self, evaluator): 	# start and external evaluator with genome as an argument
+	def evaluate(self, evaluator_path):
 		if not self.evaluated:
-			terminal_command = ["python3", evaluator, self.export_genome()]
+			terminal_command = ["python3", evaluator_path, self.export_genome()]
 			self.process = subprocess.Popen(terminal_command, stdout=subprocess.PIPE)
 
 	def collect_fitness(self): 	# if external evaluation has been completed, collect the result and update an individual
@@ -31,15 +31,34 @@ class Individual:
 				stringified += '\n\n'
 		return ''.join(letter for letter in stringified)
 
-	def import_yourself(self, genome_str, representation):  # turn a string into a list of trees
-		for index, tree in enumerate(genome_str.split('\n\n')):
-			size, depth, unconstrained, primitives = representation.tree_structure(tree=index)
+	def import_yourself(self, genome_content, instructions):  # turn a string into a list of trees
+		for index, tree_content in enumerate(genome_content.split('\n\n')):
+			size, depth, unconstrained, primitives = instructions.get_tree_structure(which_tree=index)
 			tree = Tree(size, depth, unconstrained, primitives)
+			tree.parse(tree_content)
 			self.genome += [tree]
 
 	def instantiate(self, representation): 	# representation consists of instructions how to grow a forest
-		self.genome = [Tree(tree.size, tree.depth, tree.unconstrained, tree.primitives_dict) for tree in representation]
+		for index in range(len(representation.forest)):
+			size, depth, unconstrained, primitives = representation.get_tree_structure(which_tree=index)
+			new_tree = Tree(size, depth, unconstrained, primitives)
+			new_tree.grow()
+			self.genome.append(new_tree)
 
 
 if __name__ == '__main__':
-	pass
+	from src.Representation import Representation
+	import xml.etree.ElementTree as ET
+
+	representation = object
+	evaluation_xml_path = 'eval/evaluators.xml'
+	evaluators = ET.parse(evaluation_xml_path).getroot()
+	for evaluator in evaluators:
+		if evaluator.attrib['name'] == 'symbolic_regression':
+			representation = Representation(fitness_evaluator=evaluator)
+
+	individual = Individual()
+	individual.instantiate(representation)
+
+	for tree in individual.genome:
+		tree.print()
