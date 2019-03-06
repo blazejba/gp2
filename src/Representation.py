@@ -7,7 +7,9 @@ class Representation:
 			depth = int(tree.attrib['depth'])
 			unconstrained = tree.attrib['unconstrained'] == 'True'
 			primitives = self.parse_primitives(tree.attrib['primitives'])
-			tree_structure = dict(size=size, depth=depth, unconstrained=unconstrained, primitives=primitives)
+			unique = tree.attrib['unique'] == 'true'
+			tree_structure = dict(
+				size=size, depth=depth, unconstrained=unconstrained, primitives=primitives, unique=unique)
 			self.forest.append(tree_structure)
 
 	@staticmethod

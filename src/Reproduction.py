@@ -1,6 +1,7 @@
 from src.Individual import Individual
 from src.Tree import Tree
 from random import random
+from copy import deepcopy
 
 
 class Reproduction:
@@ -29,9 +30,9 @@ class Reproduction:
 
 	def crossover(self, parent_chromosomes, index, representation):
 		# remember about deep copying
-		size, depth, unconstrained, primitives = representation.get_tree_structure(which_tree=index)
-		child_chromosome = Tree(size, depth, unconstrained, primitives)
-		child_chromosome.crossover(parent_chromosomes)
+		size, depth, unconstrained, primitives, unique = representation.get_tree_structure(which_tree=index)
+		child_chromosome = Tree(size, depth, unconstrained, primitives, unique)
+		child_chromosome.crossover(deepcopy(parent_chromosomes))
 		return child_chromosome
 
 	@staticmethod

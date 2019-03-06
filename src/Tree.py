@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
-from anytree import Node, RenderTree, findall_by_attr, findall
+from anytree import Node, RenderTree, findall_by_attr
 from anytree.exporter import DotExporter
 from random import randint, sample, uniform, shuffle
 from copy import deepcopy
 
 class Tree:
-    def __init__(self, size, depth, unconstrained, primitives):
+    def __init__(self, size, depth, unconstrained, primitives, unique):
         if unconstrained:
             self.max_size = randint(5, size)
             self.max_depth = randint(1, depth)
@@ -15,6 +15,7 @@ class Tree:
             self.max_depth = depth if depth != 0 else 999
         self.primitive_dict = primitives
         self.nodes = []
+        self.unique = unique
 
     def grow(self):  # first grow all the nodes then fill the remaining branches with leafs
         size, depth, num = [0] * 3
@@ -60,23 +61,32 @@ class Tree:
         self.nodes[index].value = self.get_value(primitive)
 
     def crossover(self, parents):
-        # select random node in parent 1
-        # find node of the same arity in parent 2
-        # mix branches
-        # randomly select one of the children
         parent_a, parent_b = parents
         crossover_node_a = parent_a.nodes[randint(1, len(parent_a.nodes) - 1)]
+        branch_a, cutoff_a = parent_a.detach_branch(crossover_node_a)
+
         valid_nodes_b = parent_b.same_arity_nodes(crossover_node_a.arity)
         crossover_node_b = valid_nodes_b[randint(1, len(valid_nodes_b) - 1)]
-        print(crossover_node_a)
-        print(valid_nodes_b)
-        print(crossover_node_b)
-        print(crossover_node_a.children)
+        branch_b, cutoff_b = parent_b.detach_branch(crossover_node_b)
 
-    def cut_off_branch(self, node):
-        cut_off_point = self.nodes.index(node)
-        branch = self.nodes[0]
-        return branch
+        parent_a.attach_branch(cutoff_a, branch_b)
+        parent_b.attach_branch(cutoff_b, branch_a)
+        self.nodes = deepcopy(parent_a.nodes if randint(0, 1) == 0 else parent_b.nodes)
+
+    def attach_branch(self, node, branch):
+        branch[0].parent = node
+        self.nodes += branch
+
+    def detach_branch(self, node):
+        cutoff_node = self.nodes[self.nodes.index(node)]
+        cutoff_node_parent = cutoff_node.parent
+        cutoff_node.parent = None
+        if len(cutoff_node.descendants) > 0:
+            branch = [cutoff_node] + [cutoff_node.descendants]
+        else:
+            branch = [cutoff_node]
+        self.nodes = [node for node in self.nodes if node not in branch]
+        return branch, cutoff_node_parent
 
     def same_arity_primitives(self, arity):  # return all primitives in the dictionary of given arity
         return [primitive for primitive in self.primitive_dict if primitive.get('arity') == arity]
@@ -142,8 +152,7 @@ class Tree:
     def save_image(self, path):
         DotExporter(self.nodes[0], nodenamefunc=lambda node: '%s:%s' % (node.value, node.name)).to_picture(path)
 
-    @staticmethod
-    def get_value(primitive):
+    def get_value(self, primitive):
         if primitive.get('ptype') == 'bool':
             return randint(0, 1)
         elif primitive.get('ptype') == 'char':
@@ -153,9 +162,12 @@ class Tree:
         elif primitive.get('ptype') == 'int':
             return randint(primitive.get('low'), primitive.get('up'))
         elif primitive.get('ptype') == 'string':
-            collection = primitive.get('collection')
-            length = randint(1, primitive.get('length'))
-            value = [sample(collection, 1)[0] for _ in range(length)]
+            while True:
+                collection = primitive.get('collection')
+                length = randint(1, primitive.get('length'))
+                value = [sample(collection, 1)[0] for _ in range(length)]
+                if value not in [node.value for node in self.nodes]:
+                    break
             return ''.join(letter for letter in value)
 
 
@@ -182,15 +194,17 @@ if __name__ == '__main__':
     max_size = 10
     max_depth = 4
     growth_constrain = True
+    unique = True
 
-    parent_a = Tree(max_size, max_depth, not growth_constrain, dict_2)
+    parent_a = Tree(max_size, max_depth, not growth_constrain, dict_1, unique)
     parent_a.grow()
     parent_a.print()
     #parent_a.save_image('tp1_max.png')
 
-    parent_b = Tree(max_size, max_depth, not growth_constrain, dict_2)
+    parent_b = Tree(max_size, max_depth, not growth_constrain, dict_1, unique)
     parent_b.grow()
     parent_b.print()
 
-    child = Tree(max_size, max_depth, not growth_constrain, dict_2)
+    child = Tree(max_size, max_depth, not growth_constrain, dict_1, unique)
     child.crossover([parent_a, parent_b])
+    child.print()
