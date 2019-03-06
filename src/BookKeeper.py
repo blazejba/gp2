@@ -2,7 +2,7 @@ import time
 from src.utilities import get_date_in_string, average_tuple
 
 
-class BookKeeper():
+class BookKeeper:
     def __init__(self, name):
         self.logfile = open('exp/logs/' + name + '_' + get_date_in_string() + '.log', 'w')
         self.final_conditions = []

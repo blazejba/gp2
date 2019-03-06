@@ -7,29 +7,26 @@ from src.utilities import clean_dir
 
 
 class Evolution:
-    def __init__(self, experiment_xml_config, evaluators_xml_list, name):
+    def __init__(self, islands_xml, evaluators_xml, name):
         self.evolution_id = name
         self.book_keeper = BookKeeper(self.evolution_id)
         self.tmp_dir = tempfile.mkdtemp(dir='/tmp')
 
-        self.max_fitness = int(experiment_xml_config.attrib['max_fitness'])
-        self.max_time = int(experiment_xml_config.attrib['max_time'])
-        self.max_generation = int(experiment_xml_config.attrib['max_generation'])
-        self.chromosome_length = int(experiment_xml_config.attrib['chromosome_length'])
+        self.max_fitness = int(islands_xml.attrib['max_fitness'])
+        self.max_time = int(islands_xml.attrib['max_time'])
+        self.max_generation = int(islands_xml.attrib['max_generation'])
 
         self.islands = []
-        self.initialize_islands(experiment_xml_config, evaluators_xml_list)
+        self.initialize_islands(islands_xml, evaluators_xml)
 
-    def initialize_islands(self, policies, evaluators):
-        for pin, policy in enumerate(policies):
-            population_size = int(policy.attrib['population_size'])
-            evaluator = self.get_evaluator(evaluators, policy.attrib['evaluator'])
-            selection = self.get_policy(policy, 'selection')
-            migration = self.get_policy(policy, 'migration')
-            replacement = self.get_policy(policy, 'replacement')
-            reproduction = self.get_policy(policy, 'reproduction')
-            self.islands.append(Island(pin, evaluator, selection, migration, replacement, reproduction, population_size,
-                                       self.tmp_dir))
+    def initialize_islands(self, islands_xml, evaluators_xml):
+        for pin, island_xml in enumerate(islands_xml):
+            representation, selection, migration, reproduction, replacement, population_size = \
+                self.parse_from_xml(island_xml, evaluators_xml)
+            island = Island(pin, representation, selection, migration, replacement, reproduction, population_size,
+                            self.tmp_dir)
+            island.instantiate_individuals()
+            self.islands.append(island)
 
     def is_terminated(self, island):
         if island.individuals[0].fitness >= self.max_fitness != 0:
@@ -72,14 +69,24 @@ class Evolution:
         os.removedirs(self.tmp_dir)
         self.book_keeper.termination_printout(generation, why)
 
+    def parse_from_xml(self, island_xml, evaluators):
+        evaluator_name = island_xml.attrib['evaluator']
+        representation = self.get_representation(evaluators=evaluators, which=evaluator_name)
+        population_size = int(island_xml.attrib['population_size'])
+        selection, migration, reproduction, replacement = object, object, object, object
+        for policy in island_xml:
+            if policy.tag == 'selection':
+                selection = policy
+            elif policy.tag == 'migration':
+                migration = policy
+            elif policy.tag == 'reproduction':
+                reproduction = policy
+            elif policy.tag == 'replacement':
+                replacement = policy
+        return representation, selection, migration, reproduction, replacement, population_size
+
     @staticmethod
-    def get_evaluator(evaluators, which):
+    def get_representation(evaluators, which):
         for evaluator in evaluators:
             if evaluator.attrib['name'] == which:
                 return evaluator
-
-    @staticmethod
-    def get_policy(policies, which):
-        for policy in policies:
-            if policy.tag == which:
-                return policy.attrib

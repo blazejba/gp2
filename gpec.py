@@ -48,4 +48,13 @@ def sum_all_columns(data):
 
 
 if __name__ == '__main__':
-    main()
+    experiment_name = 'one_max_1is'
+    evaluation_xml_path = 'eval/evaluators.xml'
+    experiment_xml_path = 'exp/' + experiment_name + '.xml'
+    evolution = Evolution(ET.parse(experiment_xml_path).getroot(),
+                          ET.parse(evaluation_xml_path).getroot(),
+                          experiment_name)
+
+    island = evolution.islands[0]
+    for individual in island.individuals:
+        print(individual.genome[0].print())

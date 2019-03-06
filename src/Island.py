@@ -5,7 +5,6 @@ from src.Replacement import Replacement
 from src.Migration import Migration
 from src.Individual import Individual
 from src.Representation import Representation
-from typing import List
 
 
 class Island:
@@ -17,19 +16,21 @@ class Island:
         self.representation = Representation(fitness_evaluator=evaluator)
 
         # Policies
-        self.selection = Selection(selection, reproduction)
+        self.selection = Selection(selection)
         self.replacement = Replacement(replacement)
         self.reproduction = Reproduction(self.population_size, reproduction)
         self.migration = Migration(tmp_dir, pin, migration)
 
         # Population
-        self.individuals = List[Individual]
-        self.initiate_individuals(evaluator)
+        self.individuals = []
         self.average_fitness = 0
         self.generation = 0
 
-    def initiate_individuals(self, representation):
-        self.individuals = [Individual(representation) for _ in range(self.population_size)]
+    def instantiate_individuals(self):
+        while self.population_size > len(self.individuals):
+            individual = Individual()
+            individual.instantiate(self.representation)
+            self.individuals.append(individual)
 
     def sort_individuals(self):     # from the fittest to the least fit
         tmp_individuals = self.individuals
@@ -91,3 +92,7 @@ class Island:
     def collect_fitness(self):
         for individual in self.individuals:
             individual.collect_fitness()
+
+
+if __name__ == '__main__':
+    pass

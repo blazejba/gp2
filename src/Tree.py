@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
-from anytree import Node, RenderTree
+from anytree import Node, RenderTree, findall_by_attr, findall
 from anytree.exporter import DotExporter
 from random import randint, sample, uniform, shuffle
-
+from copy import deepcopy
 
 class Tree:
     def __init__(self, size, depth, unconstrained, primitives):
@@ -59,11 +59,30 @@ class Tree:
         primitive = sample(valid_primitives, 1)[0]
         self.nodes[index].value = self.get_value(primitive)
 
+    def crossover(self, parents):
+        # select random node in parent 1
+        # find node of the same arity in parent 2
+        # mix branches
+        # randomly select one of the children
+        parent_a, parent_b = parents
+        crossover_node_a = parent_a.nodes[randint(1, len(parent_a.nodes) - 1)]
+        valid_nodes_b = parent_b.same_arity_nodes(crossover_node_a.arity)
+        crossover_node_b = valid_nodes_b[randint(1, len(valid_nodes_b) - 1)]
+        print(crossover_node_a)
+        print(valid_nodes_b)
+        print(crossover_node_b)
+        print(crossover_node_a.children)
+
+    def cut_off_branch(self, node):
+        cut_off_point = self.nodes.index(node)
+        branch = self.nodes[0]
+        return branch
+
     def same_arity_primitives(self, arity):  # return all primitives in the dictionary of given arity
         return [primitive for primitive in self.primitive_dict if primitive.get('arity') == arity]
 
     def same_arity_nodes(self, arity):  # this is invoked in headless chicken
-        return [node for node in self.nodes if node.arity == arity]
+        return findall_by_attr(self.nodes[0], arity, name='arity')
 
     def stringify(self):  # tree to string export
         string = []
@@ -160,15 +179,18 @@ if __name__ == '__main__':
         dict(ptype='string', arity=3, collection=['C', 'D', '[', ']'], length=5)
     ]
 
-    max_size = 21
-    max_depth = 10
+    max_size = 10
+    max_depth = 4
     growth_constrain = True
 
-    tree = Tree(max_size, max_depth, growth_constrain, dict_2)
-    tree.grow()
-    tree.print()
-    tree.save_image('tp1_max.png')
+    parent_a = Tree(max_size, max_depth, not growth_constrain, dict_2)
+    parent_a.grow()
+    parent_a.print()
+    #parent_a.save_image('tp1_max.png')
 
-    tree2 = Tree(max_size, max_depth, growth_constrain, dict_2)
-    tree2.parse(tree.stringify())
-    tree2.print()
+    parent_b = Tree(max_size, max_depth, not growth_constrain, dict_2)
+    parent_b.grow()
+    parent_b.print()
+
+    child = Tree(max_size, max_depth, not growth_constrain, dict_2)
+    child.crossover([parent_a, parent_b])

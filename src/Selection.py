@@ -2,11 +2,12 @@ from src.selection import roulette_wheel, rank_based, truncation, tournament
 
 
 class Selection:
-	def __init__(self, selection_config, reproduction_config):
-		self.policy = selection_config['policy']
-		self.num_of_parents = int(reproduction_config['num_of_parents'])
+	def __init__(self, selection_config):
+		self.policy = selection_config.attrib['policy']
+		self.num_of_parents = 2
 
-	def get_fitness_list(self, individuals):
+	@staticmethod
+	def get_fitness_list(individuals):
 		return [individual.fitness for individual in individuals]
 
 	def select_parents(self, individuals):
