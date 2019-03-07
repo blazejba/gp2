@@ -28,8 +28,8 @@ class Reproduction:
 	def headless_chicken_mutation(self):
 		pass
 
-	def crossover(self, parent_chromosomes, index, representation):
-		# remember about deep copying
+	@staticmethod
+	def crossover(parent_chromosomes, index, representation):
 		size, depth, unconstrained, primitives, unique = representation.get_tree_structure(which_tree=index)
 		child_chromosome = Tree(size, depth, unconstrained, primitives, unique)
 		child_chromosome.crossover(deepcopy(parent_chromosomes))

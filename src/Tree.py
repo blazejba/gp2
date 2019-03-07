@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
-from anytree import Node, RenderTree, findall_by_attr
+from anytree import Node, RenderTree, findall_by_attr, findall
 from anytree.exporter import DotExporter
 from random import randint, sample, uniform, shuffle
 from copy import deepcopy
+
 
 class Tree:
     def __init__(self, size, depth, unconstrained, primitives, unique):
@@ -72,6 +73,14 @@ class Tree:
         parent_a.attach_branch(cutoff_a, branch_b)
         parent_b.attach_branch(cutoff_b, branch_a)
         self.nodes = deepcopy(parent_a.nodes if randint(0, 1) == 0 else parent_b.nodes)
+        self.shape()
+        for node in self.nodes:
+            print(node)
+
+    def shape(self):
+        excess_size = len(self.nodes) - self.max_size
+        print(excess_size)
+        print(list(findall(self.nodes[0], filter_=lambda node: node.depth > self.max_depth)))
 
     def attach_branch(self, node, branch):
         branch[0].parent = node
@@ -82,7 +91,7 @@ class Tree:
         cutoff_node_parent = cutoff_node.parent
         cutoff_node.parent = None
         if len(cutoff_node.descendants) > 0:
-            branch = [cutoff_node] + [cutoff_node.descendants]
+            branch = [cutoff_node] + list(cutoff_node.descendants)
         else:
             branch = [cutoff_node]
         self.nodes = [node for node in self.nodes if node not in branch]
@@ -132,7 +141,7 @@ class Tree:
         ptype, value = self.grow_leaf()
         return ptype, 0, value
 
-    def deadlock(self, space_left):  # to identify deadlocks which might occur when size or depth of a tree is limited
+    def deadlock(self, space_left):  # to identify deadlocks which might occur when size or depth of a tree are limited
         if space_left < 0:
             return True
         elif space_left == 0:
@@ -199,7 +208,6 @@ if __name__ == '__main__':
     parent_a = Tree(max_size, max_depth, not growth_constrain, dict_1, unique)
     parent_a.grow()
     parent_a.print()
-    #parent_a.save_image('tp1_max.png')
 
     parent_b = Tree(max_size, max_depth, not growth_constrain, dict_1, unique)
     parent_b.grow()
