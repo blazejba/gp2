@@ -8,6 +8,7 @@ from copy import deepcopy
 
 class Tree:
     def __init__(self, size, depth, unconstrained, primitives, unique):
+        self.unconstrained = unconstrained
         if unconstrained:
             self.max_size = randint(5, size)
             self.max_depth = randint(1, depth)
@@ -66,18 +67,21 @@ class Tree:
         crossover_node_a = parent_a.nodes[randint(1, len(parent_a.nodes) - 1)]
         branch_a, cutoff_a = parent_a.detach_branch(crossover_node_a)
 
+        # if not unconstrained, find a branch of the same size
         valid_nodes_b = parent_b.same_arity_nodes(crossover_node_a.arity)
-        crossover_node_b = valid_nodes_b[randint(1, len(valid_nodes_b) - 1)]
+        if not self.unconstrained:
+            valid_nodes_b = [node for node in valid_nodes_b if len(node.descendants) == len(crossover_node_a.descendants)]
+            crossover_node_b = valid_nodes_b[randint(0, len(valid_nodes_b) - 1)]
+        else:
+            crossover_node_b = valid_nodes_b[randint(1, len(valid_nodes_b) - 1)]
         branch_b, cutoff_b = parent_b.detach_branch(crossover_node_b)
 
         parent_a.attach_branch(cutoff_a, branch_b)
         parent_b.attach_branch(cutoff_b, branch_a)
         self.nodes = deepcopy(parent_a.nodes if randint(0, 1) == 0 else parent_b.nodes)
-        self.shape()
-        for node in self.nodes:
-            print(node)
 
     def shape(self):
+        # maybe instead of preventing the over-growth, crossover as you wish then pruning and growing if size doest fir
         excess_size = len(self.nodes) - self.max_size
         print(excess_size)
         print(list(findall(self.nodes[0], filter_=lambda node: node.depth > self.max_depth)))
@@ -202,17 +206,17 @@ if __name__ == '__main__':
 
     max_size = 10
     max_depth = 4
-    growth_constrain = True
+    unconstrained = False
     unique = True
 
-    parent_a = Tree(max_size, max_depth, not growth_constrain, dict_1, unique)
+    parent_a = Tree(max_size, max_depth, unconstrained, dict_2, unique)
     parent_a.grow()
     parent_a.print()
 
-    parent_b = Tree(max_size, max_depth, not growth_constrain, dict_1, unique)
+    parent_b = Tree(max_size, max_depth, unconstrained, dict_2, unique)
     parent_b.grow()
     parent_b.print()
 
-    child = Tree(max_size, max_depth, not growth_constrain, dict_1, unique)
+    child = Tree(max_size, max_depth, unconstrained, dict_2, unique)
     child.crossover([parent_a, parent_b])
     child.print()
