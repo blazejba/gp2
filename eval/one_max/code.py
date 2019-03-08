@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 
 import sys
+from src.Tree import TreeReadOnly
+from anytree import Node
 
 # init
-genome = sys.argv[1]
+tree = TreeReadOnly(sys.argv[1])
 fitness = 0
 
 # evaluation
-for gene in genome:
-    if gene == '1':
+for node in tree.nodes:
+    if node.value == '1':
         fitness += 1
 
 # fill stdout

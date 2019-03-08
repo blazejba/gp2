@@ -1,6 +1,6 @@
 <evaluators>
     <e name='one_max'>
-        <tree size='10' depth='0' unconstrained='False' primitives='bool()_1 bool()_0'/>
+        <tree size='10' depth='0' unconstrained='False' unique='false' primitives='bool()_1 bool()_0'/>
     </e>
 
     <e name='tp1_max'>

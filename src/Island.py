@@ -12,7 +12,7 @@ class Island:
         # Island
         self.pin = pin  # personal identification num
         self.population_size = population_size  # num of individuals on a island
-        self.evaluator = 'eval/' + evaluator.attrib['name'] + '/code.py'  # this is for running an evaluator
+        self.evaluator = 'eval.' + evaluator.attrib['name'] + '.code'  # this is for running an evaluator
         self.representation = Representation(fitness_evaluator=evaluator)
 
         # Policies
@@ -57,7 +57,7 @@ class Island:
             # Selection
             parents = self.selection.select_parents(self.individuals)
             # Reproduction
-            new_generation += [self.reproduction.reproduce(parents)]
+            new_generation += [self.reproduction.reproduce(parents, self.representation)]
         # Combine generations
         self.individuals = new_generation + from_old_generation
 
@@ -82,7 +82,7 @@ class Island:
             if individual.process:
                 individual.process.kill()
 
-    def average_fitness(self):
+    def average(self):
         self.average_fitness = average_tuple([individual.fitness for individual in self.individuals])
 
     def print_generation_summary(self):

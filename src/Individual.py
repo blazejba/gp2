@@ -12,7 +12,7 @@ class Individual:
 
 	def evaluate(self, evaluator_path):
 		if not self.evaluated:
-			terminal_command = ["python3", evaluator_path, self.export_genome()]
+			terminal_command = ["python3", "-m", evaluator_path, self.export_genome()]
 			self.process = subprocess.Popen(terminal_command, stdout=subprocess.PIPE)
 
 	def collect_fitness(self): 	# if external evaluation has been completed, collect the result and update an individual
@@ -33,15 +33,15 @@ class Individual:
 
 	def import_genome(self, genome_content, instructions):  # turn a string into a list of trees
 		for index, tree_content in enumerate(genome_content.split('\n\n')):
-			size, depth, unconstrained, primitives = instructions.get_tree_structure(which_tree=index)
-			tree = Tree(size, depth, unconstrained, primitives)
+			size, depth, unconstrained, primitives, unique = instructions.get_tree_structure(which_tree=index)
+			tree = Tree(size, depth, unconstrained, primitives, unique)
 			tree.parse(tree_content)
 			self.genome += [tree]
 
 	def instantiate(self, representation): 	# representation consists of instructions how to grow a forest
 		for index in range(len(representation.forest)):
-			size, depth, unconstrained, primitives = representation.get_tree_structure(which_tree=index)
-			new_tree = Tree(size, depth, unconstrained, primitives)
+			size, depth, unconstrained, primitives, unique = representation.get_tree_structure(which_tree=index)
+			new_tree = Tree(size, depth, unconstrained, primitives, unique)
 			new_tree.grow()
 			self.genome.append(new_tree)
 

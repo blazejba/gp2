@@ -13,7 +13,7 @@ class Reproduction:
 	def reproduce(self, parents, representation):
 		new_individual = Individual()
 		paired_chromosomes = self.pair(self.extract_genomes(parents))
-		for num, chromosome in enumerate(parents.genome):
+		for num in range(len(paired_chromosomes)):
 			new_chromosome = self.crossover(paired_chromosomes[num], num, representation)
 			new_chromosome = self.mutate(new_chromosome)
 			new_individual.genome.append(new_chromosome)

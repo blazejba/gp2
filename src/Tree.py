@@ -71,6 +71,7 @@ class Tree:
         valid_nodes_b = parent_b.same_arity_nodes(crossover_node_a.arity)
         if not self.unconstrained:
             valid_nodes_b = [node for node in valid_nodes_b if len(node.descendants) == len(crossover_node_a.descendants)]
+            print('valid nodes', valid_nodes_b)
             crossover_node_b = valid_nodes_b[randint(0, len(valid_nodes_b) - 1)]
         else:
             crossover_node_b = valid_nodes_b[randint(1, len(valid_nodes_b) - 1)]
@@ -87,6 +88,7 @@ class Tree:
         print(list(findall(self.nodes[0], filter_=lambda node: node.depth > self.max_depth)))
 
     def attach_branch(self, node, branch):
+        print(self.stringify())
         branch[0].parent = node
         self.nodes += branch
 
@@ -182,6 +184,25 @@ class Tree:
                 if value not in [node.value for node in self.nodes]:
                     break
             return ''.join(letter for letter in value)
+
+
+class TreeReadOnly:
+    def __init__(self, text):
+        self.nodes = []
+        self.parse(text)
+
+    def parse(self, text):  # string to tree import
+        nodes = []
+        string_nodes = text.split('\n')
+        for string_node in string_nodes:
+            name, ptype, arity, value, parent = string_node.split(',')
+            if parent != '':
+                for node in nodes:
+                    if node.name == parent:
+                        parent = node
+            nodes += [Node(name, ptype=ptype, arity=arity, value=value, parent=parent) if parent != ''
+                      else Node(name, ptype=ptype, arity=arity, value=value)]
+        self.nodes = nodes
 
 
 if __name__ == '__main__':

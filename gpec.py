@@ -55,6 +55,11 @@ if __name__ == '__main__':
                           ET.parse(evaluation_xml_path).getroot(),
                           experiment_name)
 
-    island = evolution.islands[0]
-    for individual in island.individuals:
-        print(individual.genome[0].print())
+    evolution.run()
+    # island = evolution.islands[0]
+    # island.start_evaluating()
+    # while island.is_still_evaluating():
+    #     island.collect_fitness()
+    # for individual in island.individuals:
+    #     print(individual.fitness)
+    #     individual.genome[0].print()
