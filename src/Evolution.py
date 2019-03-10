@@ -42,8 +42,8 @@ class Evolution:
         while 1:
             for island in self.islands:
                 if island.is_still_evaluating():
-                    island.collect_fitness()
-                    self.book_keeper.count_evaluations(increment=1)
+                    finished_evaluations = island.collect_fitness()
+                    self.book_keeper.count_evaluations(increment=finished_evaluations)
                 else:
                     self.organize_island(island)
                     status, reason = self.is_terminated(island)

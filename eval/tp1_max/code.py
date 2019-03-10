@@ -8,43 +8,34 @@ genome_size     fitness
 '''
 
 import sys
+from anytree import PostOrderIter
+from src.Tree import TreeReadOnly
 
 
 def main():
 	# init
-	genome = sys.argv[1]
+	tree = TreeReadOnly(sys.argv[1])
 
 	# evaluation
-	fitness, _ = execute_tree(genome)
+	stack = []
+	for node in PostOrderIter(tree.nodes[0].root):
+		if node.value == '*':
+			outcome = stack[-1] + stack[-2]
+			stack = stack[:len(stack) - 2]
+			stack += [outcome]
+
+		elif node.value == '+':
+			outcome = stack[-1] * stack[-2]
+			stack = stack[:len(stack) - 2]
+			stack += [outcome]
+
+		else:
+			stack += [1]
+	fitness = stack[0]
 
 	# fill stdout
 	sys.stdout.write(str(fitness))
 	sys.exit(1)
-
-
-def execute_tree(tree):
-	if len(tree) == 0:
-		return 0, []
-	if len(tree) > 1:
-		if tree[0] == '1':
-			return 1, tree[1:len(tree)]
-		if len(tree) > 2:
-			try:
-				arg_1, rest = execute_tree(tree[1:len(tree)])
-			except:
-				return 0, []
-			try:
-				arg_2, rest = execute_tree(rest)
-			except:
-				return 0, []
-			if tree[0] == '+':
-				return arg_1 + arg_2, rest
-			elif tree[0] == '*':
-				return arg_1 * arg_2, rest
-		else:
-			return 0, []
-	else:
-		return int(tree[0]), []
 
 
 if __name__ == '__main__':

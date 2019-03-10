@@ -1,8 +1,8 @@
-<experiment chromosome_length="11" max_fitness="9" max_time="0" max_generation="0">
-    <island population_size="10" evaluator="times_plus_one_max" dna_repair="false">
-        <reproduction crossover_points="6" mutation_rate="10" num_of_parents="3"/>
+<experiment max_fitness="9" max_time="0" max_generation="0">
+    <island population_size="100" evaluator="tp1_max">
+        <reproduction mutation_rate="20"/>
         <selection policy="tournament"/>
         <migration entry_policy="periodical" in="false" out="false" period="5" selection_policy="roulette_wheel"/>
-        <replacement policy="elitism" num_of_elites="1"/>
+        <replacement policy="elitism" num_of_elites="0"/>
     </island>
 </experiment>

@@ -4,7 +4,7 @@
     </e>
 
     <e name='tp1_max'>
-        <tree size='11' depth='0' constrained='True'  primitives='char(1)_0 char(*,+)_2' />
+        <tree size='11' depth='0' constrained='True' unique='False' primitives='char(1)_0 char(*,+)_2'/>
     </e>
 
     <e name="symbolic_regression">

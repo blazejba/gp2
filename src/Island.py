@@ -88,11 +88,15 @@ class Island:
 
     def print_generation_summary(self):
         print('island [', self.pin, '], fittest [', self.individuals[0].fitness, '], mean [', self.average_fitness,
-              '], generation, [', self.generation, ']')
+              '], generation [', self.generation, ']')
 
     def collect_fitness(self):
+        evaluations_finished = 0
         for individual in self.individuals:
-            individual.collect_fitness()
+            status = individual.collect_fitness()
+            if status:
+                evaluations_finished += 1
+        return evaluations_finished
 
 
 if __name__ == '__main__':

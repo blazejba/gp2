@@ -22,6 +22,8 @@ class Individual:
 				self.fitness = decode_stdout(result)
 				self.evaluated = True
 				self.process = None
+				return True 	# finished
+		return False 	# not finished yet
 
 	def stringify(self):
 		return ''.join(letter for letter in [tree.tree_in_line() + ' ' for tree in self.genome])

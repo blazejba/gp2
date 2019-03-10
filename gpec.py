@@ -48,12 +48,12 @@ def sum_all_columns(data):
 
 
 if __name__ == '__main__':
-    experiment_name = 'one_max_1is'
-    evaluation_xml_path = 'eval/evaluators.xml'
-    experiment_xml_path = 'exp/' + experiment_name + '.xml'
-    evolution = Evolution(ET.parse(experiment_xml_path).getroot(),
-                          ET.parse(evaluation_xml_path).getroot(),
-                          experiment_name)
-
-    evolution.run()
-
+    # experiment_name = 'one_max_1is'
+    # evaluation_xml_path = 'eval/evaluators.xml'
+    # experiment_xml_path = 'exp/' + experiment_name + '.xml'
+    # evolution = Evolution(ET.parse(experiment_xml_path).getroot(),
+    #                       ET.parse(evaluation_xml_path).getroot(),
+    #                       experiment_name)
+    #
+    # evolution.run()
+    main()

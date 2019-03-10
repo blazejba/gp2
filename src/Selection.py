@@ -15,7 +15,7 @@ class Selection:
 		indexes = []
 		if self.policy == 'roulette_wheel':
 			indexes = roulette_wheel(self.num_of_parents, fitness_list)
-		elif self.policy == 'rank_based':
+		elif self.policy == 'rank':
 			indexes = rank_based(self.num_of_parents, len(individuals))
 		elif self.policy == 'truncation':
 			indexes = truncation(self.num_of_parents)
