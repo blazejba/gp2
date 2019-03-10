@@ -1,8 +1,8 @@
 class Replacement:
-	def __init__(self, replacement_config):
-		self.policy = replacement_config.attrib['policy']
+	def __init__(self, policy):
+		self.policy = policy.attrib['policy']
 		if self.policy == 'elitism':
-			self.num_of_elites = int(replacement_config.attrib['num_of_elites'])
+			self.num_of_elites = int(policy.attrib['num_of_elites'])
 
 	def replace(self, from_old_generation, individuals):
 		if self.policy == 'elitism':

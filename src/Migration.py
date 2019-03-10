@@ -1,6 +1,6 @@
 from os import rename, walk
 from random import random, randint
-from src.selection import roulette_wheel, rank_based, truncation, tournament, sort_by_scores
+from src.selection_methods import roulette_wheel, rank_based, truncation, tournament, sort_by_scores
 from src.Individual import Individual
 from src.utilities import remove_file
 

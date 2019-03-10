@@ -1,9 +1,9 @@
-from src.selection import roulette_wheel, rank_based, truncation, tournament
+from src.selection_methods import roulette_wheel, rank_based, truncation, tournament
 
 
 class Selection:
-	def __init__(self, selection_config):
-		self.policy = selection_config.attrib['policy']
+	def __init__(self, policy):
+		self.policy = policy.attrib['policy']
 		self.num_of_parents = 2
 
 	@staticmethod

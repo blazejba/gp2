@@ -56,10 +56,4 @@ if __name__ == '__main__':
                           experiment_name)
 
     evolution.run()
-    # island = evolution.islands[0]
-    # island.start_evaluating()
-    # while island.is_still_evaluating():
-    #     island.collect_fitness()
-    # for individual in island.individuals:
-    #     print(individual.fitness)
-    #     individual.genome[0].print()
+

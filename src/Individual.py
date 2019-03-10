@@ -15,13 +15,16 @@ class Individual:
 			terminal_command = ["python3", "-m", evaluator_path, self.export_genome()]
 			self.process = subprocess.Popen(terminal_command, stdout=subprocess.PIPE)
 
-	def collect_fitness(self): 	# if external evaluation has been completed, collect the result and update an individual
+	def collect_fitness(self): 	# if external evaluation completed, collect the result and update an individual
 		if self.process:
 			if self.process.poll():
 				result = self.process.communicate()[0]
 				self.fitness = decode_stdout(result)
 				self.evaluated = True
 				self.process = None
+
+	def stringify(self):
+		return ''.join(letter for letter in [tree.tree_in_line() + ' ' for tree in self.genome])
 
 	def export_genome(self):  # turn a genome (a list of trees) into a string (a list of characters)
 		stringified = []
@@ -33,15 +36,15 @@ class Individual:
 
 	def import_genome(self, genome_content, instructions):  # turn a string into a list of trees
 		for index, tree_content in enumerate(genome_content.split('\n\n')):
-			size, depth, unconstrained, primitives, unique = instructions.get_tree_structure(which_tree=index)
-			tree = Tree(size, depth, unconstrained, primitives, unique)
+			size, depth, constrained, primitives, unique = instructions.get_tree_structure(which_tree=index)
+			tree = Tree(size, depth, constrained, primitives, unique)
 			tree.parse(tree_content)
 			self.genome += [tree]
 
 	def instantiate(self, representation): 	# representation consists of instructions how to grow a forest
 		for index in range(len(representation.forest)):
-			size, depth, unconstrained, primitives, unique = representation.get_tree_structure(which_tree=index)
-			new_tree = Tree(size, depth, unconstrained, primitives, unique)
+			size, depth, constrained, primitives, unique = representation.get_tree_structure(which_tree=index)
+			new_tree = Tree(size, depth, constrained, primitives, unique)
 			new_tree.grow()
 			self.genome.append(new_tree)
 

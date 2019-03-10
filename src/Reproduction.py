@@ -5,10 +5,8 @@ from copy import deepcopy
 
 
 class Reproduction:
-	def __init__(self, population_size, reproduction_config):
-		self.crossover_points_num = int(reproduction_config.attrib['crossover_points'])
-		self.mutation_rate = float(reproduction_config.attrib['mutation_rate'])
-		self.population_size = population_size
+	def __init__(self, policy):
+		self.mutation_rate = float(policy.attrib['mutation_rate'])
 
 	def reproduce(self, parents, representation):
 		new_individual = Individual()
@@ -30,8 +28,8 @@ class Reproduction:
 
 	@staticmethod
 	def crossover(parent_chromosomes, index, representation):
-		size, depth, unconstrained, primitives, unique = representation.get_tree_structure(which_tree=index)
-		child_chromosome = Tree(size, depth, unconstrained, primitives, unique)
+		size, depth, constrained, primitives, unique = representation.get_tree_structure(which_tree=index)
+		child_chromosome = Tree(size, depth, constrained, primitives, unique)
 		child_chromosome.crossover(deepcopy(parent_chromosomes))
 		return child_chromosome
 

@@ -45,4 +45,4 @@ class BookKeeper:
         for island in islands:
             print('island [ ' + str(island.pin) + ' ]')
             for individual in island.individuals:
-                print(individual.export_genome('soft'))
+                print(individual.stringify())

@@ -60,7 +60,7 @@ class Evolution:
         island.print_generation_summary()
         self.book_keeper.update_log(island)
         for individual in island.individuals:
-            individual.genome[0].print()
+            print(individual.stringify())
 
     def quit_evolution(self, why, generation):
         for island in self.islands:

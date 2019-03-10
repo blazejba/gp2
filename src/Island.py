@@ -16,9 +16,9 @@ class Island:
         self.representation = Representation(fitness_evaluator=evaluator)
 
         # Policies
-        self.selection = Selection(selection)
-        self.replacement = Replacement(replacement)
-        self.reproduction = Reproduction(self.population_size, reproduction)
+        self.selection = Selection(policy=selection)
+        self.replacement = Replacement(policy=replacement)
+        self.reproduction = Reproduction(policy=reproduction)
         self.migration = Migration(tmp_dir, pin, migration)
 
         # Population
@@ -53,11 +53,12 @@ class Island:
         # Breed children
         new_generation = []
         offspring = self.population_size - len(from_old_generation)
-        for _ in range(offspring):
+        for num in range(offspring):
             # Selection
             parents = self.selection.select_parents(self.individuals)
             # Reproduction
-            new_generation += [self.reproduction.reproduce(parents, self.representation)]
+            child = self.reproduction.reproduce(parents, self.representation)
+            new_generation += [child]
         # Combine generations
         self.individuals = new_generation + from_old_generation
 

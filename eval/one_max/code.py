@@ -2,7 +2,6 @@
 
 import sys
 from src.Tree import TreeReadOnly
-from anytree import Node
 
 # init
 tree = TreeReadOnly(sys.argv[1])
