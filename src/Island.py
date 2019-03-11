@@ -53,12 +53,14 @@ class Island:
         # Breed children
         new_generation = []
         offspring = self.population_size - len(from_old_generation)
-        for num in range(offspring):
+        while True:
             # Selection
             parents = self.selection.select_parents(self.individuals)
             # Reproduction
-            child = self.reproduction.reproduce(parents, self.representation)
-            new_generation += [child]
+            children = self.reproduction.reproduce(parents, self.representation)
+            new_generation += children
+            if len(new_generation) >= offspring:
+                break
         # Combine generations
         self.individuals = new_generation + from_old_generation
 
@@ -87,8 +89,8 @@ class Island:
         self.average_fitness = average_tuple([individual.fitness for individual in self.individuals])
 
     def print_generation_summary(self):
-        print('island [', self.pin, '], fittest [', self.individuals[0].fitness, '], mean [', self.average_fitness,
-              '], generation [', self.generation, ']')
+        print('island [', self.pin, '], fittest [', self.individuals[0].fitness, '], mean [',
+              '{0:.2f}'.format(self.average_fitness), '], generation [', self.generation, ']')
 
     def collect_fitness(self):
         evaluations_finished = 0

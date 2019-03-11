@@ -89,7 +89,8 @@ class Tree:
         parent_b.attach_branch(cutoff_b, branch_a)
 
         # selecting one of the two trees
-        self.nodes = parent_a.nodes if randint(0, 1) == 0 else parent_b.nodes
+        self.nodes = parent_a.nodes
+        return parent_b
 
     def attach_branch(self, node, branch):
         branch[0].parent = node
