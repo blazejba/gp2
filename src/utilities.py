@@ -1,7 +1,8 @@
 from time import localtime
 from os import walk
-from random import randint
+from random import randint, random
 import os
+from math import exp
 
 
 def clean_dir(dir):
@@ -51,3 +52,27 @@ def remove_file(path):
 
 def choose_random_element(arr):
     return arr[randint(0, len(arr) - 1)]
+
+
+def poisson_random_number(lambda_):
+    L = exp(-lambda_)
+    poisson_number = 0
+    p = 1
+    while True:
+        poisson_number += 1
+        u = random()
+        p = p * u
+        if p < L:
+            break
+    return poisson_number - 1
+
+
+if __name__ == '__main__':
+    size = 100
+    mutation_rate = 0.1
+    lambda_ = size*mutation_rate
+    total = 0
+    for _ in range(0, 100):
+        total += poisson_random_number(lambda_)
+    mean = int(round(total/99))
+    print(mean)
