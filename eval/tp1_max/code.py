@@ -13,12 +13,14 @@ from src.Tree import TreeReadOnly
 
 
 def main():
-	# init
 	tree = TreeReadOnly(sys.argv[1])
+	fitness = evaluate(tree)
+	sys.stdout.write(str(fitness))
+	sys.exit(1)
 
-	# evaluation
+
+def evaluate(tree):
 	stack = []
-
 	try:
 		for node in PostOrderIter(tree.nodes[0].root):
 			if node.value == '*':
@@ -33,13 +35,9 @@ def main():
 
 			else:
 				stack += [1]
-		fitness = stack[0]
-	except:
-		fitness = 0
-
-	# fill stdout
-	sys.stdout.write(str(fitness))
-	sys.exit(1)
+		return stack[0]
+	except any:
+		return 0
 
 
 if __name__ == '__main__':

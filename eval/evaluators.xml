@@ -8,7 +8,7 @@
     </e>
 
     <e name="symbolic_regression">
-        <tree size='0' depth='5'  constrained='False' primitives='char(x)_0 real(-4,4)_0 char(*,+,%,^)_2' />
+        <tree size='15' depth='5'  constrained='False' primitives='char(x)_0 real(-4,4)_0 char(*,+,%,^)_2' />
     </e>
 
     <e name="model_generator">

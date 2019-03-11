@@ -247,23 +247,26 @@ if __name__ == '__main__':
         dict(ptype='string', arity=3, collection=['C', 'D', '[', ']'], length=5)
     ]
 
-    max_size = 11
-    max_depth = 0
-    constrained = True
-    unique = True
+    # Symbolic Regression
+    dict_4 = [
+        dict(ptype='char', arity=0, collection=['x']),
+        dict(ptype='real', arity=0, up=4, low=-4),
+        dict(ptype='char', arity=2, collection=['*', '+', '%', '^'])
+    ]
 
-    parent_a = Tree(max_size, max_depth, constrained, dict_1, unique)
+    max_size = 15
+    max_depth = 4
+    constrained = False
+    unique = False
+
+    parent_a = Tree(max_size, max_depth, constrained, dict_4, unique)
     parent_a.grow()
-    parent_a.tree_in_line()
+    parent_a.print()
 
-    parent_b = Tree(max_size, max_depth, constrained, dict_1, unique)
+    parent_b = Tree(max_size, max_depth, constrained, dict_4, unique)
     parent_b.grow()
-    parent_b.tree_in_line()
+    parent_b.print()
 
-    child = Tree(max_size, max_depth, constrained, dict_1, unique)
+    child = Tree(max_size, max_depth, constrained, dict_4, unique)
     child.crossover([parent_a, parent_b])
-    child.tree_in_line()
-    print(child.node_names_in_line(child.nodes))
-    child.rename(0)
-    print(child.node_names_in_line(child.nodes))
     child.print()

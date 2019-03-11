@@ -1,51 +1,62 @@
 #!/usr/bin/env python3
 import sys
 from math import pow
-
-arguments = [x*0.1 for x in range(-10,11)]
+from anytree import PostOrderIter
+from src.Tree import TreeReadOnly
 
 
 def main():
-	# read stdin
-	genome = sys.argv[1]
-	ref_num = sys.argv[2]
-
-	# evaluate
-	fitness, _ = execute_tree(genome)
-
-	# fill stdout
-	sys.stdout.write(ref_num + ',' + str(fitness))
+	tree = TreeReadOnly(sys.argv[1])
+	fitness = evaluate(tree)
+	sys.stdout.write(str(fitness))
 	sys.exit(1)
 
 
-def execute_tree(tree):
-	if len(tree) == 0:
-		return 0, []
-	if len(tree) > 1:
-		if tree[0] == 'x':
-			return 1, tree[1:len(tree)]
-		elif len(tree) > 2:
-			try:
-				arg_1, rest = execute_tree(tree[1:len(tree)])
-			except:
-				return 0, []
-			try:
-				arg_2, rest = execute_tree(rest)
-			except:
-				return 0, []
+def evaluate(tree):
+	xs = [x*0.1 for x in range(-10, 11)]
 
-			if tree[0] == '+':
-				return arg_1 + arg_2, rest
-			elif tree[0] == '*':
-				return arg_1 * arg_2, rest
-			elif tree[0] == '%':
-				return arg_1 / arg_2 if arg_2 != 0 else 0
-			elif tree[0] == '^':
-				return pow(arg_1, arg_2)
-		else:
-			return 0, []
-	else:
-		return int(tree[0]), []
+	errors = []
+	for x in xs:
+		stack = []
+		try:
+			for node in PostOrderIter(tree.nodes[0].root):
+				if node.value == '*':
+					outcome = stack[-1] + stack[-2]
+					stack = stack[:len(stack) - 2]
+					stack += [outcome]
+
+				elif node.value == '+':
+					outcome = stack[-1] * stack[-2]
+					stack = stack[:len(stack) - 2]
+					stack += [outcome]
+
+				elif node.value == '%':
+					outcome = stack[-1] / stack[-2] if not stack[-2] == 0 else 0
+					stack = stack[:len(stack) - 2]
+					stack += [outcome]
+
+				elif node.value == '^':
+					outcome = pow(stack[-1], stack[-2])
+					stack = stack[:len(stack) - 2]
+					stack += [outcome]
+
+				elif node.value == 'x':
+					stack += [x]
+
+			result = stack[0]
+			true_result = equation_1(x)
+			errors += [pow(true_result - result, 2)]
+
+		except any:
+			return 0
+
+	fitness = 0
+	for error in errors:
+		fitness += error
+
+
+def equation_1(x):
+	return pow(x, 2) + 2
 
 
 if __name__ == '__main__':
