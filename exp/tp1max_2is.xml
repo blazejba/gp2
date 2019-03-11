@@ -1,25 +1,17 @@
-<experiment chromosome_length="21" max_fitness="48" max_time="0" max_generation="0">
-    <island population_size="10" evaluator="times_plus_one_max" dna_repair="false">
-        <reproduction crossover_points="5" mutation_rate="5" num_of_parents="2"/>
+<experiment max_fitness="48" max_time="0" max_generation="0">
+    <island population_size="10" evaluator="tp1_max">
+        <reproduction mutation_rate="20"/>
+        <selection policy="tournament"/>
+        <migration entry_policy="probabilistic" in="true" out="true" chance="5"
+                   selection_policy="truncation" immigrants="1" emigrants="1"/>
+        <replacement policy="elitism" num_of_elites="2"/>
+    </island>
+
+    <island population_size="15" evaluator="tp1_max">
+        <reproduction mutation_rate="20"/>
         <selection policy="tournament"/>
         <migration entry_policy="probabilistic" in="true" out="true" chance="1"
                    selection_policy="truncation" immigrants="1" emigrants="1"/>
-        <replacement policy="elitism" num_of_elites="1"/>
-    </island>
-
-    <island population_size="25" evaluator="times_plus_one_max" dna_repair="false">
-        <reproduction crossover_points="5" mutation_rate="5" num_of_parents="3"/>
-        <selection policy="rank_based"/>
-        <migration entry_policy="probabilistic" in="true" out="true" chance="3"
-                   selection_policy="truncation" immigrants="1" emigrants="1"/>
-        <replacement policy="elitism" num_of_elites="1"/>
-    </island>
-
-    <island population_size="50" evaluator="times_plus_one_max" dna_repair="false">
-        <reproduction crossover_points="5" mutation_rate="15" num_of_parents="4"/>
-        <selection policy="roulette_wheel"/>
-        <migration entry_policy="probabilistic" in="true" out="true" chance="5"
-                   selection_policy="truncation" immigrants="3" emigrants="1"/>
-        <replacement policy="elitism" num_of_elites="1"/>
+        <replacement policy="elitism" num_of_elites="2"/>
     </island>
 </experiment>

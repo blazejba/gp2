@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from anytree import Node, RenderTree, findall_by_attr, findall, PreOrderIter, find
+from anytree import Node, RenderTree, findall_by_attr, PreOrderIter, find
 from anytree.exporter import DotExporter
 from random import randint, sample, uniform, shuffle
 from copy import deepcopy
@@ -54,9 +54,8 @@ class Tree:
         depth = depth if self.nodes[-1].depth < depth else self.nodes[-1].depth + 1
         return size, depth, free_branches
 
-    @staticmethod
-    def generate_name():
-        return str(randint(0, 200))
+    def generate_name(self):
+        return str(int(self.nodes[-1].name) + 1) if len(self.nodes) > 0 else str(0)
 
     def mutate(self, node):  # node value -> node of the same arity value
         index = self.nodes.index(node)
@@ -77,7 +76,8 @@ class Tree:
             crossover_node_a = parent_a.nodes[randint(1, len(parent_a.nodes) - 1)]
             valid_nodes_b = parent_b.same_arity_nodes(crossover_node_a.arity)
             if self.constrained:
-                valid_nodes_b = [node for node in valid_nodes_b if len(node.descendants) == len(crossover_node_a.descendants)]
+                valid_nodes_b = [node for node in valid_nodes_b
+                                 if len(node.descendants) == len(crossover_node_a.descendants)]
         crossover_node_b = valid_nodes_b[randint(0, len(valid_nodes_b) - 1)]
 
         # detaching branches at crossover point
@@ -89,14 +89,7 @@ class Tree:
         parent_b.attach_branch(cutoff_b, branch_a)
 
         # selecting one of the two trees
-        self.nodes = deepcopy(parent_a.nodes if randint(0, 1) == 0 else parent_b.nodes)
-        #print('crossover result:' + self.node_names_in_line(self.nodes) + '\n')
-
-    def shape(self):    # this might be unnecessary
-        # maybe instead of preventing the over-growth, crossover as you wish then pruning and growing if size doest fir
-        excess_size = len(self.nodes) - self.max_size
-        print(excess_size)
-        print(list(findall(self.nodes[0], filter_=lambda node: node.depth > self.max_depth)))
+        self.nodes = parent_a.nodes if randint(0, 1) == 0 else parent_b.nodes
 
     def attach_branch(self, node, branch):
         branch[0].parent = node
@@ -129,17 +122,25 @@ class Tree:
         return ''.join(letter for letter in string)
 
     def parse(self, text):  # string to tree import
-        nodes = []
         string_nodes = text.split('\n')
         for string_node in string_nodes:
             name, ptype, arity, value, parent = string_node.split(',')
-            if parent != '':
-                for node in nodes:
+
+            arity = int(arity)
+
+            if not parent == '':  # finding
+                for node in self.nodes:
                     if node.name == parent:
                         parent = node
-            nodes += [Node(name, ptype=ptype, arity=arity, value=value, parent=parent) if parent != ''
-                      else Node(name, ptype=ptype, arity=arity, value=value)]
-        self.nodes = nodes
+
+            if ptype == 'bool' or ptype == 'int':
+                value = int(value)
+            if ptype == 'real':
+                value = float(value)
+
+            new_node = Node(name, ptype=ptype, arity=arity, value=value, parent=parent) if not parent == '' else \
+                Node(name, ptype=ptype, arity=arity, value=value)
+            self.nodes += [new_node]
 
     def grow_leaf(self):
         valid_leafs = [primitive for primitive in self.primitive_dict if primitive.get('arity') == 0]

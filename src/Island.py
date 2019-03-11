@@ -19,7 +19,7 @@ class Island:
         self.selection = Selection(policy=selection)
         self.replacement = Replacement(policy=replacement)
         self.reproduction = Reproduction(policy=reproduction)
-        self.migration = Migration(tmp_dir, pin, migration)
+        self.migration = Migration(tmp_dir, pin, policy=migration)
 
         # Population
         self.individuals = []
@@ -47,7 +47,7 @@ class Island:
 
     def evolve(self):
         # Migration
-        immigrants = self.migration.migrate_in()
+        immigrants = [] if self.generation == 0 else self.migration.migrate_in(self.representation)
         # Replacement
         from_old_generation = self.replacement.replace(immigrants, self.individuals)
         # Breed children

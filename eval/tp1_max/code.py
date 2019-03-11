@@ -18,20 +18,24 @@ def main():
 
 	# evaluation
 	stack = []
-	for node in PostOrderIter(tree.nodes[0].root):
-		if node.value == '*':
-			outcome = stack[-1] + stack[-2]
-			stack = stack[:len(stack) - 2]
-			stack += [outcome]
 
-		elif node.value == '+':
-			outcome = stack[-1] * stack[-2]
-			stack = stack[:len(stack) - 2]
-			stack += [outcome]
+	try:
+		for node in PostOrderIter(tree.nodes[0].root):
+			if node.value == '*':
+				outcome = stack[-1] + stack[-2]
+				stack = stack[:len(stack) - 2]
+				stack += [outcome]
 
-		else:
-			stack += [1]
-	fitness = stack[0]
+			elif node.value == '+':
+				outcome = stack[-1] * stack[-2]
+				stack = stack[:len(stack) - 2]
+				stack += [outcome]
+
+			else:
+				stack += [1]
+		fitness = stack[0]
+	except:
+		fitness = 0
 
 	# fill stdout
 	sys.stdout.write(str(fitness))

@@ -36,9 +36,9 @@ class Individual:
 				stringified += '\n\n'
 		return ''.join(letter for letter in stringified)
 
-	def import_genome(self, genome_content, instructions):  # turn a string into a list of trees
+	def import_genome(self, genome_content, representation):  # turn a string into a list of trees
 		for index, tree_content in enumerate(genome_content.split('\n\n')):
-			size, depth, constrained, primitives, unique = instructions.get_tree_structure(which_tree=index)
+			size, depth, constrained, primitives, unique = representation.get_tree_structure(which_tree=index)
 			tree = Tree(size, depth, constrained, primitives, unique)
 			tree.parse(tree_content)
 			self.genome += [tree]
@@ -68,5 +68,5 @@ if __name__ == '__main__':
 
 	individual2 = Individual()
 	genome = individual.export_genome()
-	individual2.import_genome(genome_content=genome, instructions=representation)
+	individual2.import_genome(genome_content=genome, representation=representation)
 	print(individual2.export_genome())
