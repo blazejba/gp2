@@ -177,7 +177,7 @@ class Tree:
             print('%s%s' % (pre, node.value))
 
     def tree_in_line(self):
-        return ''.join(letter for letter in [str(node.value) for node in PreOrderIter(self.nodes[0].root)])
+        return ''.join(letter for letter in [str(node.value) + ' ' for node in PreOrderIter(self.nodes[0].root)])
 
     @staticmethod
     def node_names_in_line(nodes):

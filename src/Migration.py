@@ -89,7 +89,7 @@ class Migration:
         buffer_file = open(self.buffer_dir, 'w+t')
         buffer_file.write(emigrant.export_genome())
         buffer_file.close()
-        file_name = self.tmp_dir + '/' + str(self.island_name) + '_' + str(time()) + '_' + str(int(emigrant.fitness))
+        file_name = self.tmp_dir + '/' + str(self.island_name) + '_' + str(time()) + '_' + str(emigrant.fitness)
         rename(self.buffer_dir, file_name)  # atomic operation
 
     def rank_migration(self, candidates):

@@ -26,7 +26,7 @@ class Individual:
 		return False 	# not finished yet
 
 	def stringify(self):
-		return ''.join(letter for letter in [tree.tree_in_line() + ' ' for tree in self.genome])
+		return ''.join(letter for letter in [tree.tree_in_line() + '   ' for tree in self.genome])
 
 	def export_genome(self):  # turn a genome (a list of trees) into a string (a list of characters)
 		stringified = []

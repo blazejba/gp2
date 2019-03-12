@@ -12,7 +12,7 @@ class Evolution:
         self.book_keeper = BookKeeper(self.evolution_id)
         self.tmp_dir = tempfile.mkdtemp(dir='/tmp')
 
-        self.max_fitness = int(islands_xml.attrib['max_fitness'])
+        self.max_fitness = float(islands_xml.attrib['max_fitness'])
         self.max_time = int(islands_xml.attrib['max_time'])
         self.max_generation = int(islands_xml.attrib['max_generation'])
 

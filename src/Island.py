@@ -1,10 +1,10 @@
-from src.utilities import average_tuple
-from src.Selection import Selection
-from src.Reproduction import Reproduction
-from src.Replacement import Replacement
-from src.Migration import Migration
 from src.Individual import Individual
+from src.Migration import Migration
+from src.Replacement import Replacement
 from src.Representation import Representation
+from src.Reproduction import Reproduction
+from src.Selection import Selection
+from src.utilities import average_tuple
 
 
 class Island:
@@ -32,7 +32,7 @@ class Island:
             individual.instantiate(self.representation)
             self.individuals.append(individual)
 
-    def sort_individuals(self):     # from the fittest to the least fit
+    def sort_individuals(self):  # from the fittest to the least fit
         tmp_individuals = self.individuals
         self.individuals = []
         while len(tmp_individuals) > 0:

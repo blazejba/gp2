@@ -38,11 +38,11 @@ class BookKeeper:
         rates = [i.replacement_policy.migration_policy.get_success_rate() for i in islands]
         total_migrations = [island.replacement_policy.migration_policy.total_migrations for island in islands]
         print('Total migrations', [value for value in total_migrations], '.')
-        print('Migration success rates', ["{:.2f} %".format(rate) for rate in rates], '.')
+        print('Migration success rates', ["{:.2f}".format(rate) for rate in rates], '.')
 
     @staticmethod
     def print_all_individuals(islands):
         for island in islands:
             print('island [ ' + str(island.pin) + ' ]')
             for individual in island.individuals:
-                print(individual.stringify())
+                print("{:.2f} %".format(individual.fitness), individual.stringify())
