@@ -14,10 +14,16 @@ class Reproduction:
         paired_chromosomes = self.pair(self.extract_genomes(parents))
         for num in range(len(paired_chromosomes)):
             new_chromosome_a, new_chromosome_b = self.crossover(paired_chromosomes[num], num, representation)
+
+            new_chromosome_a.headless_chicken()
             new_chromosome_a = self.mutate(new_chromosome_a)
+
+            new_chromosome_b.headless_chicken()
             new_chromosome_b = self.mutate(new_chromosome_b)
+
             new_individual_a.genome.append(new_chromosome_a)
             new_individual_b.genome.append(new_chromosome_b)
+
         return [new_individual_a, new_individual_b]
 
     def mutate(self, chromosome):

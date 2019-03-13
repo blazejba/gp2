@@ -60,7 +60,7 @@ class Evolution:
         island.print_generation_summary()
         self.book_keeper.update_log(island)
         for individual in island.individuals:
-            print(individual.stringify())
+            print("[{:.2f}]".format(individual.fitness), individual.stringify())
 
     def quit_evolution(self, why, generation):
         for island in self.islands:

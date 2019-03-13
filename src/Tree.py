@@ -2,7 +2,7 @@
 
 from anytree import Node, RenderTree, findall_by_attr, PreOrderIter, find
 from anytree.exporter import DotExporter
-from random import randint, sample, uniform, shuffle
+from random import randint, sample, uniform, shuffle, random
 from copy import deepcopy
 
 
@@ -25,24 +25,24 @@ class Tree:
 
         # Growing nodes
         while True:
-            size, depth, free_branches = self.expand(size, depth, free_branches)
+            size, depth, free_branches = self.grow_function(size, depth, free_branches)
             if size >= self.max_size or depth >= self.max_depth or len(free_branches) == 0:
                 break
 
         # Growing leafs
         while 0 < len(free_branches):
-            free_branches = self.grow_leafs(free_branches)
+            free_branches = self.grow_leaf(free_branches)
 
-    def grow_leafs(self, free_branches):  # grow a random terminal node
-        ptype, value = self.grow_leaf()
+    def grow_leaf(self, free_branches):  # grow a random terminal node
+        ptype, value = self.primitive('terminal')
         parent = free_branches[randint(0, len(free_branches) - 1)]
         self.nodes.append(Node(self.generate_name(), ptype=ptype, arity=0, value=value, parent=parent))
         free_branches.remove(parent)
         return free_branches
 
-    def expand(self, size, depth, free_branches):  # expand tree by growing a new node
+    def grow_function(self, size, depth, free_branches):  # expand tree by growing a new function node
         space_left = self.max_size - size
-        ptype, arity, value = self.grow_node(space_left)
+        ptype, arity, value = self.primitive('function', space_left)
         if depth == 0:
             self.nodes.append(Node(self.generate_name(), ptype=ptype, arity=arity, value=value))
         else:
@@ -54,8 +54,46 @@ class Tree:
         depth = depth if self.nodes[-1].depth < depth else self.nodes[-1].depth + 1
         return size, depth, free_branches
 
+    def primitive(self, which, space_left=None):
+        if which == 'terminal':
+            valid_leafs = [primitive for primitive in self.primitive_dict if primitive.get('arity') == 0]
+            leaf = valid_leafs[randint(0, len(valid_leafs) - 1)]
+            value = self.get_value(leaf)
+            return leaf.get('ptype'), value
+        else:
+            valid_nodes = [primitive for primitive in self.primitive_dict if primitive.get('arity') > 0]
+            shuffle(valid_nodes)
+            for node in valid_nodes:
+                if not self.deadlock(space_left - node.get('arity')):
+                    value = self.get_value(node)
+                    return node.get('ptype'), node.get('arity'), value
+            ptype, value = self.primitive('terminal')
+            return ptype, 0, value
+
     def generate_name(self):
-        return str(int(self.nodes[-1].name) + 1) if len(self.nodes) > 0 else str(0)
+        return str(len(self.nodes))
+
+    def headless_chicken(self):     # alternative mutation, a random node is attached to a freshly generated branch
+        cutoff_node = self.nodes[randint(1, len(self.nodes) - 1)]   # select random node where new branch will be
+        branch, free_node = self.detach_branch(cutoff_node)     # cut off the branch and keep the free node
+        del branch  # branch can be discarded because the purpose of headless chicken is to grow a new one
+        free_branches = [free_node]
+        self.rename(0)
+
+        depth = 0
+        for node in self.nodes:
+            if node.depth > depth:
+                depth = node.depth
+
+        # the problem lies in here
+        while True:     # 90% grow function nodes, 10% terminal nodes
+            if random() > 0.1 and not self.max_depth == depth:
+                _, depth, free_branches = self.grow_function(0, depth, free_branches)
+            else:
+                free_branches = self.grow_leaf(free_branches)
+            if len(free_branches) == 0 or self.max_depth == depth:  # do until max depth or no free nodes
+                break
+        # end of where the problem lies
 
     def mutate(self, node):  # node value -> node of the same arity value
         index = self.nodes.index(node)
@@ -81,12 +119,12 @@ class Tree:
         crossover_node_b = valid_nodes_b[randint(0, len(valid_nodes_b) - 1)]
 
         # detaching branches at crossover point
-        branch_a, cutoff_a = parent_a.detach_branch(crossover_node_a)
-        branch_b, cutoff_b = parent_b.detach_branch(crossover_node_b)
+        branch_a, free_node_a = parent_a.detach_branch(crossover_node_a)
+        branch_b, free_node_b = parent_b.detach_branch(crossover_node_b)
 
         # attaching branches
-        parent_a.attach_branch(cutoff_a, branch_b)
-        parent_b.attach_branch(cutoff_b, branch_a)
+        parent_a.attach_branch(free_node_a, branch_b)
+        parent_b.attach_branch(free_node_b, branch_a)
 
         # selecting one of the two trees
         self.nodes = parent_a.nodes
@@ -98,14 +136,14 @@ class Tree:
 
     def detach_branch(self, detaching_node):
         cutoff_node = find(self.nodes[0].root, lambda node: node.name == detaching_node.name)
-        cutoff_node_parent = cutoff_node.parent
+        free_node = cutoff_node.parent
         cutoff_node.parent = None
         if len(cutoff_node.descendants) > 0:
             branch = [cutoff_node] + list(cutoff_node.descendants)
         else:
             branch = [cutoff_node]
         self.nodes = [node for node in self.nodes if node not in branch]
-        return branch, cutoff_node_parent
+        return branch, free_node
 
     def same_arity_primitives(self, arity):  # return all primitives in the dictionary of given arity
         return [primitive for primitive in self.primitive_dict if primitive.get('arity') == arity]
@@ -143,22 +181,6 @@ class Tree:
                 Node(name, ptype=ptype, arity=arity, value=value)
             self.nodes += [new_node]
 
-    def grow_leaf(self):
-        valid_leafs = [primitive for primitive in self.primitive_dict if primitive.get('arity') == 0]
-        leaf = valid_leafs[randint(0, len(valid_leafs) - 1)]
-        value = self.get_value(leaf)
-        return leaf.get('ptype'), value
-
-    def grow_node(self, space_left):
-        valid_nodes = [primitive for primitive in self.primitive_dict if primitive.get('arity') > 0]
-        shuffle(valid_nodes)
-        for node in valid_nodes:
-            if not self.deadlock(space_left - node.get('arity')):
-                value = self.get_value(node)
-                return node.get('ptype'), node.get('arity'), value
-        ptype, value = self.grow_leaf()
-        return ptype, 0, value
-
     def deadlock(self, space_left):  # to identify deadlocks which might occur when size or depth of a tree are limited
         if space_left < 0:
             return True
@@ -178,10 +200,6 @@ class Tree:
 
     def tree_in_line(self):
         return ''.join(letter for letter in [str(node.value) + ' ' for node in PreOrderIter(self.nodes[0].root)])
-
-    @staticmethod
-    def node_names_in_line(nodes):
-        return ''.join(letter for letter in [str(node.name) + ' ' for node in nodes])
 
     def save_image(self, path):
         DotExporter(self.nodes[0], nodenamefunc=lambda node: '%s:%s' % (node.value, node.name)).to_picture(path)
@@ -256,18 +274,12 @@ if __name__ == '__main__':
     ]
 
     max_size = 15
-    max_depth = 4
-    constrained = False
+    max_depth = 6
+    constrained = True
     unique = False
 
     parent_a = Tree(max_size, max_depth, constrained, dict_4, unique)
     parent_a.grow()
     parent_a.print()
-
-    parent_b = Tree(max_size, max_depth, constrained, dict_4, unique)
-    parent_b.grow()
-    parent_b.print()
-
-    child = Tree(max_size, max_depth, constrained, dict_4, unique)
-    child.crossover([parent_a, parent_b])
-    child.print()
+    parent_a.headless_chicken()
+    parent_a.print()

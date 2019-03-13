@@ -45,4 +45,4 @@ class BookKeeper:
         for island in islands:
             print('island [ ' + str(island.pin) + ' ]')
             for individual in island.individuals:
-                print("{:.2f} %".format(individual.fitness), individual.stringify())
+                print("[{:.2f}]".format(individual.fitness), individual.stringify())
