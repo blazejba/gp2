@@ -12,7 +12,7 @@ class Reproduction:
         new_individual_a = Individual()
         new_individual_b = Individual()
         paired_chromosomes = self.pair(self.extract_genomes(parents))
-        for num in range(len(paired_chromosomes)):
+        for num in range(len(paired_chromosomes) - 1):
             new_chromosome_a, new_chromosome_b = self.crossover(paired_chromosomes[num], num, representation)
 
             if random() < self.mutation_rate:
@@ -34,22 +34,21 @@ class Reproduction:
                 chromosome.mutate(node=gene)
         return chromosome
 
-    def headless_chicken_mutation(self):
-        pass
-
     @staticmethod
     def crossover(parent_chromosomes, index, representation):
-        size, depth, constrained, primitives, unique = representation.get_tree_structure(which_tree=index)
-        chromosome_a = Tree(size, depth, constrained, primitives, unique)
+        size, depth, primitives, unique = representation.get_tree_structure(which_tree=index)
+        chromosome_a = Tree(size, depth, primitives, unique)
         chromosome_b = chromosome_a.crossover(parent_chromosomes)
         return chromosome_a, chromosome_b
 
     @staticmethod
     def pair(genomes):
-        paired_chromosomes = [[] * len(genomes[0])]
+        paired_chromosomes = []
         for genome in genomes:
+            pair = []
             for num, chromosome in enumerate(genome):
-                paired_chromosomes[num].append(chromosome)
+                pair.append(chromosome)
+            paired_chromosomes.append(pair)
         return paired_chromosomes
 
     @staticmethod

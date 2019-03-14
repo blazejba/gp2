@@ -5,11 +5,10 @@ class Representation:
         for tree in fitness_evaluator:
             size = int(tree.attrib['size'])
             depth = int(tree.attrib['depth'])
-            constrained = tree.attrib['constrained'] == 'True'
             primitives = self.parse_primitives(tree.attrib['primitives'])
             unique = tree.attrib['unique'] == 'True'
             tree_structure = dict(
-                size=size, depth=depth, constrained=constrained, primitives=primitives, unique=unique)
+                size=size, depth=depth, primitives=primitives, unique=unique)
             self.forest.append(tree_structure)
 
     @staticmethod
@@ -37,8 +36,7 @@ class Representation:
 
     def get_tree_structure(self, which_tree):
         return self.forest[which_tree].get('size'), self.forest[which_tree].get('depth'), \
-               self.forest[which_tree].get('constrained'), self.forest[which_tree].get('primitives'), \
-               self.forest[which_tree].get('unique')
+               self.forest[which_tree].get('primitives'), self.forest[which_tree].get('unique')
 
 
 if __name__ == '__main__':

@@ -7,14 +7,9 @@ from copy import deepcopy
 
 
 class Tree:
-    def __init__(self, size, depth, constrained, primitives, unique):
-        self.constrained = constrained
-        if not constrained:
-            self.max_size = randint(5, size)
-            self.max_depth = randint(1, depth)
-        else:
-            self.max_size = size if size != 0 else 999
-            self.max_depth = depth if depth != 0 else 999
+    def __init__(self, size, depth, primitives, unique):
+        self.max_size = size if size != 0 else 999
+        self.max_depth = depth if depth != 0 else 999
         self.primitive_dict = primitives
         self.nodes = []
         self.unique = unique
@@ -74,6 +69,8 @@ class Tree:
         return str(len(self.nodes))
 
     def headless_chicken(self):     # alternative mutation, a random node is attached to a freshly generated branch
+        if len(self.nodes) == self.max_size:
+            return
         cutoff_node = self.nodes[randint(1, len(self.nodes) - 1)]   # select random node where new branch will be
         branch, free_node = self.detach_branch(cutoff_node)     # cut off the branch and keep the free node
         del branch  # branch can be discarded because the purpose of headless chicken is to grow a new one
@@ -85,16 +82,13 @@ class Tree:
             if node.depth > depth:
                 depth = node.depth
 
-        # the problem lies in here
         while True:     # 90% grow function nodes, 10% terminal nodes
-            #print('here', 'max depth', self.max_depth, 'depth', depth, free_branches)
             if random() > 0.1 and not self.max_depth < depth:
                 _, depth, free_branches = self.grow_function(0, depth, free_branches)
             else:
                 free_branches = self.grow_leaf(free_branches)
             if len(free_branches) == 0:  # do until max depth or no free nodes
                 break
-        # end of where the problem lies
 
     def mutate(self, node):  # node value -> node of the same arity value
         index = self.nodes.index(node)
@@ -107,14 +101,13 @@ class Tree:
         parent_b = deepcopy(parents[1])
         parent_a.rename(0)
         parent_b.rename(len(parent_a.nodes))
-
         valid_nodes_b, crossover_node_a, crossover_node_b = [], object, object
 
-        # finding crossover point
+        # finding crossover points A and B
         while len(valid_nodes_b) == 0:
             crossover_node_a = parent_a.nodes[randint(1, len(parent_a.nodes) - 1)]
             valid_nodes_b = parent_b.same_arity_nodes(crossover_node_a.arity)
-            if self.constrained:
+            if len(parent_a.nodes) == self.max_size:
                 valid_nodes_b = [node for node in valid_nodes_b
                                  if len(node.descendants) == len(crossover_node_a.descendants)]
         crossover_node_b = valid_nodes_b[randint(0, len(valid_nodes_b) - 1)]
@@ -127,7 +120,6 @@ class Tree:
         parent_a.attach_branch(free_node_a, branch_b)
         parent_b.attach_branch(free_node_b, branch_a)
 
-        # selecting one of the two trees
         self.nodes = parent_a.nodes
         return parent_b
 
