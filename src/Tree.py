@@ -87,11 +87,12 @@ class Tree:
 
         # the problem lies in here
         while True:     # 90% grow function nodes, 10% terminal nodes
-            if random() > 0.1 and not self.max_depth == depth:
+            #print('here', 'max depth', self.max_depth, 'depth', depth, free_branches)
+            if random() > 0.1 and not self.max_depth < depth:
                 _, depth, free_branches = self.grow_function(0, depth, free_branches)
             else:
                 free_branches = self.grow_leaf(free_branches)
-            if len(free_branches) == 0 or self.max_depth == depth:  # do until max depth or no free nodes
+            if len(free_branches) == 0:  # do until max depth or no free nodes
                 break
         # end of where the problem lies
 

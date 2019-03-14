@@ -15,10 +15,12 @@ class Reproduction:
         for num in range(len(paired_chromosomes)):
             new_chromosome_a, new_chromosome_b = self.crossover(paired_chromosomes[num], num, representation)
 
-            new_chromosome_a.headless_chicken()
+            if random() < self.mutation_rate:
+                new_chromosome_a.headless_chicken()
             new_chromosome_a = self.mutate(new_chromosome_a)
 
-            new_chromosome_b.headless_chicken()
+            if random() < self.mutation_rate:
+                new_chromosome_b.headless_chicken()
             new_chromosome_b = self.mutate(new_chromosome_b)
 
             new_individual_a.genome.append(new_chromosome_a)

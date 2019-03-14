@@ -22,12 +22,12 @@ def evaluate(tree):
         try:
             for node in PostOrderIter(tree.nodes[0].root):
                 if node.value == '*':
-                    outcome = stack[-1] + stack[-2]
+                    outcome = stack[-1] * stack[-2]
                     stack = stack[:len(stack) - 2]
                     stack += [outcome]
 
                 elif node.value == '+':
-                    outcome = stack[-1] * stack[-2]
+                    outcome = stack[-1] + stack[-2]
                     stack = stack[:len(stack) - 2]
                     stack += [outcome]
 
@@ -37,7 +37,7 @@ def evaluate(tree):
                     stack += [outcome]
 
                 elif node.value == '^':
-                    outcome = pow(stack[-1], stack[-2])
+                    outcome = pow(stack[-2], stack[-1])
                     stack = stack[:len(stack) - 2]
                     stack += [outcome]
 
