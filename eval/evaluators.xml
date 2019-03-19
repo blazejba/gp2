@@ -13,6 +13,6 @@
 
     <e name="model_generator">
         <tree size='20' depth='3' unique='True' primitives='char(N)_0 string(C,D,[,])_0.5 string(C,D,[,])_3.5' />
-        <tree size='3' depth='0' unique='False' primitives='int(0,1000)_0 char(#)_2' />
+        <tree size='3' depth='1' unique='False' primitives='int(0,1000)_0 char(#)_2' />
     </e>
 </evaluators>

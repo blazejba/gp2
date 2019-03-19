@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import sys
-from math import pow, e
+from math import pow
 from anytree import PostOrderIter
 from src.Tree import TreeReadOnly
 
@@ -8,7 +8,6 @@ from src.Tree import TreeReadOnly
 def main():
     tree = TreeReadOnly(sys.argv[1])
     fitness = evaluate(tree)
-    sys.stdout.flush()
     sys.stdout.write(str(fitness))
     sys.exit(1)
 

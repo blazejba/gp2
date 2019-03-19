@@ -4,6 +4,8 @@ import sys
 from math import sqrt, pow
 from random import randint, seed
 from src.utilities import get_date_in_string
+from anytree import PostOrderIter
+from src.Tree import TreeReadOnly
 
 
 class LSystem():
@@ -38,11 +40,6 @@ class LSystem():
 		return counter
 
 
-def decode_stdin(inp):
-	comma_separated = re.sub('.n', '', inp).split(',')
-	return [rule.split('.') for rule in comma_separated[0:-2] if len(rule) > 1], int(comma_separated[-2]), int(comma_separated[-1])
-
-
 def execute_growth_instruction(instruction, name, rnd_seed):
 	seed(rnd_seed)
 	file = open(name + ".scad", "w")
@@ -65,29 +62,6 @@ def execute_growth_instruction(instruction, name, rnd_seed):
 		print("STEP " + step + " DIR " + str(direction) + " CTR " + str(current_translation) + " CUBE " + str(cube_size))
 
 	file.close()
-
-
-def main():
-	genome = "S.C[DCC][DCC].n.n.n.n,C.CC[DC].n.n.n.n,20,1"
-	#genome = sys.argv[1]
-	individual = sys.argv[2]
-
-	grammar, size, rnd_seed = decode_stdin(genome)
-	l_system = LSystem(grammar, size, rnd_seed)
-
-	name = get_date_in_string()
-	execute_growth_instruction(l_system.structure, name, rnd_seed)
-
-	os.system("openscad -o" + name + ".stl " + name + ".scad")
-
-	triangles = get_triangles_from_stl(name)
-	volume = calculate_volume(triangles)
-	surface = calculate_surface(triangles)
-	fitness = pow(volume, 0.33)/pow(surface, 0.5)
-
-	print(volume, surface, fitness)
-	sys.stdout.write(individual + ',' + str(fitness))
-	sys.exit(1)
 
 
 def accumulate_translations(genome):
@@ -163,6 +137,47 @@ def vector_length(x, y, z):
 
 def triangle_surface(A, B):
 	return (sqrt(pow(A[1] * B[2] - A[2] * B[1], 2) + pow(A[2] * B[0] - A[0] * B[2], 2) + pow(A[0] * B[1] - A[1] * B[0], 2))) / 2
+
+
+def decode_stdin(inp):
+	comma_separated = re.sub('.n', '', inp).split(',')
+	return [rule.split('.') for rule in comma_separated[0:-2] if len(rule) > 1], int(comma_separated[-2]), int(comma_separated[-1])
+
+
+def evaluate(grammar_tree, parameter_tree):
+	rnd_seed = 0
+	for node in PostOrderIter(parameter_tree.nodes[0].root):
+		if node != '#':
+			rnd_seed = int(node)
+
+	size = 20
+
+	for node in PostOrderIter(grammar_tree.nodes[0].root):
+		#decode grammar from the tree in here
+		pass
+
+	l_system = LSystem(grammar, size, rnd_seed)
+
+	name = get_date_in_string()
+	execute_growth_instruction(l_system.structure, name, rnd_seed)
+
+	os.system("openscad -o" + name + ".stl " + name + ".scad")
+
+	triangles = get_triangles_from_stl(name)
+	volume = calculate_volume(triangles)
+	surface = calculate_surface(triangles)
+	fitness = pow(volume, 0.33)/pow(surface, 0.5)
+	return fitness
+
+
+def main():
+	#genome = "S.C[DCC][DCC].n.n.n.n,C.CC[DC].n.n.n.n,20,1"
+	forest = sys.argv[1].split('\n\n')
+	grammar_tree = TreeReadOnly(forest[0])
+	parameter_tree = TreeReadOnly(forest[1])
+	fitness = evaluate(grammar_tree, parameter_tree)
+	sys.stdout.write(str(fitness))
+	sys.exit(1)
 
 
 if __name__ == "__main__":

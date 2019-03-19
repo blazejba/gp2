@@ -92,13 +92,13 @@ class Tree:
 
     def mutate(self, node):  # node value -> node of the same arity value
         index = self.nodes.index(node)
-        valid_primitives = self.same_arity_primitives(self.nodes[index].arity)
+        valid_primitives = self.same_arity_primitives(node.arity)
         primitive = sample(valid_primitives, 1)[0]
         self.nodes[index].value = self.get_value(primitive)
 
-    def crossover(self, parents):
-        parent_a = deepcopy(parents[0])
-        parent_b = deepcopy(parents[1])
+    def crossover(self, chromosome_a, chromosome_b):
+        parent_a = deepcopy(chromosome_a)
+        parent_b = deepcopy(chromosome_b)
         parent_a.rename(0)
         parent_b.rename(len(parent_a.nodes))
         valid_nodes_b, crossover_node_a, crossover_node_b = [], object, object
@@ -139,6 +139,7 @@ class Tree:
         return branch, free_node
 
     def same_arity_primitives(self, arity):  # return all primitives in the dictionary of given arity
+        #print(self.primitive_dict)
         return [primitive for primitive in self.primitive_dict if primitive.get('arity') == arity]
 
     def same_arity_nodes(self, arity):  # this is invoked in headless chicken
@@ -207,8 +208,8 @@ class Tree:
         elif primitive.get('ptype') == 'int':
             return randint(primitive.get('low'), primitive.get('up'))
         elif primitive.get('ptype') == 'string':
+            collection = primitive.get('collection')
             while True:
-                collection = primitive.get('collection')
                 length = randint(1, primitive.get('length'))
                 value = [sample(collection, 1)[0] for _ in range(length)]
                 if value not in [node.value for node in self.nodes]:
