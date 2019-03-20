@@ -201,6 +201,8 @@ class Tree:
     def get_value(self, primitive):
         if primitive.get('ptype') == 'bool':
             return randint(0, 1)
+        elif primitive.get('ptype') == 'root':
+            return '#'
         elif primitive.get('ptype') == 'char':
             return sample(primitive.get('collection'), 1)[0]
         elif primitive.get('ptype') == 'real':
@@ -228,7 +230,7 @@ class TreeReadOnly:
 
     def parse(self, text):  # string to tree import
         nodes = []
-        string_nodes = text.split('\n')
+        string_nodes = text.split('\n')[:-1]
         for string_node in string_nodes:
             name, ptype, arity, value, parent = string_node.split(',')
             if parent != '':
