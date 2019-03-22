@@ -12,8 +12,7 @@
     </e>
 
     <e name="model_generator">
-        <tree size='20' depth='3' unique='True'
-              primitives='char(N)_0 string(C,D,[,])_0.3 char(C,D,[,])_3 char(<,>)_1 root()_3' />
-        <tree size='3' depth='1' unique='False' primitives='int(0,1000)_0 root()_2' />
+        <tree size='0' depth='3' unique='True' primitives='char(N)_0 string(C,X,Y,Z,+,-,[,])_0.3 char(C,X,Y,Z,+,-,[,])_3 root()_3' />
+        <!-- <tree size='3' depth='1' unique='False' primitives='int(0,1000)_0 root()_2' /> -->
     </e>
 </evaluators>

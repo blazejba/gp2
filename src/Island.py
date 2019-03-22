@@ -56,7 +56,6 @@ class Island:
         while True:
             # Selection
             parents = self.selection.select_parents(self.individuals)
-            print('num of parents: ', len(parents))
             # Reproduction
             children = self.reproduction.reproduce(parents, self.representation)
             new_generation += children

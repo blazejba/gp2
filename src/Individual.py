@@ -12,6 +12,7 @@ class Individual:
 
 	def evaluate(self, evaluator_path):
 		if not self.evaluated:
+			self.genome[0].print()
 			terminal_command = ["python3", "-m", evaluator_path, self.export_genome()]
 			self.process = subprocess.Popen(terminal_command, stdout=subprocess.PIPE)
 

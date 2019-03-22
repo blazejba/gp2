@@ -37,10 +37,11 @@ class Tree:
 
     def grow_function(self, size, depth, free_branches):  # expand tree by growing a new function node
         space_left = self.max_size - size
-        ptype, arity, value = self.primitive('function', space_left)
         if depth == 0:
+            ptype, arity, value = self.primitive('root')
             self.nodes.append(Node(self.generate_name(), ptype=ptype, arity=arity, value=value))
         else:
+            ptype, arity, value = self.primitive('function', space_left)
             parent = free_branches[randint(0, len(free_branches) - 1)]
             self.nodes.append(Node(self.generate_name(), ptype=ptype, arity=arity, value=value, parent=parent))
             free_branches.remove(parent)
@@ -50,13 +51,18 @@ class Tree:
         return size, depth, free_branches
 
     def primitive(self, which, space_left=None):
+        if which == 'root':
+            for primitive in self.primitive_dict:
+                if primitive.get('ptype') == 'root':
+                    return 'root', primitive.get('arity'), '#'
+
         if which == 'terminal':
             valid_leafs = [primitive for primitive in self.primitive_dict if primitive.get('arity') == 0]
             leaf = valid_leafs[randint(0, len(valid_leafs) - 1)]
             value = self.get_value(leaf)
             return leaf.get('ptype'), value
         else:
-            valid_nodes = [primitive for primitive in self.primitive_dict if primitive.get('arity') > 0]
+            valid_nodes = [primitive for primitive in self.primitive_dict if primitive.get('arity') > 0 and primitive.get('ptype' != 'root')]
             shuffle(valid_nodes)
             for node in valid_nodes:
                 if not self.deadlock(space_left - node.get('arity')):
@@ -201,8 +207,6 @@ class Tree:
     def get_value(self, primitive):
         if primitive.get('ptype') == 'bool':
             return randint(0, 1)
-        elif primitive.get('ptype') == 'root':
-            return '#'
         elif primitive.get('ptype') == 'char':
             return sample(primitive.get('collection'), 1)[0]
         elif primitive.get('ptype') == 'real':
@@ -230,7 +234,7 @@ class TreeReadOnly:
 
     def parse(self, text):  # string to tree import
         nodes = []
-        string_nodes = text.split('\n')[:-1]
+        string_nodes = text.split('\n')
         for string_node in string_nodes:
             name, ptype, arity, value, parent = string_node.split(',')
             if parent != '':
@@ -274,8 +278,10 @@ if __name__ == '__main__':
     constrained = True
     unique = False
 
-    parent_a = Tree(max_size, max_depth, constrained, dict_4, unique)
+    parent_a = Tree(max_size, max_depth, dict_1, unique)
     parent_a.grow()
     parent_a.print()
-    parent_a.headless_chicken()
-    parent_a.print()
+
+    parent_b = Tree(max_size, max_depth, dict_1, unique)
+    parent_b.parse(parent_a.stringify())
+    parent_b.print()

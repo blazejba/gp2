@@ -21,5 +21,4 @@ class Selection:
 			indexes = truncation(self.num_of_parents)
 		elif self.policy == 'tournament':
 			indexes = tournament(self.num_of_parents, fitness_list)
-		print('indexes of parents: ', indexes)
 		return [individuals[index] for index in indexes]

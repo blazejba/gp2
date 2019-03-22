@@ -26,6 +26,7 @@ class Evolution:
             island = Island(pin, representation, selection, migration, replacement, reproduction, population_size,
                             self.tmp_dir)
             island.instantiate_individuals()
+            island.start_evaluating()
             self.islands.append(island)
 
     def is_terminated(self, island):
