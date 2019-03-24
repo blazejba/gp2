@@ -8,6 +8,7 @@ from copy import deepcopy
 
 class Tree:
     def __init__(self, size, depth, primitives, unique):
+        self.full = False    # grow all branches to max depth
         self.max_size = size if size != 0 else 999
         self.max_depth = depth if depth != 0 else 999
         self.primitive_dict = primitives
@@ -19,6 +20,25 @@ class Tree:
         free_branches = []
 
         # Growing nodes
+        if self.full:
+            # grow root
+            ptype, arity, value = self.primitive_root()
+            self.nodes.append(Node(self.generate_name(), ptype=ptype, arity=arity, value=value))
+            free_branches += [self.nodes[-1]] * arity
+            while len(free_branches) > 0:
+                current_depth = free_branches[0].depth
+                parent = free_branches[0]
+                if current_depth < self.max_depth - 1:
+                    ptype, arity, value = self.primitive_function(self.max_size)
+                    self.nodes.append(Node(self.generate_name(), ptype=ptype, arity=arity, value=value, parent=parent))
+                else:
+                    ptype, value = self.primitive_terminal()
+                    arity = 0
+                    self.nodes.append(Node(self.generate_name(), ptype=ptype, arity=arity, value=value, parent=parent))
+                free_branches += [self.nodes[-1]] * arity
+                free_branches.remove(parent)
+            return
+
         while True:
             size, depth, free_branches = self.grow_function(size, depth, free_branches)
             if size >= self.max_size or depth >= self.max_depth or len(free_branches) == 0:
@@ -42,7 +62,10 @@ class Tree:
             self.nodes.append(Node(self.generate_name(), ptype=ptype, arity=arity, value=value))
         else:
             ptype, arity, value = self.primitive_function(space_left)
-            parent = free_branches[randint(0, len(free_branches) - 1)]
+            if self.full:
+                parent = free_branches[0]
+            else:
+                parent = free_branches[randint(0, len(free_branches) - 1)]
             self.nodes.append(Node(self.generate_name(), ptype=ptype, arity=arity, value=value, parent=parent))
             free_branches.remove(parent)
         free_branches += [self.nodes[-1]] * arity
@@ -121,17 +144,11 @@ class Tree:
         # finding crossover points A and B
         while len(valid_nodes_b) == 0:
             crossover_node_a = parent_a.nodes[randint(1, len(parent_a.nodes) - 1)]
-            if crossover_node_a.ptype == 'root':
-                print('WAIT WAAAT')
-                print('parent_a', parent_a.nodes)
             valid_nodes_b = parent_b.same_arity_nodes(crossover_node_a.arity)
             if len(parent_a.nodes) == self.max_size:
                 valid_nodes_b = [node for node in valid_nodes_b
                                  if len(node.descendants) == len(crossover_node_a.descendants)]
         crossover_node_b = valid_nodes_b[randint(0, len(valid_nodes_b) - 1)]
-        if crossover_node_b.ptype == 'root':
-            print('WAIT WAAAT')
-            print('parent_b', parent_a.nodes)
 
         # detaching branches at crossover point
         branch_a, free_node_a = parent_a.detach_branch(crossover_node_a)
@@ -281,9 +298,9 @@ if __name__ == '__main__':
 
     # ModGen
     dict_3 = [
-        dict(ptype='char', arity=0, collection=['N']),
-        dict(ptype='string', arity=0, collection=['C', 'D', '[', ']'], length=5),
-        dict(ptype='string', arity=3, collection=['C', 'D', '[', ']'], length=5)
+        dict(ptype='root', arity=10),
+        dict(ptype='char', arity=1, collection=['C', 'X', 'Y', 'Z', '-', '+', '[', ']']),
+        dict(ptype='string', arity=0, collection=['C', 'X', 'Y', 'Z', '-', '+', '[', ']'], length=4)
     ]
 
     # Symbolic Regression
@@ -293,15 +310,10 @@ if __name__ == '__main__':
         dict(ptype='char', arity=2, collection=['*', '+', '%', '^'])
     ]
 
-    max_size = 15
-    max_depth = 6
-    constrained = True
+    max_size = 0
+    max_depth = 2
     unique = False
 
-    parent_a = Tree(max_size, max_depth, dict_1, unique)
+    parent_a = Tree(max_size, max_depth, dict_3, unique)
     parent_a.grow()
     parent_a.print()
-
-    parent_b = Tree(max_size, max_depth, dict_1, unique)
-    parent_b.parse(parent_a.stringify())
-    parent_b.print()

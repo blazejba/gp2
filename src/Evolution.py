@@ -58,7 +58,7 @@ class Evolution:
     def organize_island(self, island):
         island.sort_individuals()
         island.average()
-        #os.system('clear')
+        os.system('clear')
         island.print_generation_summary()
         self.book_keeper.update_log(island)
         self.book_keeper.print_all_individuals(self.islands)

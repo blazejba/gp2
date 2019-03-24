@@ -1,72 +1,29 @@
 import os
 import sys
-from math import sqrt, pow
+from eval.model_generator.SurfaceVolumeRatio import SurfaceVolumeRatio
 from random import randint, seed
-from anytree import PostOrderIter, Node
 from src.utilities import get_date_in_string
 from src.Tree import TreeReadOnly
-from time import localtime
 
 
 # Constants
-ARITY = 3
 RANDOM_SEED = 88
-DEV_STEPS = 10
-
-
-# def get_date_in_string():
-#     date = localtime()
-#     return str(date.tm_year) + '_' + str(date.tm_mon) + '_' + \
-#            str(date.tm_mday) + '_' + str(date.tm_hour) + '_' + \
-#            str(date.tm_min) + '_' + str(date.tm_sec)
-#
-#
-# class TreeReadOnly:
-#     def __init__(self, text):
-#         self.nodes = []
-#         self.parse(text)
-#
-#     def parse(self, text):  # string to tree import
-#         nodes = []
-#         string_nodes = text.split('\n')[:-1]
-#         for string_node in string_nodes:
-#             name, ptype, arity, value, parent = string_node.split(',')
-#             if parent != '':
-#                 for node in nodes:
-#                     if node.name == parent:
-#                         parent = node
-#             nodes += [Node(name, ptype=ptype, arity=arity, value=value, parent=parent) if parent != ''
-#                       else Node(name, ptype=ptype, arity=arity, value=value)]
-#         self.nodes = nodes
+DEV_STEPS = 6
 
 
 class Rule:
     def __init__(self, predecessor, successors, left_context, right_context, specificity):
         self.predecessor, self.successors = predecessor, successors
-        self.left_context, self.right_context = left_context, right_context
+        self.left_context = left_context if left_context else '_'
+        self.right_context = right_context if right_context else '_'
         self.specificity = specificity
 
     def print(self):
-        print(self.left_context, ' < ', self.predecessor, ' > ', self.right_context, ' -> ', self.successors)
+        return str(self.left_context) + ' < ' + str(self.predecessor) + ' > ' + str(self.right_context) + ' -> ' +\
+               str(self.successors)
 
     def transform(self, sentence, symbol):
         if sentence[symbol] == self.predecessor:
-            # left context check
-            if self.left_context:
-                if sentence[symbol - 1]:
-                    if not sentence[symbol - 1] == self.left_context:
-                        return sentence[symbol]
-                else:
-                    return sentence[symbol]
-
-            # right context check
-            if self.right_context:
-                if sentence[symbol + 1]:
-                    if not sentence[symbol + 1] == self.left_context:
-                        return sentence[symbol]
-                else:
-                    return sentence[symbol]
-
             # symbol passed left and right context check, now randomly choose one of the successors
             return self.successors[randint(0, len(self.successors) - 1)]
         else:
@@ -78,12 +35,12 @@ class LSystem:
         random_seed, self.max_size = self.parse_parameters(parameter_tree)
         self.grammar, self.success = self.parse_grammar(grammar_tree)
         seed(random_seed)
-        self.sentence = 'S'
+        self.sentence = 'C'
         self.name = get_date_in_string()
 
     def rewrite(self):
         sentence_tmp = []
-        developmental_steps = 5
+        developmental_steps = DEV_STEPS
         for step in range(developmental_steps):
             for word_idx, word in enumerate(self.sentence):
                 new_word = word
@@ -117,10 +74,13 @@ class LSystem:
             self.grammar.append(max_specificity_rule)
             grammar_tmp.remove(max_specificity_rule)
 
-    def save_sentence(self, path):
+    def save_sentence_and_grammar(self, path):
         file = open(path, 'w')
-        for  letter in self.sentence:
+        for letter in self.sentence:
             file.write(letter)
+        file.write('\n')
+        for rule in self.grammar:
+            file.write(rule.print() + '\n')
         file.close()
 
     def generate_assembly_instructions(self):
@@ -137,7 +97,7 @@ class LSystem:
                 assembly_instructions += ["translate(" + str(current_translation) + ") cube(" + str(cube_size) +
                                           ", center=true);"]
 
-                current_translation = [compound + cube_size / 2 * direction[index] for index, compound in
+                current_translation = [compound + cube_size * direction[index] for index, compound in
                                        enumerate(current_translation)]
             elif step == '+':
                 sign = 1
@@ -165,54 +125,25 @@ class LSystem:
 
     @staticmethod
     def parse_grammar(grammar_tree):
-        grammar, successors, predecessor = [], [], []
-        left_context, right_context = None, None
-        specificity, blanks = 0, 0
-        stack = []
+        grammar = []
+        for node in grammar_tree.nodes:
+            if len(node.descendants) == 1:  # append all predecessors
+                predecessor = node.value
+                successor = node.descendants[0].value
+                if successor == 'N':
+                    continue
 
-        try:
-            for node in PostOrderIter(grammar_tree.nodes[0].root):
+                exists = False
+                for rule in grammar:
+                    if rule.predecessor == predecessor:
+                        rule.successors.append(successor)
+                        exists = True
+                        break
 
-                if node.value == '>':   # This rule has a right context
-                    if stack[-1] != 'N':
-                        right_context = stack[-1]
-                        specificity += len(right_context)
-                    blanks += 1
-                    del stack[-1]
-                elif node.value == '<':     # This rule has a left context
-                    if stack[-1] != 'N':
-                        left_context = stack[-1]
-                        specificity += len(left_context)
-                    blanks += 1
-                    del stack[-1]
-                elif int(node.arity) > 0:    # That is a predecessor node
-                    predecessor = node.value if node.value != '#' else 'S'
+                if not exists:
+                    grammar.append(Rule(predecessor, [successor], None, None, 0))
 
-                    # This part is about amount of successors
-                    arity = int(node.arity) - blanks
-                    for _ in range(arity):
-                        if stack[-1] != 'N':
-                            successors.append(stack[-1])
-                        del stack[-1]
-
-                    # Create new rule
-                    if len(successors) > 0:
-                        grammar.append(Rule(predecessor, successors, left_context, right_context, specificity))
-                    stack += [predecessor]
-
-                    # Reset rule compounds
-                    successors, predecessor = [], []
-                    left_context, right_context = None, None
-                    specificity, blanks = 0, 0
-
-                else:   # This is a successor node
-                    stack += [node.value]
-
-            # merge duplicates!!!!
-
-            return grammar, True    # grammar is valid
-        except:
-            return [], False    # something went wrong, grammar invalid
+        return grammar, True
 
     @staticmethod
     def count_cubes(structure):
@@ -236,70 +167,6 @@ class ModelConstructor:
             return False    # report failure due to empty model
 
 
-class SurfaceVolumeRatio:
-    def calculate_volume_surface_ratio(self, path_stl):
-        triangles = self.get_triangles_from_stl(path_stl)
-        volume = self.calculate_volume(triangles)
-        surface = self.calculate_surface(triangles)
-        return pow(volume, 0.33) / pow(surface, 0.5) if surface != 0 else 0
-
-    # http://chenlab.ece.cornell.edu/Publication/Cha/icip01_Cha.pdf
-    def calculate_volume(self, triangles):
-        volume = 0
-        for triangle in triangles:
-            volume += self.signed_triangle_volume(triangle[0], triangle[1], triangle[2])
-        return volume
-
-    # https://math.stackexchange.com/questions/128991/how-to-calculate-area-of-3d-triangle#128999
-    def calculate_surface(self, triangles):
-        surface = 0
-        for triangle in triangles:
-            A, B, C = triangle
-            AB = self.vector_subtraction(A, B)
-            AC = self.vector_subtraction(A, C)
-            surface += self.triangle_surface(AB, AC)
-        return surface
-
-    @staticmethod
-    def get_triangles_from_stl(path_stl):
-        triangles = []
-        triangle = []
-        stl = open(path_stl)
-        for line in stl:
-            if line.find('vertex') == 6:
-                point = [float(coordinate) for coordinate in line[13:-1].split(' ')]
-                triangle.append(point)
-                if len(triangle) == 3:
-                    triangles.append(triangle)
-                    triangle = []
-        stl.close()
-        return triangles
-
-    @staticmethod
-    def signed_triangle_volume(p1, p2, p3):
-        v321 = p3[0] * p2[1] * p1[2]
-        v231 = p2[0] * p3[1] * p1[2]
-        v312 = p3[0] * p1[1] * p2[2]
-        v132 = p1[0] * p3[1] * p2[2]
-        v123 = p1[0] * p2[1] * p3[2]
-        v213 = p2[0] * p1[1] * p3[2]
-        return (-v321 + v231 + v312 - v132 - v213 + v123) / 6
-
-    @staticmethod
-    def vector_subtraction(A, B):
-        return [B[0] - A[0], B[1] - A[1], B[2] - A[2]]
-
-    @staticmethod
-    def vector_length(x, y, z):
-        return sqrt(x ^ 2 + y ^ 2 + z ^ 2)
-
-    @staticmethod
-    def triangle_surface(A, B):
-        return (sqrt(pow(A[1] * B[2] - A[2] * B[1], 2) +
-                     pow(A[2] * B[0] - A[0] * B[2], 2) +
-                     pow(A[0] * B[1] - A[1] * B[0], 2))) / 2
-
-
 def evaluate(grammar_tree):
     # Parse genome into grammar and generate assembly instructions
     l_system = LSystem(grammar_tree)
@@ -308,7 +175,7 @@ def evaluate(grammar_tree):
         fitness = 0
         return fitness
 
-    l_system.sort_rules()
+    # l_system.sort_rules()
     l_system.rewrite()
     assembly_instruction = l_system.generate_assembly_instructions()
 
@@ -317,7 +184,7 @@ def evaluate(grammar_tree):
     path_scad = tmp_folder + l_system.name + '.scad'
     path_stl = tmp_folder + l_system.name + '.stl'
     path_sentence = tmp_folder + l_system.name
-    l_system.save_sentence(path_sentence)
+    l_system.save_sentence_and_grammar(path_sentence)
 
     # Construct a model from assembly instructions
     model_constructor = ModelConstructor()
@@ -326,11 +193,9 @@ def evaluate(grammar_tree):
         os.system('openscad -o ' + path_stl + ' ' + path_scad)
         evaluator = SurfaceVolumeRatio()
         fitness = evaluator.calculate_volume_surface_ratio(path_stl)
-        #os.remove(path=path_scad)
 
     else:   # if model generation failed return fitness of 0
         fitness = 0
-
     return fitness
 
 

@@ -1,8 +1,8 @@
 <experiment max_fitness="0.95" max_time="0" max_generation="0">
-    <island population_size="30" evaluator="symbolic_regression">
-        <reproduction mutation_rate="5"/>
+    <island population_size="35" evaluator="symbolic_regression">
+        <reproduction mutation_rate="15"/>
         <selection policy="tournament"/>
         <migration entry_policy="periodical" in="false" out="false" period="5" selection_policy="roulette_wheel"/>
-        <replacement policy="elitism" num_of_elites="15"/>
+        <replacement policy="elitism" num_of_elites="5"/>
     </island>
 </experiment>
