@@ -46,3 +46,4 @@ class BookKeeper:
             print('island [ ' + str(island.pin) + ' ]')
             for individual in island.individuals:
                 print("[{:.2f}]".format(individual.fitness), individual.stringify())
+                #individual.genome[0].print()

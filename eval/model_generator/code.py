@@ -11,7 +11,7 @@ from time import localtime
 # Constants
 ARITY = 3
 RANDOM_SEED = 88
-DEV_STEPS = 5
+DEV_STEPS = 10
 
 
 # def get_date_in_string():
@@ -86,16 +86,17 @@ class LSystem:
         developmental_steps = 5
         for step in range(developmental_steps):
             for word_idx, word in enumerate(self.sentence):
+                new_word = word
                 for rule in self.grammar:
                     new_word = rule.transform(self.sentence, word_idx)
                     if new_word != word:
                         break
 
-                for letter in new_word:     # this might be a problem
+                for letter in new_word:
                     sentence_tmp.append(letter)
 
-                if sentence_tmp == self.sentence:
-                    return
+            if sentence_tmp == self.sentence:
+                return
 
             self.sentence = sentence_tmp
             sentence_tmp = []
@@ -116,6 +117,12 @@ class LSystem:
             self.grammar.append(max_specificity_rule)
             grammar_tmp.remove(max_specificity_rule)
 
+    def save_sentence(self, path):
+        file = open(path, 'w')
+        for  letter in self.sentence:
+            file.write(letter)
+        file.close()
+
     def generate_assembly_instructions(self):
         current_translation = [0, 0, 0]
         direction = [1, 0, 0]
@@ -128,7 +135,7 @@ class LSystem:
         for step in self.sentence:
             if step == 'C':
                 assembly_instructions += ["translate(" + str(current_translation) + ") cube(" + str(cube_size) +
-                                          ", center=true);\n"]
+                                          ", center=true);"]
 
                 current_translation = [compound + cube_size / 2 * direction[index] for index, compound in
                                        enumerate(current_translation)]
@@ -219,10 +226,10 @@ class LSystem:
 class ModelConstructor:
     @staticmethod
     def create_scad_file(path, assembly_instructions):
-        print(assembly_instructions)
         if len(assembly_instructions) > 0:
             file = open(path, 'w')
-            file.write(str(assembly_instructions))
+            for line in assembly_instructions:
+                file.write(str(line) + '\n')
             file.close()
             return True     # report success
         else:
@@ -230,33 +237,14 @@ class ModelConstructor:
 
 
 class SurfaceVolumeRatio:
-    @staticmethod
-    def accumulate_translations(genome):
-        translations = [[0, 0, 0]]
-        cube_sizes = []
-        direction = [0, 0, 0]
-
-        for letter in genome:
-            if letter.isalpha():
-                if letter == "Z":
-                    direction = [0, 0, 1]
-                if letter == "X":
-                    direction = [1, 0, 0]
-                if letter == "":
-                    direction = [0, 1, 0]
-            elif letter.isdigit():
-                cube_sizes.append(int(letter))
-                translations.append([int(letter) * d + translations[-1][num] for num, d in enumerate(direction)])
-
-        return translations, cube_sizes
-
     def calculate_volume_surface_ratio(self, path_stl):
         triangles = self.get_triangles_from_stl(path_stl)
         volume = self.calculate_volume(triangles)
         surface = self.calculate_surface(triangles)
-        return pow(volume, 0.33) / pow(surface, 0.5)
+        return pow(volume, 0.33) / pow(surface, 0.5) if surface != 0 else 0
 
-    def calculate_volume(self, triangles):    # http://chenlab.ece.cornell.edu/Publication/Cha/icip01_Cha.pdf
+    # http://chenlab.ece.cornell.edu/Publication/Cha/icip01_Cha.pdf
+    def calculate_volume(self, triangles):
         volume = 0
         for triangle in triangles:
             volume += self.signed_triangle_volume(triangle[0], triangle[1], triangle[2])
@@ -307,8 +295,9 @@ class SurfaceVolumeRatio:
 
     @staticmethod
     def triangle_surface(A, B):
-        return (sqrt(
-            pow(A[1] * B[2] - A[2] * B[1], 2) + pow(A[2] * B[0] - A[0] * B[2], 2) + pow(A[0] * B[1] - A[1] * B[0], 2))) / 2
+        return (sqrt(pow(A[1] * B[2] - A[2] * B[1], 2) +
+                     pow(A[2] * B[0] - A[0] * B[2], 2) +
+                     pow(A[0] * B[1] - A[1] * B[0], 2))) / 2
 
 
 def evaluate(grammar_tree):
@@ -324,18 +313,21 @@ def evaluate(grammar_tree):
     assembly_instruction = l_system.generate_assembly_instructions()
 
     # Define paths for scad and stl files
-    path_scad = '/home/blaise/code/gpec/eval/model_generator/' + l_system.name + '.scad'
-    path_stl = '/home/blaise/code/gpec/eval/model_generator/' + l_system.name + '.stl'
+    tmp_folder = '/home/blaise/code/gpec/eval/model_generator/tmp/'
+    path_scad = tmp_folder + l_system.name + '.scad'
+    path_stl = tmp_folder + l_system.name + '.stl'
+    path_sentence = tmp_folder + l_system.name
+    l_system.save_sentence(path_sentence)
 
     # Construct a model from assembly instructions
     model_constructor = ModelConstructor()
     status = model_constructor.create_scad_file(path_scad, assembly_instruction)
     if status:  # Evaluate the model
         os.system('openscad -o ' + path_stl + ' ' + path_scad)
-        os.remove(path=path_scad)
-
         evaluator = SurfaceVolumeRatio()
         fitness = evaluator.calculate_volume_surface_ratio(path_stl)
+        #os.remove(path=path_scad)
+
     else:   # if model generation failed return fitness of 0
         fitness = 0
 
@@ -344,13 +336,7 @@ def evaluate(grammar_tree):
 
 def main():
     forest = sys.argv[1].split('\n\n')
-    # forest = ['0,char,2,#,\n2,int,0,899,0\n4,int,0,81,0\n',
-    #           '0,char,3,#,''\n1,string,0,N,0\n2,string,0,N,0\n3,char,3,C,0'
-    #           '\n4,char,0,CD,3\n5,string,0,N,3\n6,char,3,D,3\n'
-    #           '7,string,0,[DC],6\n8,char,0,N,6\n9,char,0,N,6\n']
-
     grammar_tree = TreeReadOnly(forest[0])
-    #parameter_tree = TreeReadOnly(forest[1])
 
     fitness = evaluate(grammar_tree)
     sys.stdout.write(str(fitness))

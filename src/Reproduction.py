@@ -6,7 +6,7 @@ from src.Tree import Tree
 
 class Reproduction:
     def __init__(self, policy):
-        self.mutation_rate = float(policy.attrib['mutation_rate'])
+        self.mutation_rate = float(policy.attrib['mutation_rate'])/100
 
     def reproduce(self, parents, representation):  # returns two individuals
         new_individual_a = Individual()

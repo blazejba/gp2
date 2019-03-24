@@ -58,11 +58,10 @@ class Evolution:
     def organize_island(self, island):
         island.sort_individuals()
         island.average()
-        os.system('clear')
+        #os.system('clear')
         island.print_generation_summary()
         self.book_keeper.update_log(island)
-        for individual in island.individuals:
-            print("[{:.2f}]".format(individual.fitness), individual.stringify())
+        self.book_keeper.print_all_individuals(self.islands)
 
     def quit_evolution(self, why, generation):
         for island in self.islands:

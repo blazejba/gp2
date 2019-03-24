@@ -29,7 +29,7 @@ class Tree:
             free_branches = self.grow_leaf(free_branches)
 
     def grow_leaf(self, free_branches):  # grow a random terminal node
-        ptype, value = self.primitive('terminal')
+        ptype, value = self.primitive_terminal()
         parent = free_branches[randint(0, len(free_branches) - 1)]
         self.nodes.append(Node(self.generate_name(), ptype=ptype, arity=0, value=value, parent=parent))
         free_branches.remove(parent)
@@ -38,10 +38,10 @@ class Tree:
     def grow_function(self, size, depth, free_branches):  # expand tree by growing a new function node
         space_left = self.max_size - size
         if depth == 0:
-            ptype, arity, value = self.primitive('root')
+            ptype, arity, value = self.primitive_root()
             self.nodes.append(Node(self.generate_name(), ptype=ptype, arity=arity, value=value))
         else:
-            ptype, arity, value = self.primitive('function', space_left)
+            ptype, arity, value = self.primitive_function(space_left)
             parent = free_branches[randint(0, len(free_branches) - 1)]
             self.nodes.append(Node(self.generate_name(), ptype=ptype, arity=arity, value=value, parent=parent))
             free_branches.remove(parent)
@@ -50,26 +50,29 @@ class Tree:
         depth = depth if self.nodes[-1].depth < depth else self.nodes[-1].depth + 1
         return size, depth, free_branches
 
-    def primitive(self, which, space_left=None):
-        if which == 'root':
-            for primitive in self.primitive_dict:
-                if primitive.get('ptype') == 'root':
-                    return 'root', primitive.get('arity'), '#'
+    def primitive_root(self):
+        for primitive in self.primitive_dict:
+            if primitive.get('ptype') == 'root':
+                return 'root', primitive.get('arity'), '#'
+        return self.primitive_function(self.max_size)
 
-        if which == 'terminal':
-            valid_leafs = [primitive for primitive in self.primitive_dict if primitive.get('arity') == 0]
-            leaf = valid_leafs[randint(0, len(valid_leafs) - 1)]
-            value = self.get_value(leaf)
-            return leaf.get('ptype'), value
-        else:
-            valid_nodes = [primitive for primitive in self.primitive_dict if primitive.get('arity') > 0 and primitive.get('ptype' != 'root')]
-            shuffle(valid_nodes)
-            for node in valid_nodes:
-                if not self.deadlock(space_left - node.get('arity')):
-                    value = self.get_value(node)
-                    return node.get('ptype'), node.get('arity'), value
-            ptype, value = self.primitive('terminal')
-            return ptype, 0, value
+    def primitive_terminal(self):
+        valid_leafs = [primitive for primitive in self.primitive_dict if primitive.get('arity') == 0]
+        leaf = valid_leafs[randint(0, len(valid_leafs) - 1)]
+        value = self.get_value(leaf)
+        return leaf.get('ptype'), value
+
+    def primitive_function(self, space_left):
+        valid_nodes = [primitive for primitive in self.primitive_dict if primitive.get('arity') > 0 and primitive.get('ptype') != 'root']
+        shuffle(valid_nodes)
+        for node in valid_nodes:
+            if not self.deadlock(space_left - node.get('arity')):
+                value = self.get_value(node)
+                return node.get('ptype'), node.get('arity'), value
+
+        # if no valid function has been found, grow a terminal instead
+        ptype, value = self.primitive_terminal()
+        return ptype, 0, value
 
     def generate_name(self):
         return str(len(self.nodes))
@@ -77,12 +80,16 @@ class Tree:
     def headless_chicken(self):     # alternative mutation, a random node is attached to a freshly generated branch
         if len(self.nodes) == self.max_size:
             return
-        cutoff_node = self.nodes[randint(1, len(self.nodes) - 1)]   # select random node where new branch will be
+        while True:
+            cutoff_node = self.nodes[randint(1, len(self.nodes) - 1)]   # select random node where new branch will be
+            if cutoff_node.ptype != 'root':
+                break
         branch, free_node = self.detach_branch(cutoff_node)     # cut off the branch and keep the free node
         del branch  # branch can be discarded because the purpose of headless chicken is to grow a new one
         free_branches = [free_node]
         self.rename(0)
 
+        # find depth of tree
         depth = 0
         for node in self.nodes:
             if node.depth > depth:
@@ -97,10 +104,12 @@ class Tree:
                 break
 
     def mutate(self, node):  # node value -> node of the same arity value
-        index = self.nodes.index(node)
-        valid_primitives = self.same_arity_primitives(node.arity)
-        primitive = sample(valid_primitives, 1)[0]
-        self.nodes[index].value = self.get_value(primitive)
+        if not node.ptype == 'root':
+            index = self.nodes.index(node)
+            valid_primitives = self.same_arity_primitives(node.arity)
+            primitive = sample(valid_primitives, 1)[0]
+            new_value = self.get_value(primitive, node.value)
+            self.nodes[index].value = new_value
 
     def crossover(self, chromosome_a, chromosome_b):
         parent_a = deepcopy(chromosome_a)
@@ -112,11 +121,17 @@ class Tree:
         # finding crossover points A and B
         while len(valid_nodes_b) == 0:
             crossover_node_a = parent_a.nodes[randint(1, len(parent_a.nodes) - 1)]
+            if crossover_node_a.ptype == 'root':
+                print('WAIT WAAAT')
+                print('parent_a', parent_a.nodes)
             valid_nodes_b = parent_b.same_arity_nodes(crossover_node_a.arity)
             if len(parent_a.nodes) == self.max_size:
                 valid_nodes_b = [node for node in valid_nodes_b
                                  if len(node.descendants) == len(crossover_node_a.descendants)]
         crossover_node_b = valid_nodes_b[randint(0, len(valid_nodes_b) - 1)]
+        if crossover_node_b.ptype == 'root':
+            print('WAIT WAAAT')
+            print('parent_b', parent_a.nodes)
 
         # detaching branches at crossover point
         branch_a, free_node_a = parent_a.detach_branch(crossover_node_a)
@@ -145,11 +160,11 @@ class Tree:
         return branch, free_node
 
     def same_arity_primitives(self, arity):  # return all primitives in the dictionary of given arity
-        #print(self.primitive_dict)
-        return [primitive for primitive in self.primitive_dict if primitive.get('arity') == arity]
+        return [primitive for primitive in self.primitive_dict if primitive.get('arity') == arity and primitive.get('ptype') != 'root']
 
     def same_arity_nodes(self, arity):  # this is invoked in headless chicken
-        return findall_by_attr(self.nodes[0].root, value=arity, name='arity')
+        same_arity_nodes = findall_by_attr(self.nodes[0].root, value=arity, name='arity')
+        return [node for node in same_arity_nodes if node.ptype != 'root']  # same arity nodes minus root
 
     def stringify(self):  # tree to string export
         string = []
@@ -204,11 +219,12 @@ class Tree:
     def save_image(self, path):
         DotExporter(self.nodes[0], nodenamefunc=lambda node: '%s:%s' % (node.value, node.name)).to_picture(path)
 
-    def get_value(self, primitive):
+    def get_value(self, primitive, current_value=None):
         if primitive.get('ptype') == 'bool':
             return randint(0, 1)
         elif primitive.get('ptype') == 'char':
-            return sample(primitive.get('collection'), 1)[0]
+            value = sample(primitive.get('collection'), 1)[0]
+            return value
         elif primitive.get('ptype') == 'real':
             return uniform(primitive.get('low'), primitive.get('up'))
         elif primitive.get('ptype') == 'int':
@@ -217,9 +233,13 @@ class Tree:
             collection = primitive.get('collection')
             while True:
                 length = randint(1, primitive.get('length'))
-                value = [sample(collection, 1)[0] for _ in range(length)]
-                if value not in [node.value for node in self.nodes]:
-                    break
+                value = sample(collection, length)
+                if current_value:
+                    if current_value != value and value not in [node.value for node in self.nodes]:
+                        break
+                else:
+                    if value not in [node.value for node in self.nodes]:
+                        break
             return ''.join(letter for letter in value)
 
     def rename(self, base):

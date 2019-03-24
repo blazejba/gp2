@@ -57,7 +57,7 @@ def evaluate(tree):
     for error in errors:
         total_squared_error += abs(error)
     mse = total_squared_error / len(errors)
-    fitness = 1/(1 + mse)
+    fitness = (1/(1 + mse)) / (0.34 * len(tree.nodes))
     return fitness
 
 
