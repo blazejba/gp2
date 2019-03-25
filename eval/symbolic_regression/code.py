@@ -7,12 +7,13 @@ from src.Tree import TreeReadOnly
 
 def main():
     tree = TreeReadOnly(sys.argv[1])
-    fitness = evaluate(tree)
+    function = sys.argv[2]
+    fitness = evaluate(tree, function)
     sys.stdout.write(str(fitness))
     sys.exit(1)
 
 
-def evaluate(tree):
+def evaluate(tree, function):
     xs = [x * 1 for x in range(-10, 11)]
 
     errors = []
@@ -47,7 +48,7 @@ def evaluate(tree):
                     stack += [float(node.value)]
 
             result = stack[0]
-            true_result = equation_1(x)
+            true_result = equations(x=x, which=function)
             errors += [true_result - result]
 
         except:
@@ -57,12 +58,15 @@ def evaluate(tree):
     for error in errors:
         total_squared_error += abs(error)
     mse = total_squared_error / len(errors)
-    fitness = (1/(1 + mse)) / (0.34 * len(tree.nodes))
+    fitness = 1/(1 + mse)
     return fitness
 
 
-def equation_1(x):
-    return pow(x, 2) + 4
+def equations(x, which):
+    if which == 'quadratic':
+        return pow(x, 2) + 4
+    elif which == 'quartic':
+        return pow(x, 4) + pow(x, 3) + pow(x, 2) + x
 
 
 if __name__ == '__main__':

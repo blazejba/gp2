@@ -1,8 +1,19 @@
 import os
-from math import exp
+from math import exp, pow, sqrt
 from os import walk
 from random import randint, random
 from time import localtime
+
+
+def std_tuple(t):
+    if len(t) > 1:
+        average = average_tuple(t)
+        summed = 0
+        for elem in t:
+            summed += pow(elem - average, 2)
+        return sqrt(summed/(len(t) - 1))
+    else:
+        return 0
 
 
 def clean_dir(dir):

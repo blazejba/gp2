@@ -4,7 +4,7 @@ from src.utilities import get_date_in_string, average_tuple
 
 class BookKeeper:
     def __init__(self, name):
-        self.logfile = open('exp/logs/' + name + '_' + get_date_in_string() + '.log', 'w')
+        self.logfile = open(name, 'w+')
         self.final_conditions = []
         self.total_num_of_evaluations = 0
         self.start_t = time.time()
@@ -14,7 +14,7 @@ class BookKeeper:
 
         self.logfile.write(str(island.generation) + ',' + str(island.pin) + ',' +
                            str(island.individuals[0].fitness) + ',' + str(average_fitness) + ',' +
-                           str(island.migration.migration_happened) + ',\n')
+                           str(island.migration.migration_happened) + '\n')
 
     def termination_printout(self, generation, reason):
         print('')
@@ -28,7 +28,7 @@ class BookKeeper:
         print('Generated', generation, 'generations in', "{:.2f}".format(evolution_time), 'seconds.')
         print('Total number of evaluations', self.total_num_of_evaluations)
         print('\nIndividuals of the last generation:')
-        self.final_conditions = [reason, evolution_time, generation, self.total_num_of_evaluations]
+        self.final_conditions = [evolution_time, generation, self.total_num_of_evaluations]
 
     def count_evaluations(self, increment):
         self.total_num_of_evaluations += increment

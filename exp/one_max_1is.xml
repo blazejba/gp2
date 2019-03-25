@@ -1,5 +1,5 @@
 <experiment max_fitness="10" max_time="0" max_generation="0">
-    <island population_size="10" evaluator="one_max">
+    <island population_size="10" evaluator="one_max" parameters="">
         <reproduction mutation_rate="3"/>
         <selection policy="rank"/>
         <migration entry_policy="periodical" in="false" out="false" period="5" selection_policy="roulette_wheel"/>

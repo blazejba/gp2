@@ -21,9 +21,9 @@ class Evolution:
 
     def initialize_islands(self, islands_xml, evaluators_xml):
         for pin, island_xml in enumerate(islands_xml):
-            representation, selection, migration, reproduction, replacement, population_size = \
+            representation, selection, migration, reproduction, replacement, population_size, parameters = \
                 self.parse_from_xml(island_xml, evaluators_xml)
-            island = Island(pin, representation, selection, migration, replacement, reproduction, population_size,
+            island = Island(pin, representation, parameters, selection, migration, replacement, reproduction, population_size,
                             self.tmp_dir)
             island.instantiate_individuals()
             island.start_evaluating()
@@ -72,6 +72,7 @@ class Evolution:
 
     def parse_from_xml(self, island_xml, evaluators):
         evaluator_name = island_xml.attrib['evaluator']
+        parameters = island_xml.attrib['parameters'] if island_xml.attrib['parameters'] else ''
         representation = self.get_representation(evaluators=evaluators, which=evaluator_name)
         population_size = int(island_xml.attrib['population_size'])
         selection, migration, reproduction, replacement = object, object, object, object
@@ -84,7 +85,7 @@ class Evolution:
                 reproduction = policy
             elif policy.tag == 'replacement':
                 replacement = policy
-        return representation, selection, migration, reproduction, replacement, population_size
+        return representation, selection, migration, reproduction, replacement, population_size, parameters
 
     @staticmethod
     def get_representation(evaluators, which):

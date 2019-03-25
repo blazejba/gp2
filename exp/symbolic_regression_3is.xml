@@ -1,0 +1,23 @@
+<experiment max_fitness="0.95" max_time="0" max_generation="0" >
+    <island population_size="15" evaluator="symbolic_regression" parameters="quadratic">
+        <reproduction mutation_rate="30"/>
+        <selection policy="tournament"/>
+        <migration entry_policy="probabilistic" in="true" out="true" chance="5"
+                   emigrants="2" immigrants="1" selection_policy="truncation"/>
+        <replacement policy="elitism" num_of_elites="3"/>
+    </island>
+    <island population_size="15" evaluator="symbolic_regression" parameters="quadratic">
+        <reproduction mutation_rate="15"/>
+        <selection policy="tournament"/>
+        <migration entry_policy="probabilistic" in="true" out="true" chance="5"
+                   emigrants="2" immigrants="1" selection_policy="truncation"/>
+        <replacement policy="elitism" num_of_elites="3"/>
+    </island>
+    <island population_size="15" evaluator="symbolic_regression" parameters="quadratic">
+        <reproduction mutation_rate="5"/>
+        <selection policy="tournament"/>
+        <migration entry_policy="probabilistic" in="true" out="true" chance="5"
+                   emigrants="2" immigrants="1" selection_policy="truncation"/>
+        <replacement policy="elitism" num_of_elites="3"/>
+    </island>
+</experiment>

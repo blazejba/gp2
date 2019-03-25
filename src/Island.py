@@ -8,11 +8,12 @@ from src.utilities import average_tuple
 
 
 class Island:
-    def __init__(self, pin, evaluator, selection, migration, replacement, reproduction, population_size, tmp_dir):
+    def __init__(self, pin, evaluator, parameters, selection, migration, replacement, reproduction, population_size, tmp_dir):
         # Island
         self.pin = pin  # personal identification num
         self.population_size = population_size  # num of individuals on a island
         self.evaluator = 'eval.' + evaluator.attrib['name'] + '.code'  # this is for running an evaluator
+        self.parameters = parameters
         self.representation = Representation(fitness_evaluator=evaluator)
 
         # Policies
@@ -72,7 +73,7 @@ class Island:
 
     def start_evaluating(self):
         for individual in self.individuals:
-            individual.evaluate(self.evaluator)
+            individual.evaluate(self.evaluator, self.parameters)
 
     def is_still_evaluating(self):
         for individual in self.individuals:

@@ -1,0 +1,25 @@
+<experiment max_fitness="48" max_time="0" max_generation="0">
+    <island population_size="8" evaluator="tp1_max" parameters="">
+        <reproduction mutation_rate="25"/>
+        <selection policy="tournament"/>
+        <migration entry_policy="probabilistic" in="true" out="true" chance="5"
+                   selection_policy="truncation" immigrants="1" emigrants="1"/>
+        <replacement policy="elitism" num_of_elites="3"/>
+    </island>
+
+    <island population_size="10" evaluator="tp1_max" parameters="">
+        <reproduction mutation_rate="10"/>
+        <selection policy="tournament"/>
+        <migration entry_policy="probabilistic" in="true" out="true" chance="5"
+                   selection_policy="truncation" immigrants="1" emigrants="1"/>
+        <replacement policy="elitism" num_of_elites="4"/>
+    </island>
+
+    <island population_size="15" evaluator="tp1_max" parameters="">
+        <reproduction mutation_rate="3"/>
+        <selection policy="tournament"/>
+        <migration entry_policy="probabilistic" in="true" out="true" chance="5"
+                   selection_policy="truncation" immigrants="1" emigrants="1"/>
+        <replacement policy="elitism" num_of_elites="5"/>
+    </island>
+</experiment>

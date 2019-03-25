@@ -1,12 +1,12 @@
 <experiment max_fitness="2" max_time="0" max_generation="0">
-    <island population_size="20" evaluator="model_generator">
+    <island population_size="20" evaluator="model_generator" parameters="">
         <reproduction mutation_rate="8"/>
         <selection policy="tournament"/>
         <migration entry_policy="probabilistic" in="true" out="true" chance="10"
                    emigrants="2" immigrants="1" selection_policy="truncation"/>
         <replacement policy="elitism" num_of_elites="8"/>
     </island>
-    <island population_size="20" evaluator="model_generator">
+    <island population_size="20" evaluator="model_generator" parameters="">
         <reproduction mutation_rate="8"/>
         <selection policy="tournament"/>
         <migration entry_policy="probabilistic" in="true" out="true" chance="10"

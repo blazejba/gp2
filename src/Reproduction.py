@@ -19,11 +19,13 @@ class Reproduction:
 
             if random() < self.mutation_rate:
                 new_chromosome_a.headless_chicken()
-            new_chromosome_a = self.mutate(new_chromosome_a)
+            else:
+                new_chromosome_a = self.mutate(new_chromosome_a)
 
             if random() < self.mutation_rate:
                 new_chromosome_b.headless_chicken()
-            new_chromosome_b = self.mutate(new_chromosome_b)
+            else:
+                new_chromosome_b = self.mutate(new_chromosome_b)
 
             new_individual_a.genome.append(new_chromosome_a)
             new_individual_b.genome.append(new_chromosome_b)

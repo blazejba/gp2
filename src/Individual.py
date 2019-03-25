@@ -10,9 +10,9 @@ class Individual:
         self.evaluated = False
         self.genome = [] 	# genome is represented as a forest where each tree is a chromosome
 
-    def evaluate(self, evaluator_path):
+    def evaluate(self, evaluator_path, parameters):
         if not self.evaluated:
-            terminal_command = ["python3", "-m", evaluator_path, self.export_genome()]
+            terminal_command = ["python3", "-m", evaluator_path, self.export_genome(), parameters]
             self.process = subprocess.Popen(terminal_command, stdout=subprocess.PIPE)
 
     def collect_fitness(self): 	# if external evaluation completed, collect the result and update an individual

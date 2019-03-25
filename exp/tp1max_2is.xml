@@ -1,5 +1,5 @@
 <experiment max_fitness="48" max_time="0" max_generation="0">
-    <island population_size="10" evaluator="tp1_max">
+    <island population_size="10" evaluator="tp1_max" parameters="">
         <reproduction mutation_rate="20"/>
         <selection policy="tournament"/>
         <migration entry_policy="probabilistic" in="true" out="true" chance="5"
@@ -7,7 +7,7 @@
         <replacement policy="elitism" num_of_elites="2"/>
     </island>
 
-    <island population_size="15" evaluator="tp1_max">
+    <island population_size="15" evaluator="tp1_max" parameters="">
         <reproduction mutation_rate="20"/>
         <selection policy="tournament"/>
         <migration entry_policy="probabilistic" in="true" out="true" chance="1"

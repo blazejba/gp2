@@ -102,6 +102,8 @@ class Tree:
 
     def headless_chicken(self):     # alternative mutation, a random node is attached to a freshly generated branch
         if len(self.nodes) == self.max_size:
+            self.nodes = []
+            self.grow()
             return
         while True:
             cutoff_node = self.nodes[randint(1, len(self.nodes) - 1)]   # select random node where new branch will be
@@ -119,7 +121,7 @@ class Tree:
                 depth = node.depth
 
         while True:     # 90% grow function nodes, 10% terminal nodes
-            if random() > 0.1 and not self.max_depth < depth:
+            if random() > 0.5 and not self.max_depth < depth:
                 _, depth, free_branches = self.grow_function(0, depth, free_branches)
             else:
                 free_branches = self.grow_leaf(free_branches)
@@ -133,6 +135,7 @@ class Tree:
             primitive = sample(valid_primitives, 1)[0]
             new_value = self.get_value(primitive, node.value)
             self.nodes[index].value = new_value
+            self.nodes[index].ptype = primitive.get('ptype')
 
     def crossover(self, chromosome_a, chromosome_b):
         parent_a = deepcopy(chromosome_a)
