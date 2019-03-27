@@ -6,9 +6,9 @@ class Representation:
             size = int(tree.attrib['size'])
             depth = int(tree.attrib['depth'])
             primitives = self.parse_primitives(tree.attrib['primitives'])
-            unique = tree.attrib['unique'] == 'True'
+            full = tree.attrib['full'] == 'True'
             tree_structure = dict(
-                size=size, depth=depth, primitives=primitives, unique=unique)
+                size=size, depth=depth, primitives=primitives, full=full)
             self.forest.append(tree_structure)
 
     @staticmethod

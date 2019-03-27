@@ -1,5 +1,5 @@
 import time
-from src.utilities import get_date_in_string, average_tuple
+from src.utilities import average_tuple
 
 
 class BookKeeper:
@@ -10,11 +10,12 @@ class BookKeeper:
         self.start_t = time.time()
 
     def update_log(self, island):
-        average_fitness = average_tuple([individual.fitness for individual in island.individuals])
+        fitness_list = [individual.fitness for individual in island.individuals]
+        average_fitness = average_tuple(fitness_list)
 
         self.logfile.write(str(island.generation) + ',' + str(island.pin) + ',' +
                            str(island.individuals[0].fitness) + ',' + str(average_fitness) + ',' +
-                           str(island.migration.migration_happened) + '\n')
+                           str(island.migration.migration_happened) + ',' + str(island.entropy) + '\n')
 
     def termination_printout(self, generation, reason):
         print('')

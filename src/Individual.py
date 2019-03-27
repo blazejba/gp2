@@ -38,15 +38,15 @@ class Individual:
 
     def import_genome(self, genome_content, representation):  # turn a string into a list of trees
         for index, tree_content in enumerate(genome_content.split('\n\n')):
-            size, depth, primitives, unique = representation.get_tree_structure(which_tree=index)
-            tree = Tree(size, depth, primitives, unique)
+            size, depth, primitives, full = representation.get_tree_structure(which_tree=index)
+            tree = Tree(size, depth, primitives, full)
             tree.parse(tree_content)
             self.genome += [tree]
 
     def instantiate(self, representation): 	# representation consists of instructions how to grow a forest
         for index in range(len(representation.forest)):
-            size, depth, primitives, unique = representation.get_tree_structure(which_tree=index)
-            new_tree = Tree(size, depth, primitives, unique)
+            size, depth, primitives, full = representation.get_tree_structure(which_tree=index)
+            new_tree = Tree(size, depth, primitives, full)
             new_tree.grow()
             self.genome.append(new_tree)
 

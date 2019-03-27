@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 class EvolutionMeasures:
     def __init__(self, file_names):
         self.data = []
+        self.plots = []
         self.mean_time, self.mean_gen, self.mean_eval = 0, 0, 0
 
         for file in file_names:
@@ -23,16 +24,18 @@ class EvolutionMeasures:
         for line in f.read().split('\n'):
             if len(line) == 0:
                 continue
-            generation_idx, island_idx, max_fitness, average_fitness, migration = line.split(',')
+
+            generation_idx, island_idx, max_fitness, average_fitness, migration, diversity = line.split(',')
+
             if len(self.data) > int(generation_idx):
-                self.data[int(generation_idx)].samples += [Sample(0, float(max_fitness), float(average_fitness))]
+                self.data[int(generation_idx)].samples += [Sample(float(diversity), float(max_fitness), float(average_fitness))]
             else:
                 new_generation = Generation()
-                new_generation.samples += [Sample(0, float(max_fitness), float(average_fitness))]
+                new_generation.samples += [Sample(float(diversity), float(max_fitness), float(average_fitness))]
                 self.data += [new_generation]
         f.close()
 
-    def plot_fitness_graph(self, path, experiment):
+    def plot_fitness_graph(self, path, name, runs):
         X = range(len(self.data))
         diversities = [generation.diversity for generation in self.data]
         max = [generation.max_fitness for generation in self.data]
@@ -53,15 +56,21 @@ class EvolutionMeasures:
         labs = [l.get_label() for l in lns]
         lgd = ax1.legend(lns, labs, loc='upper center', bbox_to_anchor=(0.5, -0.14), ncol=3, fancybox=True, shadow=True)
 
-        plt.title(experiment, y=1.07)
-        plt.suptitle('Mean {time ' + '{:.2f}'.format(self.mean_time) + ' , generations ' + str(int(self.mean_gen)) +
-                     ', evaluations ' + str(self.mean_eval) + '}', y=0.93, fontsize=8)
+        plt.title(name, y=1.07)
+        plt.suptitle('mean {time ' + '{:.2f}'.format(self.mean_time) + ' seconds, , generations ' + str(int(self.mean_gen)) +
+                     ', evaluations ' + str(int(self.mean_eval)) + '}, runs ' + str(runs), y=0.93, fontsize=8)
         ax1.set_ylabel('fitness')
         ax2.set_ylabel('diversity')
         ax1.set_xlabel('generation')
         plt.grid(True)
         plt.savefig(path, format='png', bbox_extra_artists=(lgd,), bbox_inches='tight')
         plt.show()
+
+
+class Plot:
+    def __init__(self):
+        self.x = []
+        self.y = []
 
 
 class Generation:

@@ -2,18 +2,17 @@
 
 from anytree import Node, RenderTree, findall_by_attr, PreOrderIter, find
 from anytree.exporter import DotExporter
-from random import randint, sample, uniform, shuffle, random
+from random import randint, sample, uniform, shuffle, random, gauss, randrange
 from copy import deepcopy
 
 
 class Tree:
-    def __init__(self, size, depth, primitives, unique):
-        self.full = False    # grow all branches to max depth
+    def __init__(self, size, depth, primitives, full):
+        self.full = full    # grow all branches to max depth
         self.max_size = size if size != 0 else 999
         self.max_depth = depth if depth != 0 else 999
         self.primitive_dict = primitives
         self.nodes = []
-        self.unique = unique
 
     def grow(self):  # first grow all the nodes then fill the remaining branches with leafs
         size, depth = 0, 0
@@ -82,7 +81,7 @@ class Tree:
     def primitive_terminal(self):
         valid_leafs = [primitive for primitive in self.primitive_dict if primitive.get('arity') == 0]
         leaf = valid_leafs[randint(0, len(valid_leafs) - 1)]
-        value = self.get_value(leaf)
+        value = self.get_new_value(leaf)
         return leaf.get('ptype'), value
 
     def primitive_function(self, space_left):
@@ -90,7 +89,7 @@ class Tree:
         shuffle(valid_nodes)
         for node in valid_nodes:
             if not self.deadlock(space_left - node.get('arity')):
-                value = self.get_value(node)
+                value = self.get_new_value(node)
                 return node.get('ptype'), node.get('arity'), value
 
         # if no valid function has been found, grow a terminal instead
@@ -101,7 +100,7 @@ class Tree:
         return str(len(self.nodes))
 
     def headless_chicken(self):     # alternative mutation, a random node is attached to a freshly generated branch
-        if len(self.nodes) == self.max_size:
+        if len(self.nodes) == self.max_size or self.full:
             self.nodes = []
             self.grow()
             return
@@ -127,15 +126,6 @@ class Tree:
                 free_branches = self.grow_leaf(free_branches)
             if len(free_branches) == 0:  # do until max depth or no free nodes
                 break
-
-    def mutate(self, node):  # node value -> node of the same arity value
-        if not node.ptype == 'root':
-            index = self.nodes.index(node)
-            valid_primitives = self.same_arity_primitives(node.arity)
-            primitive = sample(valid_primitives, 1)[0]
-            new_value = self.get_value(primitive, node.value)
-            self.nodes[index].value = new_value
-            self.nodes[index].ptype = primitive.get('ptype')
 
     def crossover(self, chromosome_a, chromosome_b):
         parent_a = deepcopy(chromosome_a)
@@ -179,8 +169,10 @@ class Tree:
         self.nodes = [node for node in self.nodes if node not in branch]
         return branch, free_node
 
-    def same_arity_primitives(self, arity):  # return all primitives in the dictionary of given arity
-        return [primitive for primitive in self.primitive_dict if primitive.get('arity') == arity and primitive.get('ptype') != 'root']
+    def get_primitive(self, name, arity):
+        for primitive in self.primitive_dict:
+            if primitive.get('ptype') == name and primitive.get('arity') == arity:
+                return primitive
 
     def same_arity_nodes(self, arity):  # this is invoked in headless chicken
         same_arity_nodes = findall_by_attr(self.nodes[0].root, value=arity, name='arity')
@@ -239,7 +231,8 @@ class Tree:
     def save_image(self, path):
         DotExporter(self.nodes[0], nodenamefunc=lambda node: '%s:%s' % (node.value, node.name)).to_picture(path)
 
-    def get_value(self, primitive, current_value=None):
+    @staticmethod
+    def get_new_value(primitive):
         if primitive.get('ptype') == 'bool':
             return randint(0, 1)
         elif primitive.get('ptype') == 'char':
@@ -251,15 +244,8 @@ class Tree:
             return randint(primitive.get('low'), primitive.get('up'))
         elif primitive.get('ptype') == 'string':
             collection = primitive.get('collection')
-            while True:
-                length = randint(1, primitive.get('length'))
-                value = sample(collection, length)
-                if current_value:
-                    if current_value != value and value not in [node.value for node in self.nodes]:
-                        break
-                else:
-                    if value not in [node.value for node in self.nodes]:
-                        break
+            length = randint(1, primitive.get('length'))
+            value = sample(collection, length)
             return ''.join(letter for letter in value)
 
     def rename(self, base):
@@ -301,8 +287,8 @@ if __name__ == '__main__':
 
     # ModGen
     dict_3 = [
-        dict(ptype='root', arity=10),
-        dict(ptype='char', arity=1, collection=['C', 'X', 'Y', 'Z', '-', '+', '[', ']']),
+        dict(ptype='root', arity=4),
+        dict(ptype='char', arity=1, collection=['S', 'C', 'X', 'Y', 'Z', '-', '+', '[', ']']),
         dict(ptype='string', arity=0, collection=['C', 'X', 'Y', 'Z', '-', '+', '[', ']'], length=4)
     ]
 
@@ -317,6 +303,22 @@ if __name__ == '__main__':
     max_depth = 2
     unique = False
 
-    parent_a = Tree(max_size, max_depth, dict_3, unique)
-    parent_a.grow()
-    parent_a.print()
+    t1 = Tree(max_size, max_depth, dict_3, unique)
+    t1.grow()
+    t1.headless_chicken()
+    print(t1.tree_in_line())
+    t1.print()
+
+    t2 = Tree(max_size, max_depth, dict_3, unique)
+    t2.grow()
+    t2.headless_chicken()
+    print(t2.tree_in_line())
+    t2.print()
+
+    # organized edit distance
+    # K = 2
+    # sigma = 1
+    # for node in PreOrderIter(t1.nodes[0].root):
+    #     print(node.value)
+    # for node in PreOrderIter(t1.nodes[0].root):
+    #     print(node.value)

@@ -4,6 +4,7 @@ import tempfile
 from src.Island import Island
 from src.BookKeeper import BookKeeper
 from src.utilities import clean_dir
+from src.DiversityMeasure import DiversityMeasure
 
 
 class Evolution:
@@ -18,6 +19,7 @@ class Evolution:
 
         self.islands = []
         self.initialize_islands(islands_xml, evaluators_xml)
+        self.diversity_measure = DiversityMeasure()
 
     def initialize_islands(self, islands_xml, evaluators_xml):
         for pin, island_xml in enumerate(islands_xml):
@@ -58,6 +60,7 @@ class Evolution:
     def organize_island(self, island):
         island.sort_individuals()
         island.average()
+        island.entropy = self.diversity_measure.entropy([individual.fitness for individual in island.individuals])
         os.system('clear')
         island.print_generation_summary()
         self.book_keeper.update_log(island)

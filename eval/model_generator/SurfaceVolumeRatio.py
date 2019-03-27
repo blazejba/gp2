@@ -8,8 +8,7 @@ class SurfaceVolumeRatio:
             volume = self.calculate_volume(triangles)
             surface = self.calculate_surface(triangles)
 
-            ratio_fitness = pow(volume, 0.33) / pow(surface, 0.5) if surface != 0 else 0
-            #volume_fitness = volume / 10 if volume <= 10 else 1
+            ratio_fitness = pow(surface, 1/2) / pow(volume, 1/3) if surface != 0 else 0
             return ratio_fitness
         except:
             return 0

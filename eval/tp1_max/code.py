@@ -5,6 +5,7 @@ Score board
 genome_size     fitness
 11              9
 15              16
+21				54
 '''
 
 import sys
@@ -21,23 +22,20 @@ def main():
 
 def evaluate(tree):
 	stack = []
-	try:
-		for node in PostOrderIter(tree.nodes[0].root):
-			if node.value == '*':
-				outcome = stack[-1] + stack[-2]
-				stack = stack[:len(stack) - 2]
-				stack += [outcome]
+	for node in PostOrderIter(tree.nodes[0].root):
+		if node.value == '*':
+			outcome = stack[-1] * stack[-2]
+			stack = stack[:len(stack) - 2]
+			stack += [outcome]
 
-			elif node.value == '+':
-				outcome = stack[-1] * stack[-2]
-				stack = stack[:len(stack) - 2]
-				stack += [outcome]
+		elif node.value == '+':
+			outcome = stack[-1] + stack[-2]
+			stack = stack[:len(stack) - 2]
+			stack += [outcome]
 
-			else:
-				stack += [1]
-		return stack[0]
-	except any:
-		return 0
+		else:
+			stack += [1]
+	return stack[0]
 
 
 if __name__ == '__main__':

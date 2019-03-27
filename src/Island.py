@@ -26,6 +26,7 @@ class Island:
         self.individuals = []
         self.average_fitness = 0
         self.generation = 0
+        self.entropy = 0
 
     def instantiate_individuals(self):
         while self.population_size > len(self.individuals):
@@ -90,8 +91,9 @@ class Island:
         self.average_fitness = average_tuple([individual.fitness for individual in self.individuals])
 
     def print_generation_summary(self):
-        print('island [', self.pin, '], fittest [', self.individuals[0].fitness, '], meaan [',
-              '{0:.2f}'.format(self.average_fitness), '], generation [', self.generation, ']')
+        print('island [', self.pin, '], fittest [', '{0:.2f}'.format(self.individuals[0].fitness), '], entropy [',
+              '{0:.2f}'.format(self.entropy), '], mean [', '{0:.2f}'.format(self.average_fitness),
+              '], generation [', self.generation, ']')
 
     def collect_fitness(self):
         evaluations_finished = 0

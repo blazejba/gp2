@@ -18,6 +18,7 @@ def main():
     num_of_evolutions = int(sys.argv[2])
     evaluation_xml_path = 'eval/evaluators.xml'
     experiment_xml_path = 'exp/' + experiment + '.xml'
+    plot_path = 'exp/plots/' + experiment + '.png'
 
     time = []
     gens = []
@@ -37,7 +38,7 @@ def main():
 
     data_processor = EvolutionMeasures(evolutions)
     data_processor.summarize_experiment(time=time, generations=gens, evaluations=evals)
-    data_processor.plot_fitness_graph('exp/plots/' + experiment + '.png', experiment)
+    data_processor.plot_fitness_graph(path=plot_path, name=experiment, runs=num_of_evolutions)
 
 
 if __name__ == '__main__':

@@ -1,19 +1,18 @@
 <evaluators>
     <e name='one_max'>
-        <tree size='10' depth='0' unique='False' primitives='bool()_1 bool()_0'/>
+        <tree size='50' depth='0' full='False' primitives='bool()_1 bool()_0'/>
     </e>
 
     <e name='tp1_max'>
-        <tree size='21' depth='0' unique='False' primitives='char(1)_0 char(*,+)_2'/>
+        <tree size='21' depth='0' full='False' primitives='char(1)_0 char(*,+)_2'/>
     </e>
 
     <e name="symbolic_regression">
-        <tree size='20' depth='6'  unique='False' primitives='char(x)_0 int(-4,4)_0 char(*,+,%,^)_2' />
+        <tree size='20' depth='5'  full='False' primitives='char(x)_0 int(-4,4)_0 char(*,+,%,^)_2' />
     </e>
 
     <e name="model_generator">
-        <tree size='0' depth='2' unique='False' primitives='string(C,X,Y,Z,+,-,[,])_0.4 char(N)_0 char(C,X,Y,Z,+,-,[,])_1 root()_5' />
-        <!--<tree size='0' depth='3' unique='True' primitives='char(N)_0 string(C,X,Y,Z,+,-,[,])_0.2 char(C,X,Y,Z,+,-,[,])_2 root()_2' />-->
+        <tree size='0' depth='2' full='True' primitives='string(C,C,C,X,Y,Z,+,-,[,])_0.4 char(N)_0 char(S,C,X,Y,Z,+,-,[,])_1 root()_4' />
         <!-- <tree size='3' depth='1' unique='False' primitives='int(0,1000)_0 root()_2' /> -->
     </e>
 </evaluators>

@@ -35,7 +35,7 @@ class LSystem:
         random_seed, self.max_size = self.parse_parameters(parameter_tree)
         self.grammar, self.success = self.parse_grammar(grammar_tree)
         seed(random_seed)
-        self.sentence = 'C'
+        self.sentence = 'S'
         self.name = get_date_in_string()
 
     def rewrite(self):
@@ -145,14 +145,6 @@ class LSystem:
 
         return grammar, True
 
-    @staticmethod
-    def count_cubes(structure):
-        counter = 0
-        for s in structure:
-            if s == 'C':
-                counter += 1
-        return counter
-
 
 class ModelConstructor:
     @staticmethod
@@ -177,6 +169,8 @@ def evaluate(grammar_tree):
 
     # l_system.sort_rules()
     l_system.rewrite()
+    if l_system.sentence.count('C') < 2:
+        return 0
     assembly_instruction = l_system.generate_assembly_instructions()
 
     # Define paths for scad and stl files

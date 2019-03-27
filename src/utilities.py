@@ -1,7 +1,7 @@
 import os
 from math import exp, pow, sqrt
 from os import walk
-from random import randint, random
+from random import randint, random, randrange
 from time import localtime
 
 
