@@ -22,7 +22,7 @@ class Individual:
                 self.fitness = decode_stdout(result)
                 self.evaluated = True
                 self.process = None
-                return True 	# finished
+                return True 	# evaluation finished
         return False 	# not finished yet
 
     def stringify(self):

@@ -36,7 +36,7 @@ class Representation:
 
     def get_tree_structure(self, which_tree):
         return self.forest[which_tree].get('size'), self.forest[which_tree].get('depth'), \
-               self.forest[which_tree].get('primitives'), self.forest[which_tree].get('unique')
+               self.forest[which_tree].get('primitives'), self.forest[which_tree].get('full')
 
 
 if __name__ == '__main__':

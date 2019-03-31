@@ -37,11 +37,11 @@ class Tree:
                 free_branches += [self.nodes[-1]] * arity
                 free_branches.remove(parent)
             return
-
-        while True:
-            size, depth, free_branches = self.grow_function(size, depth, free_branches)
-            if size >= self.max_size or depth >= self.max_depth or len(free_branches) == 0:
-                break
+        else:
+            while True:
+                size, depth, free_branches = self.grow_function(size, depth, free_branches)
+                if size >= self.max_size or depth >= self.max_depth or len(free_branches) == 0:
+                    break
 
         # Growing leafs
         while 0 < len(free_branches):
@@ -105,10 +105,10 @@ class Tree:
             self.grow()
             return
         while True:
-            cutoff_node = self.nodes[randint(1, len(self.nodes) - 1)]   # select random node where new branch will be
-            if cutoff_node.ptype != 'root':
+            cutoff_node = self.nodes[randint(0, len(self.nodes) - 1)]   # select random node where new branch will be
+            if cutoff_node.parent:
                 break
-        branch, free_node = self.detach_branch(cutoff_node)     # cut off the branch and keep the free node
+        branch, free_node, _ = self.detach_branch(cutoff_node)   # cut off the branch and keep the free node
         del branch  # branch can be discarded because the purpose of headless chicken is to grow a new one
         free_branches = [free_node]
         self.rename(0)
@@ -120,7 +120,7 @@ class Tree:
                 depth = node.depth
 
         while True:     # 90% grow function nodes, 10% terminal nodes
-            if random() > 0.5 and not self.max_depth < depth:
+            if random() > 0.5 and self.max_depth > depth:
                 _, depth, free_branches = self.grow_function(0, depth, free_branches)
             else:
                 free_branches = self.grow_leaf(free_branches)
@@ -136,7 +136,8 @@ class Tree:
 
         # finding crossover points A and B
         while len(valid_nodes_b) == 0:
-            crossover_node_a = parent_a.nodes[randint(1, len(parent_a.nodes) - 1)]
+            random_choice = randint(1, len(parent_a.nodes) - 1)
+            crossover_node_a = parent_a.nodes[random_choice]
             valid_nodes_b = parent_b.same_arity_nodes(crossover_node_a.arity)
             if len(parent_a.nodes) == self.max_size:
                 valid_nodes_b = [node for node in valid_nodes_b
@@ -144,30 +145,35 @@ class Tree:
         crossover_node_b = valid_nodes_b[randint(0, len(valid_nodes_b) - 1)]
 
         # detaching branches at crossover point
-        branch_a, free_node_a = parent_a.detach_branch(crossover_node_a)
-        branch_b, free_node_b = parent_b.detach_branch(crossover_node_b)
+        branch_a, free_node_a, position_in_children_a = parent_a.detach_branch(crossover_node_a)
+        branch_b, free_node_b, position_in_children_b = parent_b.detach_branch(crossover_node_b)
 
         # attaching branches
-        parent_a.attach_branch(free_node_a, branch_b)
-        parent_b.attach_branch(free_node_b, branch_a)
+        parent_a.attach_branch(free_node_a, branch_b, position_in_children_a)
+        parent_b.attach_branch(free_node_b, branch_a, position_in_children_b)
+
+        # remove branches if max depth is exceeded
+        #
 
         self.nodes = parent_a.nodes
         return parent_b
 
-    def attach_branch(self, node, branch):
-        branch[0].parent = node
+    def attach_branch(self, node, branch, index):
+        children_list = list(node.children)
+        children_list = children_list[:index] + [branch[0]] + children_list[index:]
+        node.children = tuple(children_list)
         self.nodes += branch
 
-    def detach_branch(self, detaching_node):
-        cutoff_node = find(self.nodes[0].root, lambda node: node.name == detaching_node.name)
-        free_node = cutoff_node.parent
-        cutoff_node.parent = None
-        if len(cutoff_node.descendants) > 0:
-            branch = [cutoff_node] + list(cutoff_node.descendants)
+    def detach_branch(self, detached_node):
+        free_node = detached_node.parent
+        position_in_children = free_node.children.index(detached_node)
+        detached_node.parent = None
+        if len(detached_node.descendants) > 0:
+            branch = [detached_node] + list(detached_node.descendants)
         else:
-            branch = [cutoff_node]
+            branch = [detached_node]
         self.nodes = [node for node in self.nodes if node not in branch]
-        return branch, free_node
+        return branch, free_node, position_in_children
 
     def get_primitive(self, name, arity):
         for primitive in self.primitive_dict:
@@ -176,7 +182,7 @@ class Tree:
 
     def same_arity_nodes(self, arity):  # this is invoked in headless chicken
         same_arity_nodes = findall_by_attr(self.nodes[0].root, value=arity, name='arity')
-        return [node for node in same_arity_nodes if node.ptype != 'root']  # same arity nodes minus root
+        return [node for node in same_arity_nodes if node.parent]  # same arity nodes minus root
 
     def stringify(self):  # tree to string export
         string = []
@@ -287,8 +293,7 @@ if __name__ == '__main__':
 
     # ModGen
     dict_3 = [
-        dict(ptype='root', arity=4),
-        dict(ptype='char', arity=1, collection=['S', 'C', 'X', 'Y', 'Z', '-', '+', '[', ']']),
+        dict(ptype='root', arity=9),
         dict(ptype='string', arity=0, collection=['C', 'X', 'Y', 'Z', '-', '+', '[', ']'], length=4)
     ]
 
@@ -305,15 +310,19 @@ if __name__ == '__main__':
 
     t1 = Tree(max_size, max_depth, dict_3, unique)
     t1.grow()
-    t1.headless_chicken()
     print(t1.tree_in_line())
     t1.print()
 
     t2 = Tree(max_size, max_depth, dict_3, unique)
     t2.grow()
-    t2.headless_chicken()
     print(t2.tree_in_line())
     t2.print()
+
+    t3 = Tree(max_size, max_depth, dict_3, unique)
+    t4 = Tree(max_size, max_depth, dict_3, unique)
+    t4 = t3.crossover(t1, t2)
+    print(t3.tree_in_line())
+    print(t4.tree_in_line())
 
     # organized edit distance
     # K = 2

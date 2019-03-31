@@ -8,11 +8,11 @@
     </e>
 
     <e name="symbolic_regression">
-        <tree size='20' depth='5'  full='False' primitives='char(x)_0 int(-4,4)_0 char(*,+,%,^)_2' />
+        <tree size='20' depth='4'  full='False' primitives='char(x)_0 int(-4,4)_0 char(*,+,^)_2' />
     </e>
 
     <e name="model_generator">
-        <tree size='0' depth='2' full='True' primitives='string(C,C,C,X,Y,Z,+,-,[,])_0.4 char(N)_0 char(S,C,X,Y,Z,+,-,[,])_1 root()_4' />
-        <!-- <tree size='3' depth='1' unique='False' primitives='int(0,1000)_0 root()_2' /> -->
+        <tree size='0' depth='1' full='True' primitives='string(N,C,X,Y,Z,+,-,[,])_0.4 root()_9' />
+<!--        <tree size='0' depth='2' full='True' primitives='string(C,X,Y,Z,+,-,[,])_0.4 char(N,S,C,X,Y,Z,+,-,[,])_1 root()_4' />-->
     </e>
 </evaluators>

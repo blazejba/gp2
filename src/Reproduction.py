@@ -3,44 +3,39 @@ from random import random
 from src.Individual import Individual
 from src.Tree import Tree
 from copy import deepcopy
-from random import shuffle, sample, randint, gauss
+from random import sample, randint, gauss
 
 
 class Reproduction:
     def __init__(self, policy):
         self.mutation_rate = float(policy.attrib['mutation_rate'])/100
         self.crossover_rate = float(policy.attrib['crossover_rate'])/100
+        self.headless_rate = float(policy.attrib['headless'])/100
 
-    def reproduce(self, parents, representation):  # returns two individuals
-        new_individual_a = Individual()
-        new_individual_b = Individual()
+    def reproduce(self, parents, representation):  # create two new individuals
+        child_a, child_b = Individual(), Individual()
         num_of_chromosomes = len(parents[0].genome)
-        parent_a = parents[0]
-        parent_b = parents[1]
-        for num in range(num_of_chromosomes):
-            if random() < self.crossover_rate:
-                new_chromosome_a, new_chromosome_b = self.crossover(parent_a.genome[num], parent_b.genome[num], num, representation)
-            else:
-                new_chromosome_a, new_chromosome_b = deepcopy(parent_a.genome[num]), deepcopy(parent_b.genome[num])
+        parent_a, parent_b = parents[0], parents[1]
 
-            if random() < self.mutation_rate:
-                new_chromosome_a.headless_chicken()
-            else:
-                new_chromosome_a = self.mutate(new_chromosome_a)
+        for num in range(num_of_chromosomes):   # for each pair of chromosomes perform crossover and mutations
+            chromosome_a, chromosome_b = self.crossover(parent_a.genome[num], parent_b.genome[num], num, representation)
+            chromosome_a, chromosome_b = self.point_mutation(chromosome_a), self.point_mutation(chromosome_b)
+            chromosome_a, chromosome_b = self.headless_chicken(chromosome_a), self.headless_chicken(chromosome_b)
 
-            if random() < self.mutation_rate:
-                new_chromosome_b.headless_chicken()
-            else:
-                new_chromosome_b = self.mutate(new_chromosome_b)
+            child_a.genome.append(chromosome_a)
+            child_b.genome.append(chromosome_b)
 
-            new_individual_a.genome.append(new_chromosome_a)
-            new_individual_b.genome.append(new_chromosome_b)
+        return [child_a, child_b]
 
-        return [new_individual_a, new_individual_b]
+    def headless_chicken(self, chromosome):
+        return chromosome.headless_chicken() if random() < self.headless_rate else chromosome
 
-    def mutate(self, chromosome):
+    def point_mutation(self, chromosome):
         new_nodes = []
         for gene in chromosome.nodes:  # point mutation
+            if gene.ptype == 'root':
+                new_nodes.append(gene)
+                continue
             if random() < self.mutation_rate:
                 primitive = chromosome.get_primitive(gene.ptype, gene.arity)
                 if primitive.get('ptype') == 'bool':
@@ -51,7 +46,7 @@ class Reproduction:
                     gene.value = self.real_mutation(primitive, gene.value)
                 elif primitive.get('ptype') == 'int':
                     gene.value = self.int_mutation(primitive, gene.value)
-                else:
+                else:   # this is string
                     gene.value = self.string_mutation(primitive, gene.value)
                 new_nodes.append(gene)
             else:
@@ -59,12 +54,14 @@ class Reproduction:
         chromosome.nodes = new_nodes
         return chromosome
 
-    @staticmethod
-    def crossover(parent_a, parent_b, index, representation):
-        size, depth, primitives, unique = representation.get_tree_structure(which_tree=index)
-        chromosome_a = Tree(size, depth, primitives, unique)
-        chromosome_b = chromosome_a.crossover(parent_a, parent_b)
-        return chromosome_a, chromosome_b
+    def crossover(self, parent_a, parent_b, index, representation):
+        if random() < self.crossover_rate:  # crossover happened
+            size, depth, primitives, unique = representation.get_tree_structure(which_tree=index)
+            chromosome_a = Tree(size, depth, primitives, unique)
+            chromosome_b = chromosome_a.crossover(parent_a, parent_b)
+            return chromosome_a, chromosome_b
+        else:   # crossover didn't happen
+            return deepcopy(parent_a), deepcopy(parent_b)
 
     @staticmethod
     def bool_mutation(current_value):
@@ -104,13 +101,13 @@ class Reproduction:
     def string_mutation(primitive, current_value):
         collection = primitive.get('collection')
         current_length = len(current_value)
+        # print('current length and value', current_length, current_value)
 
-        available_operations = ['add', 'remove', 'change', 'shuffle']
+        available_operations = ['add', 'remove', 'change']
         if current_length == primitive.get('length'):
             available_operations.remove('add')
         elif current_length == 1:
             available_operations.remove('remove')
-            available_operations.remove('shuffle')
 
         mutation_choice = available_operations[randint(0, len(available_operations) - 1)]
 
@@ -121,9 +118,9 @@ class Reproduction:
             return value
 
         elif mutation_choice == 'remove':
-            return current_value.replace(current_value[randint(0, current_length - 1)], '')
+            return current_value.replace(current_value[randint(0, current_length - 1)], '', 1)
 
-        elif mutation_choice == 'change':
+        else:   # change
             position = randint(0, current_length - 1)
             while True:
                 new_char = sample(collection, 1)[0]
@@ -131,7 +128,3 @@ class Reproduction:
                     break
             new_string = current_value[:position] + new_char + current_value[position + 1:]
             return new_string
-        else:
-            value = current_value
-            shuffle(value)
-            return value

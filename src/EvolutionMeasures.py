@@ -49,7 +49,7 @@ class EvolutionMeasures:
         ax1.fill_between(X, std_plus, std_minus, facecolors='b', alpha=0.1)
 
         ax2 = plt.twinx(ax1)
-        ln3 = ax2.plot(X, diversities, label='diversity', color='r', linestyle='-', linewidth=1)
+        ln3 = ax2.plot(X, diversities, label='diversity', color='r', linestyle='-', linewidth=1, alpha=0.5)
 
         # added these three lines
         lns = ln1 + ln2 + ln3

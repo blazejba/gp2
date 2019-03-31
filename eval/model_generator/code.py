@@ -8,47 +8,44 @@ from src.Tree import TreeReadOnly
 
 # Constants
 RANDOM_SEED = 88
-DEV_STEPS = 6
+DEV_STEPS = 5
 
 
 class Rule:
-    def __init__(self, predecessor, successors, left_context, right_context, specificity):
-        self.predecessor, self.successors = predecessor, successors
+    def __init__(self, predecessor, successor, left_context, right_context, specificity):
+        self.predecessor, self.successor = predecessor, successor
         self.left_context = left_context if left_context else '_'
         self.right_context = right_context if right_context else '_'
         self.specificity = specificity
 
     def print(self):
         return str(self.left_context) + ' < ' + str(self.predecessor) + ' > ' + str(self.right_context) + ' -> ' +\
-               str(self.successors)
-
-    def transform(self, sentence, symbol):
-        if sentence[symbol] == self.predecessor:
-            # symbol passed left and right context check, now randomly choose one of the successors
-            return self.successors[randint(0, len(self.successors) - 1)]
-        else:
-            return sentence[symbol]
+               str(self.successor)
 
 
 class LSystem:
     def __init__(self, grammar_tree, parameter_tree=None):
         random_seed, self.max_size = self.parse_parameters(parameter_tree)
-        self.grammar, self.success = self.parse_grammar(grammar_tree)
+        self.grammar = self.parse_grammar(grammar_tree)
         seed(random_seed)
         self.sentence = 'S'
         self.name = get_date_in_string()
+
+    def find_rule(self, symbol):
+        for rule in self.grammar:
+            if rule.predecessor == symbol:
+                return rule
+        return None
 
     def rewrite(self):
         sentence_tmp = []
         developmental_steps = DEV_STEPS
         for step in range(developmental_steps):
             for word_idx, word in enumerate(self.sentence):
-                new_word = word
-                for rule in self.grammar:
-                    new_word = rule.transform(self.sentence, word_idx)
-                    if new_word != word:
-                        break
-
+                rule = self.find_rule(word)
+                if not rule:
+                    continue
+                new_word = rule.successor
                 for letter in new_word:
                     sentence_tmp.append(letter)
 
@@ -126,24 +123,17 @@ class LSystem:
     @staticmethod
     def parse_grammar(grammar_tree):
         grammar = []
+        predecessors = ['S', 'C', 'X', 'Y', 'Z', '[', ']', '+', '-']
+        predecessor_pointer = 0
         for node in grammar_tree.nodes:
-            if len(node.descendants) == 1:  # append all predecessors
-                predecessor = node.value
-                successor = node.descendants[0].value
-                if successor == 'N':
-                    continue
-
-                exists = False
-                for rule in grammar:
-                    if rule.predecessor == predecessor:
-                        rule.successors.append(successor)
-                        exists = True
-                        break
-
-                if not exists:
-                    grammar.append(Rule(predecessor, [successor], None, None, 0))
-
-        return grammar, True
+            if node.ptype == 'root':
+                continue
+            successor = node.value
+            if 'N' in successor:
+                continue
+            grammar.append(Rule(predecessors[predecessor_pointer], successor, None, None, 0))
+            predecessor_pointer += 1
+        return grammar
 
 
 class ModelConstructor:
@@ -162,14 +152,8 @@ class ModelConstructor:
 def evaluate(grammar_tree):
     # Parse genome into grammar and generate assembly instructions
     l_system = LSystem(grammar_tree)
-
-    if not l_system.success:    # if grammar parsing failed return fitness of 0
-        fitness = 0
-        return fitness
-
-    # l_system.sort_rules()
     l_system.rewrite()
-    if l_system.sentence.count('C') < 2:
+    if not l_system.sentence.count('C') > 0:
         return 0
     assembly_instruction = l_system.generate_assembly_instructions()
 

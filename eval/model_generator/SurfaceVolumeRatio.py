@@ -1,4 +1,5 @@
 from math import pow, sqrt
+import sys
 
 
 class SurfaceVolumeRatio:
@@ -7,8 +8,7 @@ class SurfaceVolumeRatio:
             triangles = self.get_triangles_from_stl(path_stl)
             volume = self.calculate_volume(triangles)
             surface = self.calculate_surface(triangles)
-
-            ratio_fitness = pow(surface, 1/2) / pow(volume, 1/3) if surface != 0 else 0
+            ratio_fitness = 1 / (1 + pow(surface, 1/2) / pow(volume, 1/3))
             return ratio_fitness
         except:
             return 0
@@ -37,7 +37,7 @@ class SurfaceVolumeRatio:
         stl = open(path_stl)
         for line in stl:
             if line.find('vertex') == 6:
-                point = [float(coordinate) for coordinate in line[13:-1].split(' ')]
+                point = [float(coordinate)  for coordinate in line[13:-1].split(' ')]
                 triangle.append(point)
                 if len(triangle) == 3:
                     triangles.append(triangle)
@@ -72,5 +72,5 @@ class SurfaceVolumeRatio:
 
 if __name__ == '__main__':
     sv = SurfaceVolumeRatio()
-    fitness = sv.calculate_volume_surface_ratio('/home/blaise/code/gpec/eval/model_generator/tmp/2019_3_24_18_0_9.stl')
+    fitness = sv.calculate_volume_surface_ratio(sys.argv[1])
     print(fitness)

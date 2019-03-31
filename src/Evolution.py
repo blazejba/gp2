@@ -61,7 +61,7 @@ class Evolution:
         island.sort_individuals()
         island.average()
         island.entropy = self.diversity_measure.entropy([individual.fitness for individual in island.individuals])
-        os.system('clear')
+        # os.system('clear')
         island.print_generation_summary()
         self.book_keeper.update_log(island)
         self.book_keeper.print_all_individuals(self.islands)
