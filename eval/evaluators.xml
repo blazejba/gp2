@@ -12,7 +12,7 @@
     </e>
 
     <e name="model_generator">
-        <tree size='0' depth='1' full='True' primitives='string(N,C,X,Y,Z,+,-,[,])_0.4 root()_9' />
+        <tree size='9' depth='0' full='False' primitives='string(N,C,X,Y,Z,+,-,[,])_1.4 string(N,C,X,Y,Z,+,-,[,])_0.4' />
 <!--        <tree size='0' depth='2' full='True' primitives='string(C,X,Y,Z,+,-,[,])_0.4 char(N,S,C,X,Y,Z,+,-,[,])_1 root()_4' />-->
     </e>
 </evaluators>

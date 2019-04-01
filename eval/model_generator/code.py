@@ -1,14 +1,14 @@
 import os
 import sys
 from eval.model_generator.SurfaceVolumeRatio import SurfaceVolumeRatio
-from random import randint, seed
+from random import seed
 from src.utilities import get_date_in_string
 from src.Tree import TreeReadOnly
 
 
 # Constants
 RANDOM_SEED = 88
-DEV_STEPS = 5
+DEV_STEPS = 8
 
 
 class Rule:
@@ -101,11 +101,11 @@ class LSystem:
             elif step == '-':
                 sign = -1
             elif step == 'X':
-                direction = [sign * cube_size, 0, 0]
+                direction = [sign, 0, 0]
             elif step == 'Y':
-                direction = [0, sign * cube_size, 0]
+                direction = [0, sign, 0]
             elif step == 'Z':
-                direction = [0, 0, sign * cube_size]
+                direction = [0, 0, sign]
             elif step == '[':
                 saved_translations.append(current_translation)
             elif step == ']' and len(saved_translations) > 0:
@@ -159,9 +159,9 @@ def evaluate(grammar_tree):
 
     # Define paths for scad and stl files
     tmp_folder = '/home/blaise/code/gpec/eval/model_generator/tmp/'
-    path_scad = tmp_folder + l_system.name + '.scad'
-    path_stl = tmp_folder + l_system.name + '.stl'
-    path_sentence = tmp_folder + l_system.name
+    path_scad = tmp_folder + 'scads/' + l_system.name + '.scad'
+    path_stl = tmp_folder + 'stls/' + l_system.name + '.stl'
+    path_sentence = tmp_folder + 'rules/' + l_system.name
     l_system.save_sentence_and_grammar(path_sentence)
 
     # Construct a model from assembly instructions

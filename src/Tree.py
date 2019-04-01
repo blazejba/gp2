@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 
-from anytree import Node, RenderTree, findall_by_attr, PreOrderIter, find
+from numpy import zeros
+from scipy.cluster.vq import kmeans, vq, whiten
+
+from anytree import Node, RenderTree, findall_by_attr, PreOrderIter
 from anytree.exporter import DotExporter
-from random import randint, sample, uniform, shuffle, random, gauss, randrange
+from random import randint, sample, uniform, shuffle, random
 from copy import deepcopy
 
 
@@ -99,6 +102,7 @@ class Tree:
     def generate_name(self):
         return str(len(self.nodes))
 
+    # currently doesnt work
     def headless_chicken(self):     # alternative mutation, a random node is attached to a freshly generated branch
         if len(self.nodes) == self.max_size or self.full:
             self.nodes = []
@@ -308,26 +312,5 @@ if __name__ == '__main__':
     max_depth = 2
     unique = False
 
-    t1 = Tree(max_size, max_depth, dict_3, unique)
-    t1.grow()
-    print(t1.tree_in_line())
-    t1.print()
-
-    t2 = Tree(max_size, max_depth, dict_3, unique)
-    t2.grow()
-    print(t2.tree_in_line())
-    t2.print()
-
-    t3 = Tree(max_size, max_depth, dict_3, unique)
-    t4 = Tree(max_size, max_depth, dict_3, unique)
-    t4 = t3.crossover(t1, t2)
-    print(t3.tree_in_line())
-    print(t4.tree_in_line())
-
-    # organized edit distance
-    # K = 2
-    # sigma = 1
-    # for node in PreOrderIter(t1.nodes[0].root):
-    #     print(node.value)
-    # for node in PreOrderIter(t1.nodes[0].root):
-    #     print(node.value)
+    forest = [Tree(max_size, max_depth, dict_3, unique)]
+    forest[0].grow()

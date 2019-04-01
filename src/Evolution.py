@@ -4,7 +4,6 @@ import tempfile
 from src.Island import Island
 from src.BookKeeper import BookKeeper
 from src.utilities import clean_dir
-from src.DiversityMeasure import DiversityMeasure
 
 
 class Evolution:
@@ -19,14 +18,18 @@ class Evolution:
 
         self.islands = []
         self.initialize_islands(islands_xml, evaluators_xml)
-        self.diversity_measure = DiversityMeasure()
 
     def initialize_islands(self, islands_xml, evaluators_xml):
         for pin, island_xml in enumerate(islands_xml):
-            representation, selection, migration, reproduction, replacement, population_size, parameters = \
-                self.parse_from_xml(island_xml, evaluators_xml)
-            island = Island(pin, representation, parameters, selection, migration, replacement, reproduction, population_size,
-                            self.tmp_dir)
+            # parse from xml
+            representation, selection, migration, reproduction, replacement, population_size, parameters, \
+                diversity_control = self.parse_from_xml(island_xml, evaluators_xml)
+
+            # create new island object
+            island = Island(pin, representation, diversity_control, parameters, selection, migration, replacement,
+                            reproduction, population_size, self.tmp_dir)
+
+            # instantiate
             island.instantiate_individuals()
             island.start_evaluating()
             self.islands.append(island)
@@ -58,10 +61,23 @@ class Evolution:
                         island.next_generation()
 
     def organize_island(self, island):
-        island.sort_individuals()
+        # diversity operations
+        if island.diversity_control:
+            print('here?')
+            island.diversity_measure.calculate_entropy([individual.fitness for individual in island.individuals])
+            island.diversity_measure.calculate_distance_matrix([individual.genome[0] for individual in island.individuals])
+            clx = island.diversity_measure.kmeans_clustering()
+            shared_weights = island.diversity_measure.shared_weight(clx)
+            for index, individual in enumerate(island.individuals):
+                individual.shared_fitness = individual.fitness * shared_weights[index]
+
+            island.sort_individuals('shared')
+        else:
+            print('not here?')
+            island.sort_individuals('individual')
+
         island.average()
-        island.entropy = self.diversity_measure.entropy([individual.fitness for individual in island.individuals])
-        # os.system('clear')
+        os.system('clear')
         island.print_generation_summary()
         self.book_keeper.update_log(island)
         self.book_keeper.print_all_individuals(self.islands)
@@ -76,6 +92,8 @@ class Evolution:
     def parse_from_xml(self, island_xml, evaluators):
         evaluator_name = island_xml.attrib['evaluator']
         parameters = island_xml.attrib['parameters'] if island_xml.attrib['parameters'] else ''
+        diversity_control = island_xml.attrib['diversity_control'] if island_xml.attrib['diversity_control'] else False
+
         representation = self.get_representation(evaluators=evaluators, which=evaluator_name)
         population_size = int(island_xml.attrib['population_size'])
         selection, migration, reproduction, replacement = object, object, object, object
@@ -88,7 +106,7 @@ class Evolution:
                 reproduction = policy
             elif policy.tag == 'replacement':
                 replacement = policy
-        return representation, selection, migration, reproduction, replacement, population_size, parameters
+        return representation, selection, migration, reproduction, replacement, population_size, parameters, diversity_control
 
     @staticmethod
     def get_representation(evaluators, which):

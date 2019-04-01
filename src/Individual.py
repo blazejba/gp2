@@ -6,9 +6,11 @@ from src.utilities import decode_stdout
 class Individual:
     def __init__(self):
         self.fitness = 0
+        self.shared_fitness = 0
         self.process = None
         self.evaluated = False
         self.genome = [] 	# genome is represented as a forest where each tree is a chromosome
+        self.cluster = None
 
     def evaluate(self, evaluator_path, parameters):
         if not self.evaluated:

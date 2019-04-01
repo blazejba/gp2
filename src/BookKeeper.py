@@ -15,7 +15,7 @@ class BookKeeper:
 
         self.logfile.write(str(island.generation) + ',' + str(island.pin) + ',' +
                            str(island.individuals[0].fitness) + ',' + str(average_fitness) + ',' +
-                           str(island.migration.migration_happened) + ',' + str(island.entropy) + '\n')
+                           str(island.migration.migration_happened) + ',' + str(island.diversity_measure.entropy) + '\n')
 
     def termination_printout(self, generation, reason):
         print('')
@@ -46,5 +46,5 @@ class BookKeeper:
         for island in islands:
             print('island [ ' + str(island.pin) + ' ]')
             for individual in island.individuals:
-                print("[{:.2f}]".format(individual.fitness), individual.stringify())
+                print("[{:.2f}]".format(individual.shared_fitness), "[{:.2f}]".format(individual.fitness), individual.stringify())
                 # individual.genome[0].print()
