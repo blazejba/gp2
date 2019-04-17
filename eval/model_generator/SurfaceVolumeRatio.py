@@ -1,4 +1,5 @@
 from math import pow, sqrt
+from scipy.stats import norm
 import sys
 
 
@@ -37,7 +38,7 @@ class SurfaceVolumeRatio:
         stl = open(path_stl)
         for line in stl:
             if line.find('vertex') == 6:
-                point = [float(coordinate)  for coordinate in line[13:-1].split(' ')]
+                point = [float(coordinate) for coordinate in line[13:-1].split(' ')]
                 triangle.append(point)
                 if len(triangle) == 3:
                     triangles.append(triangle)

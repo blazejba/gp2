@@ -44,12 +44,14 @@ class Island:
             best_fitness = 0
             best_individual = 0
             for index, individual in enumerate(tmp_individuals):
-                if individual.shared_fitness > best_fitness:
-                    if how == 'shared':
+                if how == 'shared':
+                    if individual.shared_fitness > best_fitness:
                         best_fitness = individual.shared_fitness
-                    else:
+                        best_individual = index
+                else:
+                    if individual.fitness > best_fitness:
                         best_fitness = individual.fitness
-                    best_individual = index
+                        best_individual = index
             self.individuals.append(tmp_individuals[best_individual])
             tmp_individuals.remove(tmp_individuals[best_individual])
 
