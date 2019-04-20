@@ -1,28 +1,33 @@
 #!/usr/bin/env python3
 
+import os
 import sys
-from pivy import coin
-sys.path.append("/usr/lib/freecad/lib")
 import FreeCAD as App
 import ObjectsFem
 import Part
-import ImportGui
 import Mesh
 import subprocess
 import tempfile
 import Fem
-import FemGui
 from femtools import ccxtools
 from math import sqrt, pow
 
-gmsh_bin = "/usr/bin/gmsh"
-dir = '/home/blaise/code/gpec/eval/model_generator/tmp/stls/'
-name = '2019_4_8_18_55_3.stl'
+sys.stdout = open('/tmp/whatever.txt', 'w')
+
+gmsh_bin = '/usr/bin/gmsh'
+dir_stl = '/home/blaise/code/gpec/eval/model_generator/tmp/stls/'
+dir_fitness = '/home/blaise/code/gpec/eval/model_generator/tmp/results/'
+name = sys.argv[3]
 doc = App.ActiveDocument
 
-print('cookies')
 
-def importMesh(dir, name, document):
+def importMesh(dir, name):
+    while True:
+        exists = os.path.isfile(dir + name)
+        FreeCAD.Console.PrintError('waiting for stl \n')
+        if exists:
+            FreeCAD.Console.PrintError('exists now \n')
+            break
     Mesh.insert(dir + name, 'free_cad_test')
     mesh = doc.findObjects('Mesh::Feature')[0]
     return mesh
@@ -88,7 +93,7 @@ def makeConstraintForce(doc, model, direction):
 def generateFmesh():
     # Export a part in step format
     temp_file = tempfile.mkstemp(suffix='.step')[1]
-    ImportGui.export([model], temp_file)
+    model.Shape.exportStep(temp_file)
     selection_name = model.Name
 
     # Mesh temporaly file
@@ -99,15 +104,11 @@ def generateFmesh():
     options = ' -algo ' + 'netgen' + ' -clmax ' + '5.00' + ' -optimize ' + ' -order ' + '2'
     dim = ' -3 '
     command = gmsh_bin + ' ' + temp_file + dim + '-format ' + file_format + ' -o ' + temp_mesh_file + '' + options
-    FreeCAD.Console.PrintMessage("Running: {}".format(command))
 
     try:
         output = subprocess.check_output([command, '-1'], shell=True, stderr=subprocess.STDOUT, )
-        FreeCAD.Console.PrintMessage(output)
         Fem.insert(temp_mesh_file, FreeCAD.ActiveDocument.Name)
-
         FMesh = App.activeDocument().ActiveObject
-        FemGui.setActiveAnalysis(App.activeDocument().Analysis)
         App.activeDocument().Analysis.addObject(FMesh)
     except:
         FreeCAD.Console.PrintError("Unexpected error in GMSHMesh macro: {}".format(sys.exc_info()[0]))
@@ -132,7 +133,6 @@ def segregateFaces(model):
     for index, face in enumerate(model.Shape.Faces):
         Xs = [vertex.X for vertex in face.Vertexes]
         Ys = [vertex.Y for vertex in face.Vertexes]
-        Zs = [vertex.Z for vertex in face.Vertexes]
         if Xs[0] == Xs[1] == Xs[2]:
             facesX.append(index)
         elif Ys[0] == Ys[1] == Ys[2]:
@@ -167,7 +167,6 @@ def findForceReferences(model):
 
     vertexes = model.Shape.Vertexes
     for index, vertex in enumerate(vertexes):
-        print(vertex.X)
         if not min_x:
             min_x = vertex.X
             min_indexes = [index]
@@ -235,15 +234,14 @@ def calculateDistance(v1, v2):
     return sqrt(pow(v2.X - v1.X, 2) + pow(v2.Y - v1.Y, 2) + pow(v2.Z - v1.Z, 2))
 
 
+
 # model
-mesh = importMesh(dir, name, doc)
+mesh = importMesh(dir_stl, name)
 shape = shapeFromMesh(mesh)
 model = solidFromShape(shape)
 
 # analysis and solver
 analysis, solver = setAnalysis_setSolver(doc)
-
-# model
 analysis.addObject(addMaterialABS(doc))
 
 # contraints
@@ -252,6 +250,7 @@ facesX, facesY, facesZ = segregateFaces(model)
 fixed_references = findFixReferences(model, facesX)
 fixed_constraint = makeConstraintFixed(doc, model, fixed_references)
 analysis.addObject(fixed_constraint)
+
 # force
 force_direction = findTopFace(model, facesZ)
 force_references = findForceReferences(model)
@@ -261,8 +260,9 @@ analysis.addObject(force_constraint)
 # fmesh
 fmesh = generateFmesh()
 
+# fem
 doc.recompute()
-fea = ccxtools.FemToolsCcx()
+fea = ccxtools.FemToolsCcx(analysis, solver)
 fea.purge_results()
 fea.run()
 
@@ -271,5 +271,9 @@ fixed_vertex = meanFixedVertex(model, fixed_references)
 force_vertex = meanForceVertex(model, force_references)
 beam_length = calculateDistance(fixed_vertex, force_vertex)
 max_displacement = max(App.ActiveDocument.getObject("CalculiX_static_results").DisplacementLengths)
-print('length', beam_length, 'max displacement', max_displacement)
-print('fitness', 1 / (1 + max_displacement / beam_length))
+
+fitness = 1/(1 + max_displacement/beam_length)
+file = open(dir_fitness + name[:-4], 'w')
+file.write(str(fitness))
+file.close()
+sys.exit(1)

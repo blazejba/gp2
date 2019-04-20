@@ -1,10 +1,12 @@
 import os
+import io
 import sys
 from eval.model_generator.SurfaceVolumeRatio import SurfaceVolumeRatio
 from random import seed
-from src.utilities import get_date_in_string
+from time import time
 from src.Tree import TreeReadOnly
-
+import subprocess
+import tempfile
 
 # Constants
 RANDOM_SEED = 88
@@ -29,7 +31,7 @@ class LSystem:
         self.grammar = self.parse_grammar(grammar_tree)
         seed(random_seed)
         self.sentence = 'S'
-        self.name = get_date_in_string()
+        self.name = str(time()).replace('.', '')
 
     def find_rule(self, symbol):
         for rule in self.grammar:
@@ -153,11 +155,12 @@ def evaluate(grammar_tree):
     # Parse genome into grammar and generate assembly instructions
     l_system = LSystem(grammar_tree)
     l_system.rewrite()
-    if not l_system.sentence.count('C') > 0:
+    if l_system.sentence.count('C') < 1:
         return 0
     assembly_instruction = l_system.generate_assembly_instructions()
 
     # Define paths for scad and stl files
+    path_fitness = '/home/blaise/code/gpec/eval/model_generator/tmp/results/'   # this is for freecad fitness passing
     tmp_folder = '/home/blaise/code/gpec/eval/model_generator/tmp/'
     path_scad = tmp_folder + 'scads/' + l_system.name + '.scad'
     path_stl = tmp_folder + 'stls/' + l_system.name + '.stl'
@@ -167,10 +170,22 @@ def evaluate(grammar_tree):
     # Construct a model from assembly instructions
     model_constructor = ModelConstructor()
     status = model_constructor.create_scad_file(path_scad, assembly_instruction)
-    if status:  # Evaluate the model
+
+    if status:  # evaluate
+        # generate stl model in OpenSCAD
         os.system('openscad -o ' + path_stl + ' ' + path_scad)
-        evaluator = SurfaceVolumeRatio()
-        fitness = evaluator.calculate_volume_surface_ratio(path_stl)
+
+        # 1) Beam
+        stl = l_system.name + '.stl'
+        terminal_command = ['freecad', '-c', '/home/blaise/code/gpec/eval/model_generator/Constructor.py', stl]
+        subprocess.call(terminal_command)
+        file = open(path_fitness + stl[:-4], 'r')
+        fitness = file.read()
+        file.close()
+
+        # or 2) Sphere
+        #evaluator = SurfaceVolumeRatio()
+        #fitness = evaluator.calculate_volume_surface_ratio(path_stl)
 
     else:   # if model generation failed return fitness of 0
         fitness = 0
@@ -180,7 +195,6 @@ def evaluate(grammar_tree):
 def main():
     forest = sys.argv[1].split('\n\n')
     grammar_tree = TreeReadOnly(forest[0])
-
     fitness = evaluate(grammar_tree)
     sys.stdout.write(str(fitness))
     sys.exit(1)

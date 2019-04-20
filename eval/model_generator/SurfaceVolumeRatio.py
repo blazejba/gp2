@@ -1,5 +1,4 @@
 from math import pow, sqrt
-from scipy.stats import norm
 import sys
 
 

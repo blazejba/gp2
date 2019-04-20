@@ -21,6 +21,7 @@ class Individual:
         if self.process:
             if self.process.poll():
                 result = self.process.communicate()[0]
+                print('RESULT', result)
                 self.fitness = decode_stdout(result)
                 self.evaluated = True
                 self.process = None

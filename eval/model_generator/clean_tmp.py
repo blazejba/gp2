@@ -12,6 +12,7 @@ def delete_content(folder):
 
 
 if __name__== '__main__':
+    delete_content('tmp/results/')
     delete_content('tmp/rules/')
     delete_content('tmp/stls/')
     delete_content('tmp/scads/')
