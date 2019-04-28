@@ -6,11 +6,13 @@ from random import seed
 from time import time
 from src.Tree import TreeReadOnly
 import subprocess
-import tempfile
 
 # Constants
 RANDOM_SEED = 88
-DEV_STEPS = 8
+DEV_STEPS = 6
+
+# Paths
+tmp_folder = '/home/blaise/code/gpec/eval/model_generator/tmp/'
 
 
 class Rule:
@@ -160,8 +162,7 @@ def evaluate(grammar_tree):
     assembly_instruction = l_system.generate_assembly_instructions()
 
     # Define paths for scad and stl files
-    path_fitness = '/home/blaise/code/gpec/eval/model_generator/tmp/results/'   # this is for freecad fitness passing
-    tmp_folder = '/home/blaise/code/gpec/eval/model_generator/tmp/'
+    path_fitness = tmp_folder + 'results/'
     path_scad = tmp_folder + 'scads/' + l_system.name + '.scad'
     path_stl = tmp_folder + 'stls/' + l_system.name + '.stl'
     path_sentence = tmp_folder + 'rules/' + l_system.name
@@ -178,9 +179,15 @@ def evaluate(grammar_tree):
         # 1) Beam
         stl = l_system.name + '.stl'
         terminal_command = ['freecad', '-c', '/home/blaise/code/gpec/eval/model_generator/Constructor.py', stl]
-        subprocess.call(terminal_command)
-        file = open(path_fitness + stl[:-4], 'r')
-        fitness = file.read()
+        f = open('/tmp/' + l_system.name, 'w')
+        tmp_pipe = io.TextIOWrapper(f, encoding='utf8', newline='')
+        process = subprocess.Popen(terminal_command, stdout=tmp_pipe)
+        while True:
+            if process.poll():
+                file = open(path_fitness + stl[:-4], 'r')
+                fitness = file.read()
+
+                break
         file.close()
 
         # or 2) Sphere
@@ -188,8 +195,17 @@ def evaluate(grammar_tree):
         #fitness = evaluator.calculate_volume_surface_ratio(path_stl)
 
     else:   # if model generation failed return fitness of 0
+
         fitness = 0
+    rename_files(fitness, l_system.name)
     return fitness
+
+
+def rename_files(fitness, name):
+    os.rename(tmp_folder + 'results/' + name, tmp_folder + 'results/' + str(fitness) + '_' + name)
+    os.rename(tmp_folder + 'scads/' + name + '.scad', tmp_folder + 'scads/' + str(fitness) + '_' + name + '.scad')
+    os.rename(tmp_folder + 'stls/' + name + '.stl', tmp_folder + 'stls/' + str(fitness) + '_' + name + '.stl')
+    os.rename(tmp_folder + 'rules/' + name, tmp_folder + 'rules/' + str(fitness) + '_' + name)
 
 
 def main():

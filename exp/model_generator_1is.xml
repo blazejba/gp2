@@ -1,5 +1,5 @@
-<experiment max_fitness="0" max_time="0" max_generation="100">
-    <island population_size='4' evaluator="model_generator" parameters="" diversity_control="True">
+<experiment max_fitness="0" max_time="0" max_generation="20">
+    <island population_size='15' evaluator="model_generator" parameters="" diversity_control="True">
         <reproduction mutation_rate="5" crossover_rate="50" headless="0"/>
         <selection policy="tournament"/>
         <migration entry_policy="periodical" in="false" out="false" period="5" selection_policy="roulette_wheel"/>
