@@ -1,5 +1,5 @@
-<experiment max_fitness="10" max_time="0" max_generation="0">
-    <island population_size="10" evaluator="one_max" parameters="">
+<experiment max_fitness="10" max_time="0" max_generation="0" parallel="true">
+    <island population_size="10" evaluator="one_max" parameters="" diversity_control="false">
         <reproduction mutation_rate="3"/>
         <selection policy="rank"/>
         <migration entry_policy="probabilistic" in="true" out="true" chance="10"
@@ -7,7 +7,7 @@
         <replacement policy="elitism" num_of_elites="2"/>
     </island>
 
-    <island population_size="" evaluator="one_max" parameters="">
+    <island population_size="" evaluator="one_max" parameters="" diversity_control="false">
         <reproduction mutation_rate="3"/>
         <selection policy="rank"/>
         <migration entry_policy="probabilistic" in="true" out="true" chance="50"

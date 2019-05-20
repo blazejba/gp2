@@ -10,6 +10,7 @@ import subprocess
 # Constants
 RANDOM_SEED = 88
 DEV_STEPS = 6
+TIMEOUT = 60 # seconds for FEM to simulate displacement
 
 # Paths
 tmp_folder = '/home/blaise/code/gpec/eval/model_generator/tmp/'
@@ -153,7 +154,7 @@ class ModelConstructor:
             return False    # report failure due to empty model
 
 
-def evaluate(grammar_tree):
+def evaluate(grammar_tree, function):
     # Parse genome into grammar and generate assembly instructions
     l_system = LSystem(grammar_tree)
     l_system.rewrite()
@@ -162,9 +163,10 @@ def evaluate(grammar_tree):
     assembly_instruction = l_system.generate_assembly_instructions()
 
     # Define paths for scad and stl files
+    stl = l_system.name + '.stl'
     path_fitness = tmp_folder + 'results/'
     path_scad = tmp_folder + 'scads/' + l_system.name + '.scad'
-    path_stl = tmp_folder + 'stls/' + l_system.name + '.stl'
+    path_stl = tmp_folder + 'stls/' + stl
     path_sentence = tmp_folder + 'rules/' + l_system.name
     l_system.save_sentence_and_grammar(path_sentence)
 
@@ -176,33 +178,28 @@ def evaluate(grammar_tree):
         # generate stl model in OpenSCAD
         os.system('openscad -o ' + path_stl + ' ' + path_scad)
 
-        # 1) Beam
-        stl = l_system.name + '.stl'
-        terminal_command = ['freecad', '-c', '/home/blaise/code/gpec/eval/model_generator/Constructor.py', stl]
-        f = open('/tmp/' + l_system.name, 'w')
-        tmp_pipe = io.TextIOWrapper(f, encoding='utf8', newline='')
-        process = subprocess.Popen(terminal_command, stdout=tmp_pipe)
-        while True:
-            if process.poll():
-                file = open(path_fitness + stl[:-4], 'r')
-                fitness = file.read()
+        if function == 'beam': # 1) 3-D cantilever beam
+            terminal_command = ['freecad', '-c', '/home/blaise/code/gpec/eval/model_generator/Constructor.py', stl]
+            f = open('/tmp/' + l_system.name, 'w')
+            tmp_pipe = io.TextIOWrapper(f, encoding='utf8', newline='')
+            subprocess.call(terminal_command, stdout=tmp_pipe)
+            file = open(path_fitness + l_system.name, 'r')
+            fitness = file.read()
+            file.close()
+            f.close()
 
-                break
-        file.close()
-
-        # or 2) Sphere
-        #evaluator = SurfaceVolumeRatio()
-        #fitness = evaluator.calculate_volume_surface_ratio(path_stl)
+        else: # 2) 3-D sphere
+            evaluator = SurfaceVolumeRatio()
+            fitness = evaluator.calculate_volume_surface_ratio(path_stl)
 
     else:   # if model generation failed return fitness of 0
-
         fitness = 0
+
     rename_files(fitness, l_system.name)
     return fitness
 
 
 def rename_files(fitness, name):
-    os.rename(tmp_folder + 'results/' + name, tmp_folder + 'results/' + str(fitness) + '_' + name)
     os.rename(tmp_folder + 'scads/' + name + '.scad', tmp_folder + 'scads/' + str(fitness) + '_' + name + '.scad')
     os.rename(tmp_folder + 'stls/' + name + '.stl', tmp_folder + 'stls/' + str(fitness) + '_' + name + '.stl')
     os.rename(tmp_folder + 'rules/' + name, tmp_folder + 'rules/' + str(fitness) + '_' + name)
@@ -210,8 +207,9 @@ def rename_files(fitness, name):
 
 def main():
     forest = sys.argv[1].split('\n\n')
+    function = sys.argv[2]
     grammar_tree = TreeReadOnly(forest[0])
-    fitness = evaluate(grammar_tree)
+    fitness = evaluate(grammar_tree, function)
     sys.stdout.write(str(fitness))
     sys.exit(1)
 

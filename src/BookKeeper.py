@@ -12,9 +12,10 @@ class BookKeeper:
     def update_log(self, island):
         fitness_list = [individual.fitness for individual in island.individuals]
         average_fitness = average_tuple(fitness_list)
+        best_fitness = max(fitness_list)
 
         self.logfile.write(str(island.generation) + ',' + str(island.pin) + ',' +
-                           str(island.individuals[0].fitness) + ',' + str(average_fitness) + ',' +
+                           str(best_fitness) + ',' + str(average_fitness) + ',' +
                            str(island.migration.migration_happened) + ',' + str(island.diversity_measure.entropy) + '\n')
 
     def termination_printout(self, generation, reason):

@@ -6,9 +6,8 @@ class Representation:
             size = int(tree.attrib['size'])
             depth = int(tree.attrib['depth'])
             primitives = self.parse_primitives(tree.attrib['primitives'])
-            full = tree.attrib['full'] == 'True'
             tree_structure = dict(
-                size=size, depth=depth, primitives=primitives, full=full)
+                size=size, depth=depth, primitives=primitives)
             self.forest.append(tree_structure)
 
     @staticmethod
@@ -35,8 +34,7 @@ class Representation:
         return primitive_dictionary
 
     def get_tree_structure(self, which_tree):
-        return self.forest[which_tree].get('size'), self.forest[which_tree].get('depth'), \
-               self.forest[which_tree].get('primitives'), self.forest[which_tree].get('full')
+        return self.forest[which_tree].get('size'), self.forest[which_tree].get('depth'), self.forest[which_tree].get('primitives')
 
 
 if __name__ == '__main__':

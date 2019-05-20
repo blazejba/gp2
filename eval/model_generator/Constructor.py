@@ -43,7 +43,7 @@ def solidFromShape(shape, doc):
 def setAnalysis_setSolver(doc):
     analysis_object = ObjectsFem.makeAnalysis(doc, "Analysis")
     solver_object = ObjectsFem.makeSolverCalculixCcxTools(doc, "CalculiX")
-    solver_object.WorkingDir = '/home/blaise/code/gpec/eval/model_generator/'
+    solver_object.WorkingDir = '/tmp/'
     solver_object.GeometricalNonlinearity = 'linear'
     solver_object.ThermoMechSteadyState = True
     solver_object.MatrixSolverType = 'default'
@@ -211,7 +211,6 @@ def findForceReferences(model, axis):
     # leave out those with largest Z
     extrema = None
     references = []
-    print(min_indexes)
     for index in min_indexes:
         vertex = vertexes[index]
         if axis == 0 or axis == 1:
@@ -227,7 +226,6 @@ def findForceReferences(model, axis):
             references = [index]
         elif value == extrema:
             references.append(index)
-    print(references)
     return references
 
 
@@ -294,13 +292,13 @@ def fitness_1(doc, fixed_vertex, force_vertex):
 
 def fitness_2(doc, force, length, E):
     delta_max_0 = simpleBeamMaxDisplacement(force, length, E)
+    print(length)
     delta_max_1 = max(doc.getObject("CalculiX_static_results").DisplacementLengths)
-    print('displacement 0 and 1:', delta_max_0, delta_max_1)
-    return delta_max_0 / (delta_max_1 +  delta_max_0)
+    print('d0:', delta_max_0, 'd1:', delta_max_1)
+    return delta_max_0 / (delta_max_1 + delta_max_0)
 
 
 def simpleBeamMaxDisplacement(force, length, E):
-    print('what is the length unit', length)
     return (4 * force * pow(length, 3))/E
 
 
@@ -309,10 +307,10 @@ def main():
     gmsh_bin = '/usr/bin/gmsh'
     dir_stl = '/home/blaise/code/gpec/eval/model_generator/tmp/stls/'
     dir_fitness = '/home/blaise/code/gpec/eval/model_generator/tmp/results/'
-    #name = sys.argv[3]
-    name = '0.0250775548917046_15559992097142885.stl'
+    name = sys.argv[3]
+    #name = '0.77339494_1556560694925368.stl'
     doc = App.newDocument('freecad_doc')
-    force_magnitude = 98.0665 / 2 # 10 kg worth of force
+    force_magnitude = 98.0665 / 2 # 10 / 2 kg worth of force
     youngs_modulus = 2300.00 # MPa
 
     try:
@@ -325,7 +323,7 @@ def main():
         analysis, solver = setAnalysis_setSolver(doc)
         analysis.addObject(addMaterialABS(doc))
 
-        # contraints
+        # constraints
         segregated_faces = segregateFaces(model)
         bounding_box = boundingBox(model, segregated_faces)
         prime_axis = bounding_box.index(max(bounding_box))
@@ -337,7 +335,7 @@ def main():
 
         # force
         force_direction = findTopFace(model, segregated_faces, prime_axis)
-        force_references = findForceReferences(model, prime_axis)
+        # force_references = findForceReferences(model, prime_axis)
         force_constraint = makeConstraintForce(doc, model, force_direction, force_magnitude, prime_axis)
         analysis.addObject(force_constraint)
 
@@ -351,22 +349,21 @@ def main():
         fea.run()
 
         # points for calculting beam length
-        fixed_veretex, force_vertex = distil_references(model, fixed_references, force_references)
+        # fixed_veretex, force_vertex = distil_references(model, fixed_references, force_references)
 
         # fitness = 1/(1+arc)
-        fitness = fitness_1(doc, fixed_veretex, force_vertex)
+        #fitness = fitness_1(doc, fixed_veretex, force_vertex)
 
         # logaritmic equivalence fitness
-        fitness2 = fitness_2(doc, force_magnitude, max(bounding_box), youngs_modulus)
+        fitness = fitness_2(doc, force_magnitude, max(bounding_box), youngs_modulus)
 
     except:
         fitness = 0
 
     finally:
         print('fitness 1', fitness)
-        print('fitness 2', fitness2)
         file = open(dir_fitness + name[:-4], 'w')
-        file.write(str(fitness))
+        file.write(str(round(fitness, 8)))
         file.close()
 
 main()

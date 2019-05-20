@@ -17,7 +17,6 @@ class Island:
         self.evaluator = 'eval.' + evaluator.attrib['name'] + '.code'  # this is for running an evaluator
         self.parameters = parameters
         self.representation = Representation(fitness_evaluator=evaluator)
-        self.diversity_control = diversity
 
         # Policies
         self.selection = Selection(policy=selection)
@@ -29,7 +28,7 @@ class Island:
         self.individuals = []
         self.average_fitness = 0
         self.generation = 0
-        self.diversity_measure = DiversityMeasure(self.population_size)
+        self.diversity_measure = DiversityMeasure(self.population_size, diversity)
 
     def instantiate_individuals(self):
         while self.population_size > len(self.individuals):
@@ -74,19 +73,19 @@ class Island:
         # Combine generations
         self.individuals = new_generation + from_old_generation
 
-    def next_generation(self):
+    def next_generation(self, parallel):
         self.migration.migrate_out(self.individuals)
         self.evolve()
         self.generation += 1
-        self.start_evaluating()
+        self.start_evaluating(parallel)
 
-    def start_evaluating(self):
+    def start_evaluating(self, parallel):
         for individual in self.individuals:
-            individual.evaluate(self.evaluator, self.parameters)
+            individual.evaluate(self.evaluator, self.parameters, parallel)
 
     def is_still_evaluating(self):
         for individual in self.individuals:
-            if individual.process:
+            if not individual.evaluated: # not evaluated meaning still evaluating
                 return True
         return False
 

@@ -7,6 +7,7 @@ class EvolutionMeasures:
         self.data = []
         self.plots = []
         self.mean_time, self.mean_gen, self.mean_eval = 0, 0, 0
+        self.mean_time_std, self.mean_gen_std, self.mean_eval_std = 0, 0, 0
 
         for file in file_names:
             self.fetch_data(file)
@@ -18,6 +19,9 @@ class EvolutionMeasures:
         self.mean_time = average_tuple(time)
         self.mean_gen = average_tuple(generations)
         self.mean_eval = average_tuple(evaluations)
+        self.mean_time_std = std_tuple(time)
+        self.mean_gen_std = std_tuple(generations)
+        self.mean_eval_std = std_tuple(evaluations)
 
     def fetch_data(self, file):
         f = open(file, 'r')
@@ -57,8 +61,10 @@ class EvolutionMeasures:
         lgd = ax1.legend(lns, labs, loc='upper center', bbox_to_anchor=(0.5, -0.14), ncol=3, fancybox=True, shadow=True)
 
         plt.title(name, y=1.07)
-        plt.suptitle('mean {time ' + '{:.2f}'.format(self.mean_time) + ' seconds, , generations ' + str(int(self.mean_gen)) +
-                     ', evaluations ' + str(int(self.mean_eval)) + '}, runs ' + str(runs), y=0.93, fontsize=8)
+        plt.suptitle('Averaged {seconds ' + '{:.2f}'.format(self.mean_time) + ' [+/- ' + '{:.2f}'.format(self.mean_time_std) + ' ]' +
+                     ', generations ' + str(int(self.mean_gen)) + ' [+/- ' + str(int(self.mean_gen_std)) + ' ]' +
+                     ', evaluations ' + str(int(self.mean_eval)) + ' [+/- ' + str(int(self.mean_eval_std)) + ' ]' +
+                     '},\nbased on ' + str(runs) + ' iterations', y=0.93, fontsize=8)
         ax1.set_ylabel('fitness')
         ax2.set_ylabel('diversity')
         ax1.set_xlabel('generation')

@@ -28,7 +28,8 @@ class Reproduction:
         return [child_a, child_b]
 
     def headless_chicken(self, chromosome):
-        return chromosome.headless_chicken() if random() < self.headless_rate else chromosome
+        chromosome.headless_chicken() if random() < self.headless_rate else chromosome
+        return chromosome
 
     def point_mutation(self, chromosome):
         new_nodes = []
@@ -56,8 +57,8 @@ class Reproduction:
 
     def crossover(self, parent_a, parent_b, index, representation):
         if random() < self.crossover_rate:  # crossover happened
-            size, depth, primitives, unique = representation.get_tree_structure(which_tree=index)
-            chromosome_a = Tree(size, depth, primitives, unique)
+            size, depth, primitives = representation.get_tree_structure(which_tree=index)
+            chromosome_a = Tree(size, depth, primitives)
             chromosome_b = chromosome_a.crossover(parent_a, parent_b)
             return chromosome_a, chromosome_b
         else:   # crossover didn't happen
@@ -82,7 +83,7 @@ class Reproduction:
         low = primitive.get('low')
         up = primitive.get('up')
         while True:
-            value = gauss(current_value, (abs(low) + abs(up)) / 100)
+            value = gauss(current_value, abs(up - low) / 100)
             if value > low or value < up:
                 break
         return value

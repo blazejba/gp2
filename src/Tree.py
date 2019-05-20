@@ -10,41 +10,18 @@ from copy import deepcopy
 
 
 class Tree:
-    def __init__(self, size, depth, primitives, full):
-        self.full = full    # grow all branches to max depth
+    def __init__(self, size, depth, primitives):
         self.max_size = size if size != 0 else 999
         self.max_depth = depth if depth != 0 else 999
         self.primitive_dict = primitives
         self.nodes = []
 
-    def grow(self):  # first grow all the nodes then fill the remaining branches with leafs
-        size, depth = 0, 0
-        free_branches = []
-
+    def grow(self, size=0, depth=0, free_branches=[]):  # first grow all the nodes then fill the remaining branches with leafs
         # Growing nodes
-        if self.full:
-            # grow root
-            ptype, arity, value = self.primitive_root()
-            self.nodes.append(Node(self.generate_name(), ptype=ptype, arity=arity, value=value))
-            free_branches += [self.nodes[-1]] * arity
-            while len(free_branches) > 0:
-                current_depth = free_branches[0].depth
-                parent = free_branches[0]
-                if current_depth < self.max_depth - 1:
-                    ptype, arity, value = self.primitive_function(self.max_size)
-                    self.nodes.append(Node(self.generate_name(), ptype=ptype, arity=arity, value=value, parent=parent))
-                else:
-                    ptype, value = self.primitive_terminal()
-                    arity = 0
-                    self.nodes.append(Node(self.generate_name(), ptype=ptype, arity=arity, value=value, parent=parent))
-                free_branches += [self.nodes[-1]] * arity
-                free_branches.remove(parent)
-            return
-        else:
-            while True:
-                size, depth, free_branches = self.grow_function(size, depth, free_branches)
-                if size >= self.max_size or depth >= self.max_depth or len(free_branches) == 0:
-                    break
+        while True:
+            size, depth, free_branches = self.grow_function(size, depth, free_branches)
+            if size >= self.max_size or depth >= self.max_depth or len(free_branches) == 0:
+                break
 
         # Growing leafs
         while 0 < len(free_branches):
@@ -64,10 +41,7 @@ class Tree:
             self.nodes.append(Node(self.generate_name(), ptype=ptype, arity=arity, value=value))
         else:
             ptype, arity, value = self.primitive_function(space_left)
-            if self.full:
-                parent = free_branches[0]
-            else:
-                parent = free_branches[randint(0, len(free_branches) - 1)]
+            parent = free_branches[randint(0, len(free_branches) - 1)]
             self.nodes.append(Node(self.generate_name(), ptype=ptype, arity=arity, value=value, parent=parent))
             free_branches.remove(parent)
         free_branches += [self.nodes[-1]] * arity
@@ -102,34 +76,24 @@ class Tree:
     def generate_name(self):
         return str(len(self.nodes))
 
-    # currently doesnt work
-    def headless_chicken(self):     # alternative mutation, a random node is attached to a freshly generated branch
-        if len(self.nodes) == self.max_size or self.full:
-            self.nodes = []
-            self.grow()
-            return
+    def headless_chicken(self): # cuts a branch off and grows a new one in its place
         while True:
             cutoff_node = self.nodes[randint(0, len(self.nodes) - 1)]   # select random node where new branch will be
-            if cutoff_node.parent:
+            if cutoff_node.parent: # if it is not a root, break
                 break
-        branch, free_node, _ = self.detach_branch(cutoff_node)   # cut off the branch and keep the free node
+
+        branch, free_node, order = self.detach_branch(cutoff_node)   # cut off the branch and keep the free node
         del branch  # branch can be discarded because the purpose of headless chicken is to grow a new one
-        free_branches = [free_node]
+        size, depth, free_branches = len(self.nodes), self.find_depth(), [free_node]
         self.rename(0)
+        self.grow(size, depth, free_branches)
+        return self.nodes
 
-        # find depth of tree
-        depth = 0
+    def find_depth(self):
+        max_depth = 0
         for node in self.nodes:
-            if node.depth > depth:
-                depth = node.depth
-
-        while True:     # 90% grow function nodes, 10% terminal nodes
-            if random() > 0.5 and self.max_depth > depth:
-                _, depth, free_branches = self.grow_function(0, depth, free_branches)
-            else:
-                free_branches = self.grow_leaf(free_branches)
-            if len(free_branches) == 0:  # do until max depth or no free nodes
-                break
+            max_depth = node.depth > max_depth if node.depth > max_depth else max_depth
+        return max_depth
 
     def crossover(self, chromosome_a, chromosome_b):
         parent_a = deepcopy(chromosome_a)
@@ -155,9 +119,6 @@ class Tree:
         # attaching branches
         parent_a.attach_branch(free_node_a, branch_b, position_in_children_a)
         parent_b.attach_branch(free_node_b, branch_a, position_in_children_b)
-
-        # remove branches if max depth is exceeded
-        #
 
         self.nodes = parent_a.nodes
         return parent_b

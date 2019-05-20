@@ -1,0 +1,17 @@
+<experiment max_fitness="54" max_time="0" max_generation="0" parallel="true" preview="false">
+    <island population_size="30" evaluator="tp1_max" parameters="" diversity_control="false">
+        <reproduction mutation_rate="4" crossover_rate="70" headless="0"/>
+        <selection policy="tournament"/>
+        <migration entry_policy="probabilistic" in="true" out="true" chance="5"
+                   selection_policy="truncation" immigrants="1" emigrants="1"/>
+        <replacement policy="elitism" num_of_elites="1"/>
+    </island>
+
+    <island population_size="30" evaluator="tp1_max" parameters="" diversity_control="false">
+        <reproduction mutation_rate="4" crossover_rate="70" headless="0"/>
+        <selection policy="tournament"/>
+        <migration entry_policy="probabilistic" in="true" out="true" chance="5"
+                   selection_policy="truncation" immigrants="1" emigrants="1"/>
+        <replacement policy="elitism" num_of_elites="1"/>
+    </island>
+</experiment>
