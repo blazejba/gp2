@@ -77,16 +77,16 @@ class Tree:
         return str(len(self.nodes))
 
     def headless_chicken(self): # cuts a branch off and grows a new one in its place
-        while True:
-            cutoff_node = self.nodes[randint(0, len(self.nodes) - 1)]   # select random node where new branch will be
-            if cutoff_node.parent: # if it is not a root, break
-                break
-
-        branch, free_node, order = self.detach_branch(cutoff_node)   # cut off the branch and keep the free node
-        del branch  # branch can be discarded because the purpose of headless chicken is to grow a new one
-        size, depth, free_branches = len(self.nodes), self.find_depth(), [free_node]
-        self.rename(0)
-        self.grow(size, depth, free_branches)
+        cutoff_node = self.nodes[randint(0, len(self.nodes) - 1)]   # select random node where new branch will be
+        if cutoff_node.parent: # if it is not a root, break
+            branch, free_node, order = self.detach_branch(cutoff_node)   # cut off the branch and keep the free node
+            del branch  # branch can be discarded because the purpose of headless chicken is to grow a new one
+            size, depth, free_branches = len(self.nodes), self.find_depth(), [free_node]
+            self.rename(0)
+            self.grow(size, depth, free_branches)
+        else:
+            self.nodes = []
+            self.grow()
         return self.nodes
 
     def find_depth(self):
@@ -271,7 +271,6 @@ if __name__ == '__main__':
 
     max_size = 0
     max_depth = 2
-    unique = False
 
-    forest = [Tree(max_size, max_depth, dict_3, unique)]
+    forest = [Tree(max_size, max_depth, dict_3)]
     forest[0].grow()

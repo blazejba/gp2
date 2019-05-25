@@ -1,8 +1,8 @@
-<experiment max_fitness="20" max_time="0" max_generation="0" parallel="true" preview="false">
+<experiment max_fitness="10" max_time="0" max_generation="0" parallel="true" preview="false">
     <island population_size="50" evaluator="one_max" parameters="" diversity_control="false">
-        <reproduction mutation_rate="2" crossover_rate="15" headless="0"/>
+        <reproduction mutation_rate="10" crossover_rate="100" headless="0"/>
         <selection policy="rank"/>
         <migration entry_policy="periodical" in="false" out="false" period="5" selection_policy="roulette_wheel"/>
-        <replacement policy="elitism" num_of_elites="1"/>
+        <replacement policy="elitism" num_of_elites="2"/>
     </island>
 </experiment>

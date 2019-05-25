@@ -58,7 +58,7 @@ class Evolution:
                     if status:
                         self.quit_evolution(why=reason, generation=island.generation)
                         self.book_keeper.print_all_individuals(self.islands)
-                        return self.book_keeper.final_conditions
+                        return
                     else:
                         island.next_generation(self.parallel)
 

@@ -35,8 +35,10 @@ class Reproduction:
         new_nodes = []
         for gene in chromosome.nodes:  # point mutation
             if gene.ptype == 'root':
+                print('WAHAT')
                 new_nodes.append(gene)
                 continue
+
             if random() < self.mutation_rate:
                 primitive = chromosome.get_primitive(gene.ptype, gene.arity)
                 if primitive.get('ptype') == 'bool':

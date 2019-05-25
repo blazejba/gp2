@@ -32,6 +32,8 @@ class BookKeeper:
         print('\nIndividuals of the last generation:')
         self.final_conditions = [evolution_time, generation, self.total_num_of_evaluations]
 
+        self.logfile.write(str(evolution_time) + ',' + str(generation) + ',' + str(self.total_num_of_evaluations) + ',' + reason)
+
     def count_evaluations(self, increment):
         self.total_num_of_evaluations += increment
 
@@ -48,4 +50,5 @@ class BookKeeper:
             print('island [ ' + str(island.pin) + ' ]')
             for individual in island.individuals:
                 print("[{:.2f}]".format(individual.shared_fitness), "[{:.2f}]".format(individual.fitness), individual.stringify())
+                # print([node.ptype for node in individual.genome[0].nodes])
                 # individual.genome[0].print()

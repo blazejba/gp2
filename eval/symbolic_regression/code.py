@@ -66,7 +66,7 @@ def equations(x, which):
     if which == 'quadratic':
         return pow(x, 2) + 4
     elif which == 'quartic':
-        return pow(x, 4) + pow(x, 3) + pow(x, 2) + x
+        return pow(x, 4) + pow(x, 2) + 1
 
 
 if __name__ == '__main__':
