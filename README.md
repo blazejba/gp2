@@ -1,5 +1,5 @@
-# General Purpose Evolutionary Computation
-GPEC has been written in order to tame the power of evolutionary computation, 
+# General Purpose Genetic Programming
+GPEC has been written in order to tame the power of genetic programming,
 namely making it easily applicable to variety of real-life up-to-date engineering problems. 
 GPEC is a Python lightweight piece of software, which gives an user an open hand in creating programs and optimizing parameters in evolutionary manner, 
 embracing many state-of-art techniques, and is parallel processing oriented.
