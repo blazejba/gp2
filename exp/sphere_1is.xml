@@ -1,4 +1,4 @@
-<experiment max_fitness="0" max_time="0" max_generation="100" parallel="false" preview="false">
+<experiment max_fitness="0.9" max_time="0" max_generation="0" parallel="false" preview="false">
     <island population_size='20' evaluator="model_generator" parameters="sphere" diversity_control="edit">
         <reproduction mutation_rate="6" crossover_rate="50" headless="0"/>
         <selection policy="tournament"/>

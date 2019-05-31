@@ -41,7 +41,7 @@ class DiversityMeasure:
         return whiten(distance_matrix)
 
     def calculate_entropy(self, fitness_list):
-        fitness_list = [round(fitness * 10) for fitness in fitness_list]
+        fitness_list = [round(fitness * 100) for fitness in fitness_list]
         probabilities = [partition_k / len(fitness_list) for partition_k in Counter(fitness_list).values()]
         entropy = 0
         for p_k in probabilities:

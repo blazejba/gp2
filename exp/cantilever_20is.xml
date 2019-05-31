@@ -1,0 +1,122 @@
+<experiment max_fitness="0.9" max_time="0" max_generation="0" parallel="false" preview="false">
+    <island population_size='10' evaluator="model_generator" parameters="beam" diversity_control="edit">
+        <reproduction mutation_rate="2" crossover_rate="50" headless="0"/>
+        <selection policy="tournament"/>
+        <migration entry_policy="probabilistic" in="true" out="true" chance="5" selection_policy="roulette_wheel"/>
+        <replacement policy="elitism" num_of_elites="0"/>
+    </island>
+    <island population_size='10' evaluator="model_generator" parameters="beam" diversity_control="edit">
+        <reproduction mutation_rate="2" crossover_rate="50" headless="0"/>
+        <selection policy="tournament"/>
+        <migration entry_policy="probabilistic" in="true" out="true" chance="5" selection_policy="roulette_wheel"/>
+        <replacement policy="elitism" num_of_elites="0"/>
+    </island>
+    <island population_size='10' evaluator="model_generator" parameters="beam" diversity_control="edit">
+        <reproduction mutation_rate="2" crossover_rate="50" headless="0"/>
+        <selection policy="tournament"/>
+        <migration entry_policy="probabilistic" in="true" out="true" chance="5" selection_policy="roulette_wheel"/>
+        <replacement policy="elitism" num_of_elites="0"/>
+    </island>
+    <island population_size='10' evaluator="model_generator" parameters="beam" diversity_control="edit">
+        <reproduction mutation_rate="2" crossover_rate="50" headless="0"/>
+        <selection policy="tournament"/>
+        <migration entry_policy="probabilistic" in="true" out="true" chance="5" selection_policy="roulette_wheel"/>
+        <replacement policy="elitism" num_of_elites="0"/>
+    </island>
+    <island population_size='10' evaluator="model_generator" parameters="beam" diversity_control="edit">
+        <reproduction mutation_rate="2" crossover_rate="50" headless="0"/>
+        <selection policy="tournament"/>
+        <migration entry_policy="probabilistic" in="true" out="true" chance="5" selection_policy="roulette_wheel"/>
+        <replacement policy="elitism" num_of_elites="0"/>
+    </island>
+    <island population_size='10' evaluator="model_generator" parameters="beam" diversity_control="edit">
+        <reproduction mutation_rate="2" crossover_rate="50" headless="0"/>
+        <selection policy="tournament"/>
+        <migration entry_policy="probabilistic" in="true" out="true" chance="5" selection_policy="roulette_wheel"/>
+        <replacement policy="elitism" num_of_elites="0"/>
+    </island>
+    <island population_size='10' evaluator="model_generator" parameters="beam" diversity_control="edit">
+        <reproduction mutation_rate="2" crossover_rate="50" headless="0"/>
+        <selection policy="tournament"/>
+        <migration entry_policy="probabilistic" in="true" out="true" chance="5" selection_policy="roulette_wheel"/>
+        <replacement policy="elitism" num_of_elites="0"/>
+    </island>
+    <island population_size='10' evaluator="model_generator" parameters="beam" diversity_control="edit">
+        <reproduction mutation_rate="2" crossover_rate="50" headless="0"/>
+        <selection policy="tournament"/>
+        <migration entry_policy="probabilistic" in="true" out="true" chance="5" selection_policy="roulette_wheel"/>
+        <replacement policy="elitism" num_of_elites="0"/>
+    </island>
+    <island population_size='10' evaluator="model_generator" parameters="beam" diversity_control="edit">
+        <reproduction mutation_rate="2" crossover_rate="50" headless="0"/>
+        <selection policy="tournament"/>
+        <migration entry_policy="probabilistic" in="true" out="true" chance="5" selection_policy="roulette_wheel"/>
+        <replacement policy="elitism" num_of_elites="0"/>
+    </island>
+    <island population_size='10' evaluator="model_generator" parameters="beam" diversity_control="edit">
+        <reproduction mutation_rate="2" crossover_rate="50" headless="0"/>
+        <selection policy="tournament"/>
+        <migration entry_policy="probabilistic" in="true" out="true" chance="5" selection_policy="roulette_wheel"/>
+        <replacement policy="elitism" num_of_elites="0"/>
+    </island>
+     <island population_size='10' evaluator="model_generator" parameters="beam" diversity_control="edit">
+        <reproduction mutation_rate="2" crossover_rate="50" headless="0"/>
+        <selection policy="tournament"/>
+        <migration entry_policy="probabilistic" in="true" out="true" chance="5" selection_policy="roulette_wheel"/>
+        <replacement policy="elitism" num_of_elites="0"/>
+    </island>
+    <island population_size='10' evaluator="model_generator" parameters="beam" diversity_control="edit">
+        <reproduction mutation_rate="2" crossover_rate="50" headless="0"/>
+        <selection policy="tournament"/>
+        <migration entry_policy="probabilistic" in="true" out="true" chance="5" selection_policy="roulette_wheel"/>
+        <replacement policy="elitism" num_of_elites="0"/>
+    </island>
+    <island population_size='10' evaluator="model_generator" parameters="beam" diversity_control="edit">
+        <reproduction mutation_rate="2" crossover_rate="50" headless="0"/>
+        <selection policy="tournament"/>
+        <migration entry_policy="probabilistic" in="true" out="true" chance="5" selection_policy="roulette_wheel"/>
+        <replacement policy="elitism" num_of_elites="0"/>
+    </island>
+    <island population_size='10' evaluator="model_generator" parameters="beam" diversity_control="edit">
+        <reproduction mutation_rate="2" crossover_rate="50" headless="0"/>
+        <selection policy="tournament"/>
+        <migration entry_policy="probabilistic" in="true" out="true" chance="5" selection_policy="roulette_wheel"/>
+        <replacement policy="elitism" num_of_elites="0"/>
+    </island>
+    <island population_size='10' evaluator="model_generator" parameters="beam" diversity_control="edit">
+        <reproduction mutation_rate="2" crossover_rate="50" headless="0"/>
+        <selection policy="tournament"/>
+        <migration entry_policy="probabilistic" in="true" out="true" chance="5" selection_policy="roulette_wheel"/>
+        <replacement policy="elitism" num_of_elites="0"/>
+    </island>
+    <island population_size='10' evaluator="model_generator" parameters="beam" diversity_control="edit">
+        <reproduction mutation_rate="2" crossover_rate="50" headless="0"/>
+        <selection policy="tournament"/>
+        <migration entry_policy="probabilistic" in="true" out="true" chance="5" selection_policy="roulette_wheel"/>
+        <replacement policy="elitism" num_of_elites="0"/>
+    </island>
+    <island population_size='10' evaluator="model_generator" parameters="beam" diversity_control="edit">
+        <reproduction mutation_rate="2" crossover_rate="50" headless="0"/>
+        <selection policy="tournament"/>
+        <migration entry_policy="probabilistic" in="true" out="true" chance="5" selection_policy="roulette_wheel"/>
+        <replacement policy="elitism" num_of_elites="0"/>
+    </island>
+    <island population_size='10' evaluator="model_generator" parameters="beam" diversity_control="edit">
+        <reproduction mutation_rate="2" crossover_rate="50" headless="0"/>
+        <selection policy="tournament"/>
+        <migration entry_policy="probabilistic" in="true" out="true" chance="5" selection_policy="roulette_wheel"/>
+        <replacement policy="elitism" num_of_elites="0"/>
+    </island>
+    <island population_size='10' evaluator="model_generator" parameters="beam" diversity_control="edit">
+        <reproduction mutation_rate="2" crossover_rate="50" headless="0"/>
+        <selection policy="tournament"/>
+        <migration entry_policy="probabilistic" in="true" out="true" chance="5" selection_policy="roulette_wheel"/>
+        <replacement policy="elitism" num_of_elites="0"/>
+    </island>
+    <island population_size='10' evaluator="model_generator" parameters="beam" diversity_control="edit">
+        <reproduction mutation_rate="2" crossover_rate="50" headless="0"/>
+        <selection policy="tournament"/>
+        <migration entry_policy="probabilistic" in="true" out="true" chance="5" selection_policy="roulette_wheel"/>
+        <replacement policy="elitism" num_of_elites="0"/>
+    </island>
+</experiment>

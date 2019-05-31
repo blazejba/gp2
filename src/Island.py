@@ -1,3 +1,4 @@
+from time import time
 from src.Individual import Individual
 from src.Migration import Migration
 from src.Replacement import Replacement

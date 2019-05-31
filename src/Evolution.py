@@ -53,6 +53,8 @@ class Evolution:
                     finished_evaluations = island.collect_fitness()
                     self.book_keeper.count_evaluations(increment=finished_evaluations)
                 else:
+                    if not self.parallel:
+                        self.book_keeper.count_evaluations(increment=island.population_size)
                     self.organize_island(island)
                     status, reason = self.is_terminated(island)
                     if status:

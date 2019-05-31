@@ -1,14 +1,14 @@
 <evaluators>
     <e name='one_max'>
-        <tree size='10' depth='0' primitives='bool()_1 bool()_0'/>
+        <tree size='20' depth='0' primitives='bool()_1 bool()_0'/>
     </e>
 
     <e name='tp1_max'>
-        <tree size='13' depth='0' primitives='char(1)_0 char(*,+)_2'/>
+        <tree size='21' depth='0' primitives='char(1)_0 char(*,+)_2'/>
     </e>
 
     <e name="symbolic_regression">
-        <tree size='20' depth='4' primitives='char(x)_0 real(-4,4)_0 char(*,+,^)_2' />
+        <tree size='20' depth='4' primitives='char(x)_0 int(-4,4)_0 char(*,+,^)_2' />
     </e>
 
     <e name="model_generator">

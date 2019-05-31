@@ -1,0 +1,62 @@
+<experiment max_fitness="54" max_time="0" max_generation="100" parallel="true" preview="false">
+    <island population_size="20" evaluator="tp1_max" parameters="" diversity_control="false">
+        <reproduction mutation_rate="1" crossover_rate="100" headless="30"/>
+        <selection policy="tournament"/>
+        <migration entry_policy="probabilistic" in="true" out="true" chance="20" selection_policy="roulette_wheel"/>
+        <replacement policy="elitism" num_of_elites="1"/>
+    </island>
+    <island population_size="20" evaluator="tp1_max" parameters="" diversity_control="false">
+        <reproduction mutation_rate="1" crossover_rate="100" headless="30"/>
+        <selection policy="tournament"/>
+        <migration entry_policy="probabilistic" in="true" out="true" chance="20" selection_policy="roulette_wheel"/>
+        <replacement policy="elitism" num_of_elites="1"/>
+    </island>
+    <island population_size="20" evaluator="tp1_max" parameters="" diversity_control="false">
+        <reproduction mutation_rate="1" crossover_rate="100" headless="30"/>
+        <selection policy="tournament"/>
+        <migration entry_policy="probabilistic" in="true" out="true" chance="20" selection_policy="roulette_wheel"/>
+        <replacement policy="elitism" num_of_elites="1"/>
+    </island>
+    <island population_size="20" evaluator="tp1_max" parameters="" diversity_control="false">
+        <reproduction mutation_rate="1" crossover_rate="100" headless="30"/>
+        <selection policy="tournament"/>
+        <migration entry_policy="probabilistic" in="true" out="true" chance="20" selection_policy="roulette_wheel"/>
+        <replacement policy="elitism" num_of_elites="1"/>
+    </island>
+    <island population_size="20" evaluator="tp1_max" parameters="" diversity_control="false">
+        <reproduction mutation_rate="1" crossover_rate="100" headless="30"/>
+        <selection policy="tournament"/>
+        <migration entry_policy="probabilistic" in="true" out="true" chance="20" selection_policy="roulette_wheel"/>
+        <replacement policy="elitism" num_of_elites="1"/>
+    </island>
+    <island population_size="20" evaluator="tp1_max" parameters="" diversity_control="false">
+        <reproduction mutation_rate="1" crossover_rate="100" headless="30"/>
+        <selection policy="tournament"/>
+        <migration entry_policy="probabilistic" in="true" out="true" chance="20" selection_policy="roulette_wheel"/>
+        <replacement policy="elitism" num_of_elites="1"/>
+    </island>
+    <island population_size="20" evaluator="tp1_max" parameters="" diversity_control="false">
+        <reproduction mutation_rate="1" crossover_rate="100" headless="30"/>
+        <selection policy="tournament"/>
+        <migration entry_policy="probabilistic" in="true" out="true" chance="20" selection_policy="roulette_wheel"/>
+        <replacement policy="elitism" num_of_elites="1"/>
+    </island>
+    <island population_size="20" evaluator="tp1_max" parameters="" diversity_control="false">
+        <reproduction mutation_rate="1" crossover_rate="100" headless="30"/>
+        <selection policy="tournament"/>
+        <migration entry_policy="probabilistic" in="true" out="true" chance="20" selection_policy="roulette_wheel"/>
+        <replacement policy="elitism" num_of_elites="1"/>
+    </island>
+    <island population_size="20" evaluator="tp1_max" parameters="" diversity_control="false">
+        <reproduction mutation_rate="1" crossover_rate="100" headless="30"/>
+        <selection policy="tournament"/>
+        <migration entry_policy="probabilistic" in="true" out="true" chance="20" selection_policy="roulette_wheel"/>
+        <replacement policy="elitism" num_of_elites="1"/>
+    </island>
+    <island population_size="20" evaluator="tp1_max" parameters="" diversity_control="false">
+        <reproduction mutation_rate="1" crossover_rate="100" headless="30"/>
+        <selection policy="tournament"/>
+        <migration entry_policy="probabilistic" in="true" out="true" chance="20" selection_policy="roulette_wheel"/>
+        <replacement policy="elitism" num_of_elites="1"/>
+    </island>
+</experiment>

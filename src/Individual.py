@@ -1,4 +1,5 @@
 import subprocess
+import time
 from src.Tree import Tree
 from src.utilities import decode_stdout
 
@@ -50,8 +51,8 @@ class Individual:
 
     def import_genome(self, genome_content, representation):  # turn a string into a list of trees
         for index, tree_content in enumerate(genome_content.split('\n\n')):
-            size, depth, primitives, full = representation.get_tree_structure(which_tree=index)
-            tree = Tree(size, depth, primitives, full)
+            size, depth, primitives = representation.get_tree_structure(which_tree=index)
+            tree = Tree(size, depth, primitives)
             tree.parse(tree_content)
             self.genome += [tree]
 

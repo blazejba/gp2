@@ -308,7 +308,7 @@ def main():
     dir_stl = '/home/blaise/code/gpec/eval/model_generator/tmp/stls/'
     dir_fitness = '/home/blaise/code/gpec/eval/model_generator/tmp/results/'
     name = sys.argv[3]
-    #name = '0.77339494_1556560694925368.stl'
+    #name = '0.840559_15586675557134109.stl'
     doc = App.newDocument('freecad_doc')
     force_magnitude = 98.0665 / 2 # 10 / 2 kg worth of force
     youngs_modulus = 2300.00 # MPa

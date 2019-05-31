@@ -1,6 +1,6 @@
-<experiment max_fitness="0" max_time="0" max_generation="100" parallel="false" preview="false">
-    <island population_size='20' evaluator="model_generator" parameters="beam" diversity_control="edit">
-        <reproduction mutation_rate="6" crossover_rate="50" headless="0"/>
+<experiment max_fitness="0.9" max_time="0" max_generation="1" parallel="false" preview="false">
+    <island population_size='3' evaluator="model_generator" parameters="beam" diversity_control="edit">
+        <reproduction mutation_rate="2" crossover_rate="50" headless="0"/>
         <selection policy="tournament"/>
         <migration entry_policy="periodical" in="false" out="false" period="5" selection_policy="roulette_wheel"/>
         <replacement policy="elitism" num_of_elites="0"/>
