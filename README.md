@@ -5,8 +5,8 @@ GP2 is a Python lightweight piece of software, which gives an user an open hand 
 embracing many state-of-art techniques, and is parallel processing oriented.
 
 Concurrently to the development of the software, an in-depth documentation is made,
- for the purpose of spreading the knowledge and understanding of Evolutionary Computation. 
- GPEC is released under an open-source license to promote free science.
+for the purpose of spreading the knowledge and understanding of Evolutionary Computation. 
+GP2 is released under an open-source license to promote free science.
 
 To start evolving your own programs, plug in an evaluator of your choice, 
 by following the instructions given in the documentation, 
