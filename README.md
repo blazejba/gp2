@@ -1,7 +1,7 @@
-# General Purpose Genetic Programming
-GPEC has been written in order to tame the power of genetic programming,
+# General Purpose Genetic Programming (GP2)
+GP2 has been written in order to tame the power of genetic programming,
 namely making it easily applicable to variety of real-life up-to-date engineering problems. 
-GPEC is a Python lightweight piece of software, which gives an user an open hand in creating programs and optimizing parameters in evolutionary manner, 
+GP2 is a Python lightweight piece of software, which gives an user an open hand in creating programs and optimizing parameters in evolutionary manner, 
 embracing many state-of-art techniques, and is parallel processing oriented.
 
 Concurrently to the development of the software, an in-depth documentation is made,
@@ -11,7 +11,7 @@ Concurrently to the development of the software, an in-depth documentation is ma
 To start evolving your own programs, plug in an evaluator of your choice, 
 by following the instructions given in the documentation, 
 then modify one of the existing experiment configurations or write your own,
-and let the randomness of EC surprise you with its novel human-competitive solutions.
+and let the randomness of GP surprise you with its novel human-competitive solutions.
 
 ## 0 Licensing
 Copyright (c) 2019 [Blazej Banaszewski]
