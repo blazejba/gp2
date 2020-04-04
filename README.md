@@ -1,17 +1,5 @@
 # General Purpose Genetic Programming (GP2)
-GP2 has been written in order to tame the power of genetic programming,
-namely making it easily applicable to variety of real-life up-to-date engineering problems. 
-GP2 is a Python lightweight piece of software, which gives an user an open hand in creating programs and optimizing parameters in evolutionary manner, 
-embracing many state-of-art techniques, and is parallel processing oriented.
-
-Concurrently to the development of the software, an in-depth documentation is made,
-for the purpose of spreading the knowledge and understanding of Evolutionary Computation. 
-GP2 is released under an open-source license to promote free science.
-
-To start evolving your own programs, plug in an evaluator of your choice, 
-by following the instructions given in the documentation, 
-then modify one of the existing experiment configurations or write your own,
-and let the randomness of GP surprise you with its novel human-competitive solutions.
+This project has a foundation in MSc thesis defendend in 2019 at University of Southern Denmark in Robot System. It is meant to provide genetic programmming functionalities to evolve systems exisiting on many level of abstractions at once, e.g. a morpohology and control (for a robot), or weights and topology (neural model). It's meant to be scriptable with an open end to plug arbitrary simulators/evaluators. 
 
 ## 0 Licensing
 Copyright (c) 2019 [Blazej Banaszewski]
