@@ -1,5 +1,5 @@
 # General Purpose Genetic Programming (GP2)
-This project has a foundation in MSc thesis defendend in 2019 at University of Southern Denmark in Robot System. It is meant to provide genetic programmming functionalities to evolve systems exisiting on many level of abstractions at once, e.g. a morpohology and control (for a robot), or weights and topology (neural model). It's meant to be scriptable with an open end to plug arbitrary simulators/evaluators. 
+This project has a foundation in MSc thesis defendend in 2019 at University of Southern Denmark in Robot System. It is meant to provide genetic programmming functionalities to evolve systems exisiting on many level of abstractions at once, e.g. a morpohology and control (for a robot), or weights and topology (neural model). It's scriptable to allow plugging external simulators/evaluators. 
 
 ## 0 Licensing
 Copyright (c) 2019 [Blazej Banaszewski]
